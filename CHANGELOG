@@ -1,0 +1,9 @@
+2010-06-02  Tyler Romeo  <tylerromeo@gmail.com>
+	Moved applications files into redhen module.
+	* backend.py: Created draft of the spectrum class.
+	
+	TODO:
+	* Parse the XY data in redhen.backend.Spectrum.parseString.
+	* Handle multiple XY datasets according to JCAMP file standards.
+	* Create functions to integrate and differentiate XY data.
+	* Create functions to find peaks, etc. from XY data.
