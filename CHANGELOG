@@ -4,6 +4,7 @@
 2010-06-03  James Stevenson  <jminuse@gmail.com>
 	Moved applications files back into trunk, and deleted some empty/unused files. I'd prefer not to create subfolders until absolutely necessary, and to strictly limit the number of code files, to leave the project more manageable (the defunct project which proceded this one was useless largely due to proliferation of files).
 	Corrected some syntax errors in backend.py. Good work with the database handling.
+	Added HTML templates to main - this should be useful later to frontend.
 	
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.
