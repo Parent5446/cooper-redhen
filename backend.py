@@ -2,7 +2,7 @@
 from google.appengine.ext import db
 import os.path
 
-def search():
+def search(spectrum):
 	type = 'Infrared'
 	heavysideDict = memcache.get(type+'heavysideDict')
 	peakTable = memcache.get(type+'peakTable')
@@ -10,6 +10,13 @@ def search():
 	if not heavysideDict: #Make new ones or get from database
 		mem = { 'heavysideDict': {'keys':'data'}, 'peakTable': [1,2,3] }
 		memcache.setMulti(mem, key_prefix=type)
+	
+	#Once all the data structures are loaded, they vote on their keys
+	#and the winners are fetched from the database by key
+	keys = []
+	candidates = db.get(keys)
+	candidates = sorted(candidates, key=lambda k: k.error)
+	#Then return the candidates, and let frontend do the rest
 	
 	return "It's me, the backend! Let's do this!\n"
 
@@ -119,7 +126,7 @@ class Spectrum(db.Model):
     
     def find_peaks(self, thres):
         """Looks at the x and y values and finds peaks in the spectrum's
-        graph that are higher than the given integer threshold."""
+        graph that are higher than the given numeric threshold."""
         # Get XY data and set temporary variables
         x, y = self.x, self.y
         peaks = []
