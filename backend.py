@@ -3,6 +3,14 @@ from google.appengine.ext import db
 import os.path
 
 def search():
+	type = 'Infrared'
+	heavysideDict = memcache.get(type+'heavysideDict')
+	peakTable = memcache.get(type+'peakTable')
+	
+	if not heavysideDict: #Make new ones or get from database
+		mem = { 'heavysideDict': {'keys':'data'}, 'peakTable': [1,2,3] }
+		memcache.setMulti(mem, key_prefix=type)
+	
 	return "It's me, the backend! Let's do this!\n"
 
 class Spectrum(db.Model):
