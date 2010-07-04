@@ -1,14 +1,24 @@
 2010-06-02  Tyler Romeo  <tylerromeo@gmail.com>
 	Moved applications files into redhen module.
 	* backend.py: Created draft of the spectrum class.
+
 2010-06-03  James Stevenson  <jminuse@gmail.com>
-	Moved applications files back into trunk, and deleted some empty/unused files. I'd prefer not to create subfolders until absolutely necessary, and to strictly limit the number of code files, to leave the project more manageable (the defunct project which proceded this one was useless largely due to proliferation of files).
+	Moved applications files back into trunk, and deleted some empty/unused files.
+	    (I'd prefer not to create subfolders until absolutely necessary, and to strictly
+	     limit the number of code files, to leave the project more manageable (the defunct
+             project which proceded this one was useless largely due to proliferation of files).)
 	Corrected some syntax errors in backend.py. Good work with the database handling.
 	Added HTML templates to main - this should be useful later to frontend.
+
+2010-06-03  Tyler Romeo  <tylerromeo@gmail.com>
+	* backend.py (Spectrum, Spectrum.parse_string, Spectrum.parse_file): Added docstrings.
+	Altered method names to match Python style guide recommendations.
+	
+	* backend.py (Spectrum.find_peaks): New function.
 	
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.
 	* Handle multiple XY datasets according to JCAMP file standards.
 	* Functions to integrate and differentiate XY data.
-	* Functions to find peaks, etc. from XY data.
+	* Functions to find heavyside, etc. from XY data.
 	* Data structures which store spectra's database keys and vote on them.

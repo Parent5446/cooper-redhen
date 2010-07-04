@@ -6,6 +6,10 @@ def search():
 	return "It's me, the backend! Let's do this!\n"
 
 class Spectrum(db.Model):
+    """Store a spectrum, its related data, and any algorithms necessary
+    to compare the spectrum to the DataStore."""
+    
+    # Variables to be stored in the Google DataStore.
     chemical_name = db.StringProperty(required=True)
     chemical_type = db.StringProperty(required=True)
     options_jcamp = db.ListProperty(str)
@@ -18,29 +22,34 @@ class Spectrum(db.Model):
         if not isinstance(file_data, bool):
             self.parseString(file_data)
     
-    def parseFile(self, file_name):
+    def parse_file(self, file_name):
+        """Parse a JCAMP file and extract all options and XY data."""
+        # Check if file is a directory or does not exist.
         if not os.path.exists(file_name) or os.path.isdir(file_name):
             return Error("File error: File does not exist or is invalid.")
         fp = open(file_name)
         lines = fp.readlines()
         fp.close()
-        return self.parseString(lines)
+        # Pass the string on to self.parse_string.
+        return self.parse_string(lines)
     
-    def parseString(self, data):
-        opt_list  =  {"TITLE":             True,  "JCAMP-DX":           True, \
-                      "DATA TYPE":         True,  "ORIGIN":             True, \
-                      "OWNER":             True,  "XUNITS":             True, \
-                      "YUNITS":            True,  "XFACTOR":            True, \
-                      "YFACTOR":           True,  "FIRSTX":             True, \
-                      "LASTX":             True,  "NPOINTS":            True, \
-                      "FIRSTY":            True,  "XYDATA":             True, \
-                      "END":               True,  "CLASS":              False,\
-                      "DATE":              False, "SAMPLE DESCRIPTION": False,\
-                      "CAS NAME":          False, "MOLOFORM":           False,\
-                      "CAS REGISTRY NO":   False, "WISWESSER":          False,\
-                      "MP":                False, "BP":                 False,\
-                      "SOURCE REFERENCE":  False, "SAMPLING PROCEDURE": False,\
-                      "DATA PROCESSING":   False, "RESOLUTION":         False,\
+    def parse_string(self, data):
+        """Parse a string of JCAMP file data and extract all options
+        and XY data."""
+        opt_list  =  {"TITLE":             True,  "JCAMP-DX":           True,
+                      "DATA TYPE":         True,  "ORIGIN":             True,
+                      "OWNER":             True,  "XUNITS":             True,
+                      "YUNITS":            True,  "XFACTOR":            True,
+                      "YFACTOR":           True,  "FIRSTX":             True,
+                      "LASTX":             True,  "NPOINTS":            True,
+                      "FIRSTY":            True,  "XYDATA":             True,
+                      "END":               True,  "CLASS":              False,
+                      "DATE":              False, "SAMPLE DESCRIPTION": False,
+                      "CAS NAME":          False, "MOLOFORM":           False,
+                      "CAS REGISTRY NO":   False, "WISWESSER":          False,
+                      "MP":                False, "BP":                 False,
+                      "SOURCE REFERENCE":  False, "SAMPLING PROCEDURE": False,
+                      "DATA PROCESSING":   False, "RESOLUTION":         False,
                       "DELTAX":            False}
 
         # Note on JCAMP parsing syntax:
@@ -99,3 +108,39 @@ class Spectrum(db.Model):
             # Reset the working line.
             workingline = ""
         return True
+    
+    def find_peaks(self, thres):
+        """Looks at the x and y values and finds peaks in the spectrum's
+        graph that are higher than the given integer threshold."""
+        # Get XY data and set temporary variables
+        x, y = self.x, self.y
+        peaks = []
+        prev = ypeak = end = xpeak = 0
+        start = y[1]
+        # This variable is true when ascending a peak and false when
+        # descending a peak.
+        searching = True
+        for k in x:
+            if y[k] < prev and searching:
+                # Found the peak itself
+                ypeak = y[k - 1]
+                xpeak = k
+                searching = False
+            elif y[k] > prev and not searching:
+                # Found the end of the peak
+                end = y[k]
+                if ypeak - start < int(thres):
+                    # Peak not high enough, keep searching
+                    xpeak = ypeak = 0
+                    searching = True
+                elif ypeak - end < int(thres):
+                    # End not low enough, keep looking
+                    end = 0
+                else:
+                    # Peak confirmed, add it to the list
+                    peaks.append(xpeak)
+                    start = end
+                    end = xpeak = ypeak = 0
+                    searching = True
+            prev = y[k]
+        return peaks
