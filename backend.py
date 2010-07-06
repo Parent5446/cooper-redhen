@@ -1,7 +1,9 @@
 
-from google.appengine.ext import db, memcache
+from google.appengine.ext import db
+from google.appengine.api import memcache
 import os.path
 
+#Spectrum database entries and voting data structures will be preloaded
 def search(spectrum):
 	spectrum_type = 'Infrared'
 	heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')

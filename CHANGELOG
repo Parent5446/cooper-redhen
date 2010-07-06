@@ -25,6 +25,11 @@
 	* backend.py (Spectrum.find_peaks): New function that checks Data Store and memcached before calculating peaks.
 	* backend.py (search): Function now calculates peak table from Data Store if it does not exist.
 	Spectrum class now checks Data Store and memcached before calculating its own peaks.
+	
+2010-07-05 James Stevenson <jminuse@gmail.com>
+	* Changed 'main.py' to 'frontend.py' so as to better represent division of labor.
+	* Changed app.yaml to route requests to frontend.py.
+	
 
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.
