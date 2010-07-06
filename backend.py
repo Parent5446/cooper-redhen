@@ -4,7 +4,9 @@ from google.appengine.api import memcache
 import os.path
 
 #Spectrum database entries and voting data structures will be preloaded
-def search(spectrum):
+def search(file):
+	if file is not None:
+		file_contents = file.read() 
 	spectrum_type = 'Infrared'
 	heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
 	peak_table = memcache.get(spectrum_type+'_peak_table')
@@ -31,19 +33,13 @@ def search(spectrum):
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
     to compare the spectrum to the DataStore."""
-    
     # Variables to be stored in the Google DataStore.
     chemical_name = db.StringProperty(required=True)
     chemical_type = db.StringProperty(required=True)
-    options_jcamp = db.ListProperty(str)
-    options_custom = db.ListProperty(str)
-    xydata_normal = db.ListProperty(float, required=True)
-    xydata_integrated = db.ListProperty(float, required=True)
-    xydata_differentiated = db.ListProperty(float, required=True)
+    data = db.ListProperty(float, required=True)
     
-    def __init__(self, file_data = False):
-        if not isinstance(file_data, bool):
-            self.parseString(file_data)
+    def __init__(self, file_data = None):
+        if file_data is not None: self.parseString(file_data)
     
     def parse_file(self, file_name):
         """Parse a JCAMP file and extract all options and XY data."""
