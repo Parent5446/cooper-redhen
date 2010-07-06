@@ -9,7 +9,7 @@ import backend
 class MainHandler(webapp.RequestHandler):
     def get(self):
 	user = users.get_current_user()
-	name = 'Developer'
+	name = 'Redhen User'
 	if user is not None: name = user.nickname()
 	greeting = 'Hello'
         template_values = {
