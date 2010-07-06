@@ -176,7 +176,16 @@ class Spectrum(db.Model):
             # Store the final memcached dictionary.
             memcache.set(spectrum_type+'_peak_table', peaks_memcached)
         return peaks_local
-                
+    
+    def find_integrals(self):
+        if not len(self.xydata_integrated):
+            self.xydata_integrated = self._calculate_integrals()
+        return self.xydata_integrated
+    
+    def _calculate_integrals(self):
+        x, y = self.x, self.y
+        deltax = x[2] - x[1]
+        return [deltax * yvalue for yvalue in y]
     
     def _calculate_peaks(self, thres):
         """Looks at the x and y values and finds peaks in the spectrum's
