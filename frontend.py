@@ -8,16 +8,16 @@ import backend
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
-	user = users.get_current_user()
-	name = 'Red Hen User'
-	if user is not None: name = user.nickname()
-	greeting = 'How u doin my friend?'
-        template_values = {
-            'greeting': greeting,
-            'userName': name
-            }
-        path = os.path.join(os.path.dirname(__file__), 'index.html')
-        self.response.out.write(template.render(path, template_values))
+		user = users.get_current_user()
+		name = 'Red Hen User'
+		if user is not None: name = user.nickname()
+		greeting = 'How u doin my friend?'
+			template_values = {
+				'greeting': greeting,
+				'userName': name
+				}
+			path = os.path.join(os.path.dirname(__file__), 'index.html')
+			self.response.out.write(template.render(path, template_values))
 
 def main():
     application = webapp.WSGIApplication([('/', MainHandler)], debug=True)
