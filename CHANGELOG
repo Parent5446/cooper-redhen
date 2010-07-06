@@ -1,16 +1,31 @@
-2010-06-02  Tyler Romeo  <tylerromeo@gmail.com>
+2010-07-02  Tyler Romeo  <tylerromeo@gmail.com>
 	Moved applications files into redhen module.
 	* backend.py: Created draft of the spectrum class.
-2010-06-03  James Stevenson  <jminuse@gmail.com>
+
+2010-07-03  James Stevenson  <jminuse@gmail.com>
 	Moved applications files back into trunk, and deleted some empty/unused files. I'd prefer not to create subfolders until absolutely necessary, and to strictly limit the number of code files, to leave the project more manageable (the defunct project which proceded this one was useless largely due to proliferation of files).
 	Corrected some syntax errors in backend.py. Good work with the database handling.
 	Added HTML templates to main - this should be useful later to frontend.
-2010-06-04  James Stevenson  <jminuse@gmail.com>
+
+2010-07-03  Tyler Romeo  <tylerromeo@gmail.com>
+	* backend.py (Spectrum, Spectrum.parse_string, Spectrum.parse_file): Added docstrings.
+	Altered method names to match Python style guide recommendations.
+	
+	* backend.py (Spectrum.find_peaks): New function.
+
+2010-07-04  James Stevenson  <jminuse@gmail.com>
 	Added code to use memcache and clarified how the searches will be structured.
 	Keeping hashtables, etc in the datastore seems problematic - we may have to regenerate them from the data each time memcache is wiped (which shouldn't be too often).
 	We hold these truths to be self-evident: that all floats are created equal, and that they are endowed by their creator with four inalienable bytes.
 	Happy Independence Day!
-	
+
+2010-07-05  Tyler Romeo  <tylerromeo@gmail.com>
+	* backend.py (Peak): New class, data model for the peak table.
+	* backend.py (Spectrum): Renamed function find_peaks to _calculate_peaks.
+	* backend.py (Spectrum.find_peaks): New function that checks Data Store and memcached before calculating peaks.
+	* backend.py (search): Function now calculates peak table from Data Store if it does not exist.
+	Spectrum class now checks Data Store and memcached before calculating its own peaks.
+
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.
 	* Handle multiple XY datasets according to JCAMP file standards.

@@ -1,15 +1,21 @@
 
-from google.appengine.ext import db
+from google.appengine.ext import db, memcache
 import os.path
 
 def search(spectrum):
-	type = 'Infrared'
-	heavysideDict = memcache.get(type+'heavysideDict')
-	peakTable = memcache.get(type+'peakTable')
+	spectrum_type = 'Infrared'
+	heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
+	peak_table = memcache.get(spectrum_type+'_peak_table')
 	
-	if not heavysideDict: #Make new ones or get from database
-		mem = { 'heavysideDict': {'keys':'data'}, 'peakTable': [1,2,3] }
-		memcache.setMulti(mem, key_prefix=type)
+	if peak_table is None: #Make new ones or get from database
+	    peak_table = {}
+	    peak_objects = Peak.all()
+	    for peak in peak_table:
+	        if peak_table[peak.value] is None:
+	            peak_table[peak.value] = [peak.spectrum]
+	        else:
+	            peak_table[peak.value].append(peak.spectrum)
+	    memcache.set(spectrum_type+'_peak_table', peak_table)
 	
 	#Once all the data structures are loaded, they vote on their keys
 	#and the winners are fetched from the database by key
@@ -124,7 +130,53 @@ class Spectrum(db.Model):
             workingline = ""
         return True
     
-    def find_peaks(self, thres):
+    def find_peaks(self):
+        """Check memcache then the Data Store for the peaks in this Spectrum.
+        If they are not found, calculate them and store them."""
+        # Check memcached first.
+        spectrum_type = 'Infrared'
+        key = str(self.key())
+        peaks_memcached = memcache.get(spectrum_type+'_peak_table')
+        peaks_datastore = Peak.Gql("WHERE spectrum == KEY(':1')", key).fetch()
+        peaks_local = []
+        if peaks_memcached is not None:
+            # Peak table is a dictionary where the keys are x-values and the
+            # values are dictionaries with Spectrum keys.
+            for peak in peaks_memcached.keys():
+                # Check if there is a peak for this spectrum
+                if key in peaks_memcached[peak]:
+                    peaks_local.append(peak)
+                if len(peaks_local) != 0:
+                    # If we got any peaks, return them.
+                    return peaks_local
+        # Function did not return, so nothing is in memcached. Check data store.
+        if len(peaks_datastore) != 0:
+            # Data store has something, so get the values and return.
+            for peak in peaks_datastore:
+                peaks_local.append(peak.value)
+            return peaks_local
+        else:
+            # Now we have to get the peaks ourselves and store them.
+            # FIXME: Find way to define threshold.
+            peaks_local = self._calculate_peaks(thres)
+            if peaks_memcached is None:
+                # Set a default peak table if memcached does not exist
+                peaks_memcached = {}
+            for peak in peaks_local:
+                # Data Store: Make a new Peak object and store it.
+                tmp = Peak(spectra=self.key(), value=peak)
+                tmp.put()
+                # Memcached: Add the value to the dictionary.
+                if peaks_memcached[peak] is None:
+                    peaks_memcached[peak] = [key]
+                else:
+                    peaks_memcached[peak].append(key)
+            # Store the final memcached dictionary.
+            memcache.set(spectrum_type+'_peak_table', peaks_memcached)
+        return peaks_local
+                
+    
+    def _calculate_peaks(self, thres):
         """Looks at the x and y values and finds peaks in the spectrum's
         graph that are higher than the given numeric threshold."""
         # Get XY data and set temporary variables
@@ -159,3 +211,7 @@ class Spectrum(db.Model):
                     searching = True
             prev = y[k]
         return peaks
+
+class Peak(db.Model):
+    spectra = db.ReferenceProperty(Spectrum, required=True)
+    value = db.FloatProperty(required=True)
