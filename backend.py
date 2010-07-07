@@ -3,8 +3,6 @@ from google.appengine.ext import db, memcache
 
 #Spectrum database entries and voting data structures will be preloaded
 def search(file):
-	if file is not None:
-		file_contents = file.read() 
 	spectrum_type = 'Infrared'
 	heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
 	peak_table = memcache.get(spectrum_type+'_peak_table')
@@ -28,7 +26,9 @@ def search(file):
 	
 	#Once all the data structures are loaded, they vote on their keys
 	#and the winners are fetched from the database by key
-	keys = []
+	spectrum = Spectrum(file)
+	keys = [ (spec, 10) for spec in heavyside_dict[spectrum.heavySideKey]]
+	keys += peak_table[spectrum.peak-5:spectrum.peak+5]
 	candidates = db.get(keys)
 	candidates = sorted(candidates, key=lambda k: k.error)
 	#Then return the candidates, and let frontend do the rest
