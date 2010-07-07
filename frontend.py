@@ -5,9 +5,8 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 class MainPage(webapp.RequestHandler):
     def get(self):
         user = users.get_current_user()
-
         if user:
-            self.response.out.write('Hello, ' + user.nickname())
+            self.response.out.write('<html style=text-align:center><h1>Hello, '+user.nickname()+'</h1></html>')
         else:
             self.redirect(users.create_login_url(self.request.uri))
 
