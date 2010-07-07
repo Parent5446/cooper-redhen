@@ -1,4 +1,4 @@
-2010-07-02  Tyler Romeo  <tylerromeo@gmail.com>
+﻿2010-07-02  Tyler Romeo  <tylerromeo@gmail.com>
 	Moved applications files into redhen module.
 	* backend.py: Created draft of the spectrum class.
 

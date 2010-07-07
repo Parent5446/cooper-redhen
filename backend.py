@@ -1,4 +1,4 @@
-import os.path
+﻿import os.path
 from google.appengine.ext import db, memcache
 
 #Spectrum database entries and voting data structures will be preloaded
