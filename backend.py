@@ -44,7 +44,7 @@ class Spectrum(db.Model):
     
     def __init__(self, file_data = None):
         if file_data is not None:
-			self.parseString(file_data)
+            self.parseString(file_data)
     
     def parse_file(self, file_name):
         """Parse a JCAMP file and extract all options and XY data."""
@@ -132,7 +132,7 @@ class Spectrum(db.Model):
             # Reset the working line.
             workingline = ""
         return True
-	
+    
     def find_peaks(self):
         """Check memcache then the Data Store for the peaks in this Spectrum.
         If they are not found, calculate them and store them."""
@@ -177,23 +177,23 @@ class Spectrum(db.Model):
             # Store the final memcached dictionary.
             memcache.set(spectrum_type+'_peak_table', peaks_memcached)
         return peaks_local
-	
+    
     def find_integrals(self):
-		"""Get the integrated XY dat for this spectrum, or calculate it if
-		it does not exist."""
+        """Get the integrated XY dat for this spectrum, or calculate it if
+        it does not exist."""
         if not len(self.xydata_integrated):
             self.xydata_integrated = self._calculate_integrals()
         return self.xydata_integrated
     
-	def find_integrals(self):
-		"""Get the heavyside index for this spectrum, or calculate it if
-		it does not exist."""
-		# FIXME: Need storage for heavyside so it does not have to be
-		#        calculated every time.
+    def find_integrals(self):
+        """Get the heavyside index for this spectrum, or calculate it if
+        it does not exist."""
+        # FIXME: Need storage for heavyside so it does not have to be
+        #        calculated every time.
         return self._calculate_heavyside(self, 8)
-	
+    
     def _calculate_integrals(self):
-		"""Integrate the XY data for the spectrum."""
+        """Integrate the XY data for the spectrum."""
         x, y = self.x, self.y
         deltax = x[2] - x[1]
         return [deltax * yvalue for yvalue in y]
@@ -233,29 +233,29 @@ class Spectrum(db.Model):
                     searching = True
             prev = y[k]
         return peaks
-	
-	def _calculate_heavyside(self, bits):
-		"""Calculate the heavyside index for this spectrum."""
-		# Get the intgrated data for calculation.
-		integrals = self.find_integrals()
-		index = ""
-		# Only run for a user-defined number of bits.
-		for k in range(bits):
-			# Separate the data and find the total area.
-			separator = len(integrals) / 2
-			sum1 = reduce(add, integrals[:separator])
-			sum2 = reduce(add, integrals[separator:])
-			if sum1 > sum2:
-				# The left is bigger, add a zero bit.
-				index += "0"
-				integrals = integrals[:separator]
-			else:
-				# The right is bigger, add a one bit.
-				index += "1"
-				integrals = integrals[separator:]
-		# Convert to binary and return.
-		return int(index, 2)
-		
+    
+    def _calculate_heavyside(self, bits):
+        """Calculate the heavyside index for this spectrum."""
+        # Get the intgrated data for calculation.
+        integrals = self.find_integrals()
+        index = ""
+        # Only run for a user-defined number of bits.
+        for k in range(bits):
+            # Separate the data and find the total area.
+            separator = len(integrals) / 2
+            sum1 = reduce(add, integrals[:separator])
+            sum2 = reduce(add, integrals[separator:])
+            if sum1 > sum2:
+                # The left is bigger, add a zero bit.
+                index += "0"
+                integrals = integrals[:separator]
+            else:
+                # The right is bigger, add a one bit.
+                index += "1"
+                integrals = integrals[separator:]
+        # Convert to binary and return.
+        return int(index, 2)
+        
 class Peak(db.Model):
     spectra = db.ReferenceProperty(Spectrum, required=True)
     value = db.FloatProperty(required=True)
