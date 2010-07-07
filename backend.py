@@ -20,14 +20,12 @@ def search(file):
     #and the winners are fetched from the database by key
     spectrum = Spectrum(file)
 	keys = [(spec, 10) for spec in heavyside_dict[spectrum.find_heavyside()]]
-	keys += peak_table[spectrum.peak-5:spectrum.peak+5]
+	keys += [(spec, 10) for spec in peak_table[spectrum.peak-5:spectrum.peak+5]]
 	keys += [(spec, 10) for spec in high_low_dict[spectrum.highLowKey]]
 	keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
 	#Sort keys and take top 10.
 	keys = sorted(keys, key=lambda k: key[0])
-	keys = keys[10]
-	
-    candidates = db.get(keys)
+    candidates = db.get(keys[:10])
     candidates = sorted(candidates, key=lambda k: k.error)
     #Then return the candidates, and let frontend do the rest
     return "It's me, the backend! Let's do this!\n"
