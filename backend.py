@@ -6,7 +6,8 @@ def search(file):
     spectrum_type = 'Infrared'
     heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
     peak_table = memcache.get(spectrum_type+'_peak_table')
-    
+    matcher = Matcher.all()[0]
+	
     # Load the user's spectrum into a Spectrum object.
     user_spectrum = Spectrum()
     user_spectrum.parse_string(file_contents)
@@ -135,7 +136,7 @@ class Spectrum(db.Model):
         spectrum_type = 'Infrared'
         key = str(self.key())
         peaks_memcached = memcache.get(spectrum_type+'_peak_table')
-        peaks_datastore = Matcher.peak_table
+        peaks_datastore = Matcher.all()[0].peak_table
         peaks_local = []
         if peaks_memcached is not None:
             # Peak table is a dictionary where the keys are x-values and the
