@@ -1,5 +1,13 @@
 <html>
-  <body style='text-align:center; background-color:black; color:red;'>
+
+<head>
+<script>
+function alertStuff() {
+	alert({{ greeting }} + " " + {{ userName }}!);
+}
+</script>
+</head>
+  <body style='text-align:center; background-color:black; color:red;' onload="alertStuff();">
 
     <h1>{{ greeting }}, {{ userName }}!</h1>
   </body>
