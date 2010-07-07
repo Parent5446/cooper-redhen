@@ -34,15 +34,6 @@ def search(file):
 	#Then return the candidates, and let frontend do the rest
 	return "It's me, the backend! Let's do this!\n"
     # Make peak table from database if it does not exist.
-    if peak_table is None:
-        peak_table = {}
-        peak_objects = Peak.all()
-        for peak in peak_table:
-            if peak_table[peak.value] is None:
-                peak_table[peak.value] = [peak.spectrum]
-            else:
-                peak_table[peak.value].append(peak.spectrum)
-        memcache.set(spectrum_type+'_peak_table', peak_table)
     
     #Once all the data structures are loaded, they vote on their keys
     #and the winners are fetched from the database by key
@@ -313,6 +304,7 @@ class DictProperty(db.Property):
 class Matcher(db.Model):
     heavyside1 = DictProperty()
     heavyside2 = DictProperty()
-    peak_table = DictProperty()
+    peak_table = ListProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
+	
