@@ -211,7 +211,7 @@ class Spectrum(db.Model):
         x, y = self.x, self.y
         peaks = []
         prev = ypeak = end = xpeak = 0
-        start = y[1]
+        start = y[1] # The spectra has to be within the range of 600-3900
         # This variable is true when ascending a peak and false when
         # descending a peak.
         searching = True
