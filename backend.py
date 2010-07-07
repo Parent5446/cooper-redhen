@@ -1,38 +1,38 @@
 import os.path
 from google.appengine.ext import db, memcache
 
-class Backend:
-	#Spectrum database entries and voting data structures will be preloaded
-	def search(file):
-		if file is not None:
-			file_contents = file.read() 
-		spectrum_type = 'Infrared'
-		heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
-		peak_table = memcache.get(spectrum_type+'_peak_table')
-		
-		# Load the user's spectrum into a Spectrum object.
-		user_spectrum = Spectrum()
-		user_spectrum.parse_string(file_contents)
-		# Get necessary data from spectrum.
-		user_peaks = user_spectrum.find_peaks()
-		
-		if peak_table is None: #Make new ones or get from database
-			peak_table = {}
-			peak_objects = Peak.all()
-			for peak in peak_table:
-				if peak_table[peak.value] is None:
-					peak_table[peak.value] = [peak.spectrum]
-				else:
-					peak_table[peak.value].append(peak.spectrum)
-			memcache.set(spectrum_type+'_peak_table', peak_table)
-		
-		#Once all the data structures are loaded, they vote on their keys
-		#and the winners are fetched from the database by key
-		keys = []
-		candidates = db.get(keys)
-		candidates = sorted(candidates, key=lambda k: k.error)
-		#Then return the candidates, and let frontend do the rest
-		return "It's me, the backend! Let's do this!\n"
+#Spectrum database entries and voting data structures will be preloaded
+def search(file):
+	if file is not None:
+		file_contents = file.read() 
+	spectrum_type = 'Infrared'
+	heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
+	peak_table = memcache.get(spectrum_type+'_peak_table')
+	
+	# Load the user's spectrum into a Spectrum object.
+	user_spectrum = Spectrum()
+	user_spectrum.parse_string(file_contents)
+	# Get necessary data from spectrum.
+	user_peaks = user_spectrum.find_peaks()
+
+	# Make peak table from database if it does not exist.
+	if peak_table is None:
+		peak_table = {}
+		peak_objects = Peak.all()
+		for peak in peak_table:
+			if peak_table[peak.value] is None:
+				peak_table[peak.value] = [peak.spectrum]
+			else:
+				peak_table[peak.value].append(peak.spectrum)
+		memcache.set(spectrum_type+'_peak_table', peak_table)
+	
+	#Once all the data structures are loaded, they vote on their keys
+	#and the winners are fetched from the database by key
+	keys = []
+	candidates = db.get(keys)
+	candidates = sorted(candidates, key=lambda k: k.error)
+	#Then return the candidates, and let frontend do the rest
+	return "It's me, the backend! Let's do this!\n"
 
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
@@ -176,13 +176,16 @@ class Spectrum(db.Model):
             # Store the final memcached dictionary.
             memcache.set(spectrum_type+'_peak_table', peaks_memcached)
         return peaks_local
-    
+	
     def find_integrals(self):
+		"""Get the integrated XY dat for this spectrum, or calculate it if
+		it does not exist."""
         if not len(self.xydata_integrated):
             self.xydata_integrated = self._calculate_integrals()
         return self.xydata_integrated
     
     def _calculate_integrals(self):
+		"""Integrate the XY data for the spectrum."""
         x, y = self.x, self.y
         deltax = x[2] - x[1]
         return [deltax * yvalue for yvalue in y]
