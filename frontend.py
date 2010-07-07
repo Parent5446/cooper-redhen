@@ -4,7 +4,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 from google.appengine.api import users
-import backend
+#import backend
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
