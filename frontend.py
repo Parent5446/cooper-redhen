@@ -10,11 +10,9 @@ class MainPage(webapp.RequestHandler):
             self.response.headers['Content-Type'] = 'text/plain'
             self.response.out.write('Hello, ' + user.nickname())
         else:
-            self.redirect(users.create_login_url(self.request.uri))
+            self.redirect(users.create_login_url('/'))
 
-application = webapp.WSGIApplication(
-                                     [('/', MainPage)],
-                                     debug=True)
+application = webapp.WSGIApplication([('/', MainPage)], debug=True)
 
 def main():
     run_wsgi_app(application)
