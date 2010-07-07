@@ -185,7 +185,7 @@ class Spectrum(db.Model):
             self.xydata_integrated = self._calculate_integrals()
         return self.xydata_integrated
     
-    def find_integrals(self):
+    def find_heavyside(self):
         """Get the heavyside index for this spectrum, or calculate it if
         it does not exist."""
         # FIXME: Need storage for heavyside so it does not have to be
