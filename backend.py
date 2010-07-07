@@ -12,28 +12,6 @@ def search(file):
     user_spectrum.parse_string(file_contents)
     # Get necessary data from spectrum.
     user_peaks = user_spectrum.find_peaks()
-
-	# Make peak table from database if it does not exist.
-	if peak_table is None:
-		peak_table = {}
-		peak_objects = Peak.all()
-		for peak in peak_table:
-			if peak_table[peak.value] is None:
-				peak_table[peak.value] = [peak.spectrum]
-			else:
-				peak_table[peak.value].append(peak.spectrum)
-		memcache.set(spectrum_type+'_peak_table', peak_table)
-	
-	#Once all the data structures are loaded, they vote on their keys
-	#and the winners are fetched from the database by key
-	spectrum = Spectrum(file)
-	keys = [ (spec, 10) for spec in heavyside_dict[spectrum.heavySideKey]]
-	keys += peak_table[spectrum.peak-5:spectrum.peak+5]
-	candidates = db.get(keys)
-	candidates = sorted(candidates, key=lambda k: k.error)
-	#Then return the candidates, and let frontend do the rest
-	return "It's me, the backend! Let's do this!\n"
-    # Make peak table from database if it does not exist.
     
     #Once all the data structures are loaded, they vote on their keys
     #and the winners are fetched from the database by key
