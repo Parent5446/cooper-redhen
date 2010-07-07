@@ -11,7 +11,7 @@ class MainHandler(webapp.RequestHandler):
 		user = users.get_current_user()
 		name = 'Red Hen User'
 		if user is not None: name = user.nickname()
-		greeting = 'Welcome!'
+		greeting = 'elcome!'
 			template_values = {
 				'greeting': greeting,
 				'userName': name
