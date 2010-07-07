@@ -1,34 +1,32 @@
-
-from google.appengine.ext import db
-from google.appengine.api import memcache
 import os.path
+from google.appengine.ext import db, memcache
 
-#Spectrum database entries and voting data structures will be preloaded
-def search(file):
-	if file is not None:
-		file_contents = file.read() 
-	spectrum_type = 'Infrared'
-	heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
-	peak_table = memcache.get(spectrum_type+'_peak_table')
-	
-	if peak_table is None: #Make new ones or get from database
-	    peak_table = {}
-	    peak_objects = Peak.all()
-	    for peak in peak_table:
-	        if peak_table[peak.value] is None:
-	            peak_table[peak.value] = [peak.spectrum]
-	        else:
-	            peak_table[peak.value].append(peak.spectrum)
-	    memcache.set(spectrum_type+'_peak_table', peak_table)
-	
-	#Once all the data structures are loaded, they vote on their keys
-	#and the winners are fetched from the database by key
-	keys = []
-	candidates = db.get(keys)
-	candidates = sorted(candidates, key=lambda k: k.error)
-	#Then return the candidates, and let frontend do the rest
-	
-	return "It's me, the backend! Let's do this!\n"
+class Backend:
+	#Spectrum database entries and voting data structures will be preloaded
+	def search(file):
+		if file is not None:
+			file_contents = file.read() 
+		spectrum_type = 'Infrared'
+		heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
+		peak_table = memcache.get(spectrum_type+'_peak_table')
+		
+		if peak_table is None: #Make new ones or get from database
+			peak_table = {}
+			peak_objects = Peak.all()
+			for peak in peak_table:
+				if peak_table[peak.value] is None:
+					peak_table[peak.value] = [peak.spectrum]
+				else:
+					peak_table[peak.value].append(peak.spectrum)
+			memcache.set(spectrum_type+'_peak_table', peak_table)
+		
+		#Once all the data structures are loaded, they vote on their keys
+		#and the winners are fetched from the database by key
+		keys = []
+		candidates = db.get(keys)
+		candidates = sorted(candidates, key=lambda k: k.error)
+		#Then return the candidates, and let frontend do the rest
+		return "It's me, the backend! Let's do this!\n"
 
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary

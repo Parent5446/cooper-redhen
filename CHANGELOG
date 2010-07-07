@@ -35,6 +35,9 @@
 	* backend.py (Spectrum.find_integrals): New function to find integrated data, or calculate it if it does not exist.
 	Spectrum class can now find and calculate its xydata_integrated variable.
 
+2010-07-07  Tyler Romeo  <tylerromeo@gmail.com>
+	* backend.py (Backend): New class to hold search function and related methods.
+
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.
 	* Handle multiple XY datasets according to JCAMP file standards.
