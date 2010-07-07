@@ -176,10 +176,10 @@ class Spectrum(db.Model):
         if len(peaks_datastore) != 0:
             # Data store has something, so get the values and return.
             for peak in peaks_datastore:
-				if key in peak:
-					peaks_local.append(peak.value)
+                if key in peak:
+                    peaks_local.append(peak.value)
             if len(peaks_local) != 0:
-				return peaks_local
+                return peaks_local
         else:
             # Now we have to get the peaks ourselves and store them.
             # FIXME: Find way to define threshold.
@@ -200,8 +200,8 @@ class Spectrum(db.Model):
                     peaks_memcached[peak].append(key)
             # Store the final dictionaries.
             memcache.set(spectrum_type+'_peak_table', peaks_memcached)
-			Matcher.peak_table = peaks_datastore
-			Matcher.put()
+            Matcher.peak_table = peaks_datastore
+            Matcher.put()
         return peaks_local
     
     def find_integrals(self):
@@ -313,6 +313,6 @@ class DictProperty(db.Property):
 class Matcher(db.Model):
     heavyside1 = DictProperty()
     heavyside2 = DictProperty()
-	peak_table = DictProperty()
-	high_low = DictProperty()
-	chem_types = DictProperty()
+    peak_table = DictProperty()
+    high_low = DictProperty()
+    chem_types = DictProperty()
