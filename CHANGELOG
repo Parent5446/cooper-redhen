@@ -37,6 +37,9 @@
 
 2010-07-07  Tyler Romeo  <tylerromeo@gmail.com>
 	* backend.py (search): Added code to create the user's spectrum object.
+	* backend.py (find_heavyside): New function to find heavyside index.
+	* backend.py (_calculate_heavyside): New function to calculate the heavyside index for the spectrum.
+	Added heavyside function to the Spectrum class.
 
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.
