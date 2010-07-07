@@ -110,8 +110,9 @@ class Spectrum(db.Model):
 					self.x.extend([firstx + k * deltax for k in range(len(rawpoints) - 1)])
 					self.y.extend(rawpoints[1:])
                 elif opt_list["XYDATA"] == "(XY..XY)":
-                    # TODO: Parse XY data
-                    pass
+                    x, y = re.findall(r'[0-9\.]+', workingline)
+					self.x.append(x)
+					self.y.append(y)
                 else:
                     return Error("Parse error: Invalid XY data.")
             # Reset the working line.
