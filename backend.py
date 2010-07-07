@@ -1,4 +1,5 @@
 ﻿import os.path
+import re
 from google.appengine.ext import db, memcache
 
 #Spectrum database entries and voting data structures will be preloaded
@@ -104,7 +105,10 @@ class Spectrum(db.Model):
                                  (opt_list["NPOINTS"] - 1)
                     else:
                         deltax = opt_list["DELTAX"]
-                    # TODO: Parse XY data
+                    rawpoints = re.findall(r'[0-9\.]+', workingline)
+					firstx = rawpoints[0]
+					self.x.extend([firstx + k * deltax for k in range(len(rawpoints) - 1)])
+					self.y.extend(rawpoints[1:])
                 elif opt_list["XYDATA"] == "(XY..XY)":
                     # TODO: Parse XY data
                     pass

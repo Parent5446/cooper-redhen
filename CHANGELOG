@@ -46,6 +46,8 @@
 	* backend.py (find_peaks): Changed function to use new Matcher class instead of deprecated Peaks class.
 	Moved Peaks class into a dictionary in the Matcher class along with other dictionaries.
 
+	* backend.py (__init__): Added functionality to parse XY data.
+	
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.
 	* Handle multiple XY datasets according to JCAMP file standards.
