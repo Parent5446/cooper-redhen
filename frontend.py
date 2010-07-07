@@ -7,21 +7,27 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 class MainPage(webapp.RequestHandler):
     def get(self):
         self.response.out.write("""
-          <html>
-            <body>
-              <form action="/sign" method="post">
-                <div><textarea name="content" rows="3" cols="60"></textarea></div>
-                <div><input type="submit" value="Sign Guestbook"></div>
-              </form>
-            </body>
-          </html>""")
+          <form action="/sign" enctype="multipart/form-data" method="post">
+            <div><label>Message:</label></div>
+            <div><textarea name="content" rows="3" cols="60"></textarea></div>
+            <div><label>Avatar:</label></div>
+            <div><input type="file" name="img"/></div>
+            <div><input type="submit" value="Sign Guestbook"></div>
+          </form>
+        </body>
+      </html>""")
 
 
 class Guestbook(webapp.RequestHandler):
     def post(self):
-        self.response.out.write('<html><body>You wrote:<pre>')
-        self.response.out.write(cgi.escape(self.request.get('content')))
-        self.response.out.write('</pre></body></html>')
+        greeting = Greeting()
+        if users.get_current_user():
+            greeting.author = users.get_current_user()
+        greeting.content = self.request.get("content")
+        avatar = self.request.get("img")
+        greeting.avatar = db.Blob(avatar)
+        greeting.put()
+        self.redirect('/')
 
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
