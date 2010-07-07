@@ -16,8 +16,14 @@ def search(file):
     #Once all the data structures are loaded, they vote on their keys
     #and the winners are fetched from the database by key
     spectrum = Spectrum(file)
-    keys = [ (spec, 10) for spec in heavyside_dict[spectrum.heavySideKey]]
-    keys += peak_table[spectrum.peak-5:spectrum.peak+5]
+	keys = [(spec, 10) for spec in heavyside_dict[spectrum.heavySideKey]]
+	keys += peak_table[spectrum.peak-5:spectrum.peak+5]
+	keys += [(spec, 10) for spec in highLowDictionary[spectrum.highLowKey]]
+	keys += [(spec, 10) for spec in chemicalTypeDictionary[spectrum.chemicalTypeKey]]
+	#Sort keys and take top 10.
+	keys = sorted(keys, key=lambda k: key[0])
+	keys = keys[10]
+	
     candidates = db.get(keys)
     candidates = sorted(candidates, key=lambda k: k.error)
     #Then return the candidates, and let frontend do the rest
