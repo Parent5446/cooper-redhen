@@ -38,23 +38,8 @@ class Spectrum(db.Model):
     chemical_type = db.StringProperty(required=True)
     data = db.ListProperty(float, required=True)
     
-    def __init__(self, file_data = None):
-        if file_data is not None:
-            self.parseString(file_data)
-    
-    def parse_file(self, file_name):
-        """Parse a JCAMP file and extract all options and XY data."""
-        # Check if file is a directory or does not exist.
-        if not os.path.exists(file_name) or os.path.isdir(file_name):
-            return Error("File error: File does not exist or is invalid.")
-        fp = open(file_name)
-        lines = fp.readlines()
-        fp.close()
-        # Pass the string on to self.parse_string.
-        return self.parse_string(lines)
-    
-    def parse_string(self, data):
-        """Parse a string of JCAMP file data and extract all options
+    def __init__(self, file_data):
+		"""Parse a string of JCAMP file data and extract all options
         and XY data."""
         opt_list  =  {"TITLE":             True,  "JCAMP-DX":           True,
                       "DATA TYPE":         True,  "ORIGIN":             True,
