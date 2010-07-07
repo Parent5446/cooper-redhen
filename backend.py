@@ -7,10 +7,10 @@ def search(file):
     spectrum_type = 'Infrared'
     heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
     peak_table = memcache.get(spectrum_type+'_peak_table')
-	high_low_dict = memcache.get(spectrum_type+'_high_low_dict')
-	chemical_types = memcache.get(spectrum_type+'_chemical_types')
+    high_low_dict = memcache.get(spectrum_type+'_high_low_dict')
+    chemical_types = memcache.get(spectrum_type+'_chemical_types')
     matcher = Matcher.all()[0]
-	
+    
     # Load the user's spectrum into a Spectrum object.
     user_spectrum = Spectrum()
     user_spectrum.parse_string(file_contents)
@@ -20,12 +20,12 @@ def search(file):
     #Once all the data structures are loaded, they vote on their keys
     #and the winners are fetched from the database by key
     spectrum = Spectrum(file)
-	keys = [(spec, 10) for spec in heavyside_dict[spectrum.find_heavyside()]]
-	keys += [(spec, 10) for spec in peak_table[spectrum.peak-5:spectrum.peak+5]]
-	keys += [(spec, 10) for spec in high_low_dict[spectrum.highLowKey]]
-	keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
-	#Sort keys and take top 10.
-	keys = sorted(keys, key=lambda k: key[0])
+    keys = [(spec, 10) for spec in heavyside_dict[spectrum.find_heavyside()]]
+    keys += [(spec, 10) for spec in peak_table[spectrum.peak-5:spectrum.peak+5]]
+    keys += [(spec, 10) for spec in high_low_dict[spectrum.highLowKey]]
+    keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
+    #Sort keys and take top 10.
+    keys = sorted(keys, key=lambda k: key[0])
     candidates = db.get(keys[:10])
     candidates = sorted(candidates, key=lambda k: k.error)
     #Then return the candidates, and let frontend do the rest
@@ -40,7 +40,7 @@ class Spectrum(db.Model):
     data = db.ListProperty(float, required=True)
     
     def __init__(self, file_data):
-		"""Parse a string of JCAMP file data and extract all options
+        """Parse a string of JCAMP file data and extract all options
         and XY data."""
         opt_list  =  {"TITLE":             True,  "JCAMP-DX":           True,
                       "DATA TYPE":         True,  "ORIGIN":             True,
@@ -106,13 +106,13 @@ class Spectrum(db.Model):
                     else:
                         deltax = opt_list["DELTAX"]
                     rawpoints = re.findall(r'[0-9\.]+', workingline)
-					firstx = rawpoints[0]
-					self.x.extend([firstx + k * deltax for k in range(len(rawpoints) - 1)])
-					self.y.extend(rawpoints[1:])
+                    firstx = rawpoints[0]
+                    self.x.extend([firstx + k * deltax for k in range(len(rawpoints) - 1)])
+                    self.y.extend(rawpoints[1:])
                 elif opt_list["XYDATA"] == "(XY..XY)":
                     x, y = re.findall(r'[0-9\.]+', workingline)
-					self.x.append(x)
-					self.y.append(y)
+                    self.x.append(x)
+                    self.y.append(y)
                 else:
                     return Error("Parse error: Invalid XY data.")
             # Reset the working line.
@@ -282,4 +282,4 @@ class Matcher(db.Model):
     peak_table = DictProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
-	
+    
