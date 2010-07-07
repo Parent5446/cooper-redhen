@@ -105,12 +105,12 @@ class Spectrum(db.Model):
                                  (opt_list["NPOINTS"] - 1)
                     else:
                         deltax = opt_list["DELTAX"]
-                    rawpoints = re.findall(r'[0-9\.]+', workingline)
+                    rawpoints = re.findall(r'[0-9].]+', workingline)
                     firstx = rawpoints[0]
                     self.x.extend([firstx + k * deltax for k in range(len(rawpoints) - 1)])
                     self.y.extend(rawpoints[1:])
                 elif opt_list["XYDATA"] == "(XY..XY)":
-                    x, y = re.findall(r'[0-9\.]+', workingline)
+                    x, y = re.findall(r'[0-9].]+', workingline)
                     self.x.append(x)
                     self.y.append(y)
                 else:
