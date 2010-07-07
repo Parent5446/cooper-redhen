@@ -6,6 +6,8 @@ def search(file):
     spectrum_type = 'Infrared'
     heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
     peak_table = memcache.get(spectrum_type+'_peak_table')
+	high_low_dict = memcache.get(spectrum_type+'_high_low_dict')
+	chemical_types = memcache.get(spectrum_type+'_chemical_types')
     matcher = Matcher.all()[0]
 	
     # Load the user's spectrum into a Spectrum object.
@@ -17,10 +19,10 @@ def search(file):
     #Once all the data structures are loaded, they vote on their keys
     #and the winners are fetched from the database by key
     spectrum = Spectrum(file)
-	keys = [(spec, 10) for spec in heavyside_dict[spectrum.heavySideKey]]
+	keys = [(spec, 10) for spec in heavyside_dict[spectrum.find_heavyside()]]
 	keys += peak_table[spectrum.peak-5:spectrum.peak+5]
-	keys += [(spec, 10) for spec in highLowDictionary[spectrum.highLowKey]]
-	keys += [(spec, 10) for spec in chemicalTypeDictionary[spectrum.chemicalTypeKey]]
+	keys += [(spec, 10) for spec in high_low_dict[spectrum.highLowKey]]
+	keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
 	#Sort keys and take top 10.
 	keys = sorted(keys, key=lambda k: key[0])
 	keys = keys[10]
@@ -289,7 +291,7 @@ class DictProperty(db.Property):
 class Matcher(db.Model):
     heavyside1 = DictProperty()
     heavyside2 = DictProperty()
-    peak_table = ListProperty()
+    peak_table = DictProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
 	
