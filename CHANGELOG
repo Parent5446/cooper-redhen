@@ -40,6 +40,11 @@
 	* backend.py (find_heavyside): New function to find heavyside index.
 	* backend.py (_calculate_heavyside): New function to calculate the heavyside index for the spectrum.
 	Added heavyside function to the Spectrum class.
+	
+	* backend.py (DictProperty): New class from Google's db.Property to handle Dictionary properties.
+	* backend.py (Matcher): New class to store dictionaries from matching algorithms.
+	* backend.py (find_peaks): Changed function to use new Matcher class instead of deprecated Peaks class.
+	Moved Peaks class into a dictionary in the Matcher class along with other dictionaries.
 
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.

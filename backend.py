@@ -3,36 +3,36 @@ from google.appengine.ext import db, memcache
 
 #Spectrum database entries and voting data structures will be preloaded
 def search(file):
-	spectrum_type = 'Infrared'
-	heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
-	peak_table = memcache.get(spectrum_type+'_peak_table')
-	
-	# Load the user's spectrum into a Spectrum object.
-	user_spectrum = Spectrum()
-	user_spectrum.parse_string(file_contents)
-	# Get necessary data from spectrum.
-	user_peaks = user_spectrum.find_peaks()
+    spectrum_type = 'Infrared'
+    heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
+    peak_table = memcache.get(spectrum_type+'_peak_table')
+    
+    # Load the user's spectrum into a Spectrum object.
+    user_spectrum = Spectrum()
+    user_spectrum.parse_string(file_contents)
+    # Get necessary data from spectrum.
+    user_peaks = user_spectrum.find_peaks()
 
-	# Make peak table from database if it does not exist.
-	if peak_table is None:
-		peak_table = {}
-		peak_objects = Peak.all()
-		for peak in peak_table:
-			if peak_table[peak.value] is None:
-				peak_table[peak.value] = [peak.spectrum]
-			else:
-				peak_table[peak.value].append(peak.spectrum)
-		memcache.set(spectrum_type+'_peak_table', peak_table)
-	
-	#Once all the data structures are loaded, they vote on their keys
-	#and the winners are fetched from the database by key
-	spectrum = Spectrum(file)
-	keys = [ (spec, 10) for spec in heavyside_dict[spectrum.heavySideKey]]
-	keys += peak_table[spectrum.peak-5:spectrum.peak+5]
-	candidates = db.get(keys)
-	candidates = sorted(candidates, key=lambda k: k.error)
-	#Then return the candidates, and let frontend do the rest
-	return "It's me, the backend! Let's do this!\n"
+    # Make peak table from database if it does not exist.
+    if peak_table is None:
+        peak_table = {}
+        peak_objects = Peak.all()
+        for peak in peak_table:
+            if peak_table[peak.value] is None:
+                peak_table[peak.value] = [peak.spectrum]
+            else:
+                peak_table[peak.value].append(peak.spectrum)
+        memcache.set(spectrum_type+'_peak_table', peak_table)
+    
+    #Once all the data structures are loaded, they vote on their keys
+    #and the winners are fetched from the database by key
+    spectrum = Spectrum(file)
+    keys = [ (spec, 10) for spec in heavyside_dict[spectrum.heavySideKey]]
+    keys += peak_table[spectrum.peak-5:spectrum.peak+5]
+    candidates = db.get(keys)
+    candidates = sorted(candidates, key=lambda k: k.error)
+    #Then return the candidates, and let frontend do the rest
+    return "It's me, the backend! Let's do this!\n"
 
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
@@ -140,7 +140,7 @@ class Spectrum(db.Model):
         spectrum_type = 'Infrared'
         key = str(self.key())
         peaks_memcached = memcache.get(spectrum_type+'_peak_table')
-        peaks_datastore = Peak.Gql("WHERE spectrum == KEY(':1')", key).fetch()
+        peaks_datastore = Matcher.peak_table
         peaks_local = []
         if peaks_memcached is not None:
             # Peak table is a dictionary where the keys are x-values and the
@@ -156,8 +156,10 @@ class Spectrum(db.Model):
         if len(peaks_datastore) != 0:
             # Data store has something, so get the values and return.
             for peak in peaks_datastore:
-                peaks_local.append(peak.value)
-            return peaks_local
+				if key in peak:
+					peaks_local.append(peak.value)
+            if len(peaks_local) != 0:
+				return peaks_local
         else:
             # Now we have to get the peaks ourselves and store them.
             # FIXME: Find way to define threshold.
@@ -166,16 +168,20 @@ class Spectrum(db.Model):
                 # Set a default peak table if memcached does not exist
                 peaks_memcached = {}
             for peak in peaks_local:
-                # Data Store: Make a new Peak object and store it.
-                tmp = Peak(spectra=self.key(), value=peak)
-                tmp.put()
+                # Data Store: Add the value to the dictionary.
+                if peaks_datastore[peak] is None:
+                    peaks_datastore[peak] = [key]
+                else:
+                    peaks_datastore[peak].append(key)
                 # Memcached: Add the value to the dictionary.
                 if peaks_memcached[peak] is None:
                     peaks_memcached[peak] = [key]
                 else:
                     peaks_memcached[peak].append(key)
-            # Store the final memcached dictionary.
+            # Store the final dictionaries.
             memcache.set(spectrum_type+'_peak_table', peaks_memcached)
+			Matcher.peak_table = peaks_datastore
+			Matcher.put()
         return peaks_local
     
     def find_integrals(self):
@@ -255,7 +261,38 @@ class Spectrum(db.Model):
                 integrals = integrals[separator:]
         # Convert to binary and return.
         return int(index, 2)
-        
-class Peak(db.Model):
-    spectra = db.ReferenceProperty(Spectrum, required=True)
-    value = db.FloatProperty(required=True)
+
+class DictProperty(db.Property):
+    data_type = dict
+    
+    def get_value_for_datastore(self, model_instance):
+        value = super(DictProperty, self).get_value_for_datastore(model_instance)
+        return db.Blob(pickle.dumps(value))
+    
+    def make_value_from_datastore(self, value):
+        if value is None:
+            return dict()
+        return pickle.loads(value)
+
+    def default_value(self):
+        if self.default is None:
+            return dict()
+        else:
+            return super(DictProperty, self).default_value().copy()
+
+    def validate(self, value):
+        if not isinstance(value, dict):
+            raise db.BadValueError('Property %s needs to be convertible '
+                                   'to a dict instance (%s) of class dict' % (self.name, value))
+        return super(DictProperty, self).validate(value)
+    
+    def empty(self, value):
+        return value is None
+
+
+class Matcher(db.Model):
+    heavyside1 = DictProperty()
+    heavyside2 = DictProperty()
+	peak_table = DictProperty()
+	high_low = DictProperty()
+	chem_types = DictProperty()
