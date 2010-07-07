@@ -10,6 +10,12 @@ class Backend:
 		heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
 		peak_table = memcache.get(spectrum_type+'_peak_table')
 		
+		# Load the user's spectrum into a Spectrum object.
+		user_spectrum = Spectrum()
+		user_spectrum.parse_string(file_contents)
+		# Get necessary data from spectrum.
+		user_peaks = user_spectrum.find_peaks()
+		
 		if peak_table is None: #Make new ones or get from database
 			peak_table = {}
 			peak_objects = Peak.all()

@@ -36,7 +36,7 @@
 	Spectrum class can now find and calculate its xydata_integrated variable.
 
 2010-07-07  Tyler Romeo  <tylerromeo@gmail.com>
-	* backend.py (Backend): New class to hold search function and related methods.
+	* backend.py (search): Added code to create the user's spectrum object.
 
 	TODO:
 	* Parse the XY data in backend.Spectrum.parseString.
