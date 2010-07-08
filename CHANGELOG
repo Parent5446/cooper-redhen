@@ -40,16 +40,36 @@
 	* backend.py (find_heavyside): New function to find heavyside index.
 	* backend.py (_calculate_heavyside): New function to calculate the heavyside index for the spectrum.
 	Added heavyside function to the Spectrum class.
-	
+
+2010-07-07  James Stevenson  <jminuse@gmail.com>
+    * backend.py (search): Added preliminary voting system
+    
+2010-07-07  Tyler Romeo  <tylerromeo@gmail.com>
 	* backend.py (DictProperty): New class from Google's db.Property to handle Dictionary properties.
 	* backend.py (Matcher): New class to store dictionaries from matching algorithms.
 	* backend.py (find_peaks): Changed function to use new Matcher class instead of deprecated Peaks class.
 	Moved Peaks class into a dictionary in the Matcher class along with other dictionaries.
 
+2010-07-07  Tony Hung  <tony.h.hung@gmail.com>
+    * backend.py (search): Updated voting system to include newly implemented models and methods.
+    Voting system now implements the peak table, high-low dictionary, and heavyside data.
+
+2010-07-07  Tyler Romeo  <tylerromeo@gmail.com>
+    * backend.py (search): Intialized variables for hash tables and changes variables to appropriate names.
+
+2010-07-07  James Stevenson  <jminuse@gmail.com>
+    * backend.py (search): Fixed syntax errors in the list comprehension statements for the voting system.
+
+2010-07-07  Tony Hung  <tony.h.hung@gmail.com>
+    * backend.py (Spectrum.parse_string, Spectrum.parse_file) <search>: Removed functions and moved code.
+    Code for parsing JCAMP files now exists in Spectrum.__init__.
+
+2010-07-07  Tyler Romeo  <tylerromeo@gmail.com>
 	* backend.py (__init__): Added functionality to parse XY data.
-	
+	Spectrum class now parses both (X+(Y..Y)) and (XY..XY) format data.
+
+
 	TODO:
-	* Parse the XY data in backend.Spectrum.parseString.
 	* Handle multiple XY datasets according to JCAMP file standards.
 	* Functions to integrate and differentiate XY data.
 	* Functions to find peaks, etc. from XY data.
