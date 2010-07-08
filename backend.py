@@ -5,11 +5,8 @@ from google.appengine.ext import db, memcache
 #Spectrum database entries and voting data structures will be preloaded
 def search(file):
     spectrum_type = 'Infrared'
-    heavyside_dict = memcache.get(spectrum_type+'_heavyside_dict')
-    peak_table = memcache.get(spectrum_type+'_peak_table')
-    high_low_dict = memcache.get(spectrum_type+'_high_low_dict')
-    chemical_types = memcache.get(spectrum_type+'_chemical_types')
-    matcher = Matcher.all()[0]
+	matcher = memcache.get(spectrum_type+'_matcher')
+    if matcher is None: matcher = Matcher.all()[0]
     
     # Load the user's spectrum into a Spectrum object.
     user_spectrum = Spectrum()
@@ -20,17 +17,24 @@ def search(file):
     #Once all the data structures are loaded, they vote on their keys
     #and the winners are fetched from the database by key
     spectrum = Spectrum(file)
-    keys = [(spec, 10) for spec in heavyside_dict[spectrum.find_heavyside()]]
-    keys += [(spec, 10) for spec in peak_table[spectrum.peak-5:spectrum.peak+5]]
-    keys += [(spec, 10) for spec in high_low_dict[spectrum.highLowKey]]
-    keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
-    #Sort keys and take top 10.
-    keys = sorted(keys, key=lambda k: key[0])
-    candidates = db.get(keys[:10])
+	candidates = matcher.get(spectrum)
+	findError(candidates)
     candidates = sorted(candidates, key=lambda k: k.error)
     #Then return the candidates, and let frontend do the rest
     return "It's me, the backend! Let's do this!\n"
 
+def	add(file):
+	spectrum = Spectrum(file)
+	spectrum_type = 'Infrared'
+	matcher = memcache.get(spectrum_type+'_matcher')
+    if matcher is None: matcher = Matcher.all()
+	if matcher: matcher = matcher[0] #Change this when there is more than one
+	else: matcher = Matcher()
+	key = spectrum.put()
+	matcher.add(spectrum, key)
+	memcache.set(spectrum_type+'_matcher', matcher)
+	matcher.put()
+	
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
     to compare the spectrum to the DataStore."""
@@ -279,7 +283,12 @@ class DictProperty(db.Property):
 class Matcher(db.Model):
     heavyside1 = DictProperty()
     heavyside2 = DictProperty()
-    peak_table = DictProperty()
+    peak_table = ListProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
+	
+	def add(self, spectrum, key):
+		pass
+	def get(self, spectrum):
+		pass
     
