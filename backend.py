@@ -38,27 +38,21 @@ class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
     to compare the spectrum to the DataStore."""
     # Variables to be stored in the Google DataStore.
-    chemical_name = db.StringProperty(required=True)
-    chemical_type = db.StringProperty(required=True)
-    data = db.ListProperty(float, required=True)
+    chemical_name = db.StringProperty()
+    chemical_type = db.StringProperty()
+    data = db.ListProperty(float)
     
     def __init__(self, file):
         """Parse a string of JCAMP file data and extract all needed data."""
-        db.Model.__init__(self)
         contents = file.read()
-        self.data = [ float(match.group(1)) for match in re.finditer('[^\r\n]([d.-]+)', contents[contents.find('##XYDATA=(X++(Y..Y))')+20:]) ]
-        # Note on JCAMP parsing syntax:
-        # The file has a number of special characters to process:
-        #   == - Denotes the start of a data label
-        #   =  - Signals the end of a data label (and beginning of its value)
-        #        NOTE: At the end of a line, the equals sign means continue
-        #              to the next line without stopping.
-        #   $$ - Indicates the rest of the line is a comment
-        #   $  - Signifies a user-defined, nonstandard data label
-        #   () - Used to delimit strings instead of quotes
-        #        NOTE: Can also be used to delimit string-containing
-        #              data groups.
+        self.xy = [ float(match.group(1)) for match in re.finditer('[^\r\n]([d.-]+)', contents[contents.index('##XYDATA=(X++(Y..Y))')+20:]) ]
+        self.chemical_type = 'Unknown'
+        self.chemicalName = self.get_field('##TITLE=', contents)
+        db.Model.__init__(self)
         # Reference: http://www.jcamp-dx.org/
+    def get_field(self, name, data):
+        index = data.index(name) + len(name)
+        return data[index:data.index('\n')] #Does not handle Unix format
     
     def add(self):
         """Add the spectrum to the data store and put its relevant heuristic data in
@@ -142,13 +136,6 @@ class Spectrum(db.Model):
             self.xydata_integrated = self._calculate_integrals()
         return self.xydata_integrated
     
-    def find_heavyside(self):
-        """Get the heavyside index for this spectrum, or calculate it if
-        it does not exist."""
-        # FIXME: Need storage for heavyside so it does not have to be
-        #        calculated every time.
-        return self._calculate_heavyside(self, 8)
-    
     def _calculate_integrals(self):
         """Integrate the XY data for the spectrum."""
         x, y = self.x, self.y
@@ -191,7 +178,7 @@ class Spectrum(db.Model):
             prev = y[k]
         return peaks
     
-    def _calculate_heavyside(self, bits):
+    def find_heavyside(self, bits=8):
         """Calculate the heavyside index for this spectrum."""
         # Get the intgrated data for calculation.
         integrals = self.find_integrals()
