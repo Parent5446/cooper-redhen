@@ -110,13 +110,13 @@ class Spectrum(db.Model):
             # Reset the working line.
             workingline = ""
         return True
-		
+        
     def Bove(self, other):
-		self.error = max([abs(self.data[i]-other.data[i]) for i in len(self.data)])
-	
-	def leastSquares(self, other):
-		self.error = sum([(self.data[i]-self.other[i])**2 for i in len(self.data)])
-		
+        self.error = max([abs(self.data[i]-other.data[i]) for i in len(self.data)])
+    
+    def leastSquares(self, other):
+        self.error = sum([(self.data[i]-self.other[i])**2 for i in len(self.data)])
+    
     def add(self):
         """Add the spectrum to the data store and put its relevant heuristic data in
         the Matcher object."""
@@ -263,8 +263,8 @@ class Spectrum(db.Model):
                 integrals = integrals[separator:]
         # Convert to binary and return.
         return int(index, 2)
-	def least_squares(self,other):
-		self.error=error
+    def least_squares(self,other):
+        self.error=error
 
 class DictProperty(db.Property):
     data_type = dict
