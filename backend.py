@@ -8,7 +8,8 @@ def search(file):
     matcher = memcache.get(spectrum_type+'_matcher')
     if matcher is None: matcher = Matcher.get_by_key_name('__'+spectrum_type+'__')
 
-    spectrum = Spectrum(file) # Load the user's spectrum into a Spectrum object.
+    spectrum = Spectrum() # Load the user's spectrum into a Spectrum object.
+    spectrum.parseFile(file)
     candidates = matcher.get(spectrum)
     candidates = [ (candidate, Matcher.bove(spectrum, candidate)) for candidate in candidates]
     candidates = sorted(candidates, key=lambda k: k[1])
@@ -16,7 +17,8 @@ def search(file):
     return "It's me, the backend! Let's do this!\n"
 
 def add(file):
-    spectrum = Spectrum(file)
+    spectrum = Spectrum() # Load the user's spectrum into a Spectrum object.
+    spectrum.parseFile(file)
     spectrum_type = 'Infrared'
     matcher = memcache.get(spectrum_type+'_matcher')
     if matcher is None: matcher = Matcher.get_by_key_name(spectrum_type)
@@ -31,16 +33,16 @@ class Spectrum(db.Model):
     to compare the spectrum to the DataStore."""
     # Variables to be stored in the Google DataStore.
     chemical_name = db.StringProperty()
-    chemical_type = db.StringProperty()
+    #chemical_type = db.StringProperty()
     data = db.ListProperty(float)
     
-    def __init__(self, file):
+    def parseFile(self, file): #Consider not using a constructor
         """Parse a string of JCAMP file data and extract all needed data."""
         contents = file.read()
         self.xy = [ float(match.group(1)) for match in re.finditer('[^\r\n]([d.-]+)', contents[contents.index('##XYDATA=(X++(Y..Y))')+20:]) ]
-        self.chemical_type = 'Unknown'
+        self.data = [1.0, 2.0, 3.0]
+        #self.chemical_type = 'Unknown'
         self.chemicalName = self.get_field('##TITLE=', contents)
-        db.Model.__init__(self)
         # Reference: http://www.jcamp-dx.org/
         
     def get_field(self, name, data):
@@ -64,12 +66,13 @@ class Spectrum(db.Model):
         matcher.add(self)
         memcache.set(spectrum_type+'_matcher', matcher)
         matcher.put()
-    
+    """
     def bove(self, other):
         self.error = Matcher().bove(self, other)
     
     def least_squares(self, other):
         self.error = Matcher().least_squares(self, other)
+    """
 
 class DictProperty(db.Property):
     data_type = dict
@@ -130,22 +133,21 @@ class Matcher(db.Model):
         # Get the reference values
         flatHeavysideKey = 21 # Calculate for real later later
         peaks = [1, 2] # Calculate for real later later
-        # Get the set of relevant spectra. The keys list should be a zipped pair
-        # of lists with a spectra and and a vote in each.
-        keys = []
-        for peak in peaks:
-            keys.extend([(spec, 10) for spec in self.peak_table if peak - 5 < spec < peak + 5])
-        keys.extend([(spec, 10) for spec in self.flat_heavyside if heavyside - 5 < spec < heavyside + 5])
-        keys += [(spec, 10) for spec in high_low_dict[spectrum.highLowKey]]
-        keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
-        # Add together all the votes.
-        keys.sort()
-        return Spectrum.get(keys)
+        # Get the set of relevant spectra. The keys list should be a list of pairs with a spectrum and and a vote in each.
+        keys = {}
+        if flatHeavysideKey in self.flat_heavyside: 
+            for key in self.flat_heavyside[flatHeavysideKey]:
+                keys[key] = 10 #10 votes
+        keys = sorted(keys.iteritems(), lambda k: k[1])
+        keys = [k[0] for k in keys]
+        candidates = Spectrum.get(keys)
+        if type(candidates) is not list: candidates = [candidates]
+        return candidates
     
     @staticmethod
     def bove(a, b):
-        return max([abs(a.data[i]-b.data[i]) for i in len(a.data)])
+        return max([abs(a.data[i]-b.data[i]) for i in xrange(len(a.data))])
     
     @staticmethod
     def least_squares(a, b):
-        return sum([(a.data[i]-a.b[i])**2 for i in len(a.data)])
+        return sum([(a.data[i]-a.b[i])**2 for i in xrange(len(a.data))])
