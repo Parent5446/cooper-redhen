@@ -1,6 +1,7 @@
 ﻿import cgi
 import datetime
 import logging
+import backend
 
 from google.appengine.ext import db
 from google.appengine.api import users
@@ -56,7 +57,7 @@ class Test(webapp.RequestHandler):
 
 application = webapp.WSGIApplication([
     ('/', MainPage),
-    ('/uploader', uploadedPage)
+    ('/uploader', uploadedPage),
     ('/test', Test)
 ], debug=True)
 
