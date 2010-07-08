@@ -22,18 +22,6 @@ def search(file):
     candidates = sorted(candidates, key=lambda k: k.error)
     #Then return the candidates, and let frontend do the rest
     return "It's me, the backend! Let's do this!\n"
-
-def	add(file):
-	spectrum = Spectrum(file)
-	spectrum_type = 'Infrared'
-	matcher = memcache.get(spectrum_type+'_matcher')
-    if matcher is None: matcher = Matcher.all()
-	if matcher: matcher = matcher[0] #Change this when there is more than one
-	else: matcher = Matcher()
-	key = spectrum.put()
-	matcher.add(spectrum, key)
-	memcache.set(spectrum_type+'_matcher', matcher)
-	matcher.put()
 	
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
@@ -122,6 +110,20 @@ class Spectrum(db.Model):
             # Reset the working line.
             workingline = ""
         return True
+    
+    def	add(self):
+        spectrum_type = 'Infrared'
+        matcher = memcache.get(spectrum_type+'_matcher')
+        if matcher is None:
+            matcher = Matcher.all()
+        if matcher:
+            matcher = matcher[0] #Change this when there is more than one
+        else:
+            matcher = Matcher()
+        key = self.put()
+        matcher.add(self, key)
+        memcache.set(spectrum_type+'_matcher', matcher)
+        matcher.put()
     
     def find_peaks(self):
         """Check memcache then the Data Store for the peaks in this Spectrum.
