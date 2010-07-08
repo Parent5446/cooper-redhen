@@ -111,12 +111,6 @@ class Spectrum(db.Model):
             # Reset the working line.
             workingline = ""
         return True
-        
-    def Bove(self, other):
-        self.error = max([abs(self.data[i]-other.data[i]) for i in len(self.data)])
-    
-    def leastSquares(self, other):
-        self.error = sum([(self.data[i]-self.other[i])**2 for i in len(self.data)])
     
     def add(self):
         """Add the spectrum to the data store and put its relevant heuristic data in
@@ -135,7 +129,13 @@ class Spectrum(db.Model):
         matcher.add(self)
         memcache.set(spectrum_type+'_matcher', matcher)
         matcher.put()
-
+    
+    def bove(self, other):
+		self.error = Matcher().bove(self, other)
+	
+	def least_squares(self, other):
+		self.error = Matcher().least_squares(self, other)
+    
     def find_peaks(self): 
         """Check memcache then the Data Store for the peaks in this Spectrum.
         If they are not found, calculate them and store them."""
@@ -337,3 +337,11 @@ class Matcher(db.Model):
         # Add together all the votes.
         keys.sort()
         return keys
+    
+    @staticmethod
+    def bove(one, other):
+		return max([abs(one.data[i]-other.data[i]) for i in len(one.data)])
+	
+    @staticmethod
+	def least_squares(one, other):
+		return sum([(one.data[i]-one.other[i])**2 for i in len(one.data)])
