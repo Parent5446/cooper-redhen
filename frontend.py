@@ -12,57 +12,44 @@ from google.appengine.api import images
 logging.getLogger().setLevel(logging.DEBUG)
 
 
-class Greeting(db.Model):
-    author = db.UserProperty()
-    content = db.StringProperty(multiline=True)
-    avatar = db.BlobProperty()
+class JDXFile(db.Model):
+    fileName = db.BlobProperty()
     date = db.DateTimeProperty(auto_now_add=True)
 
 class MainPage(webapp.RequestHandler):
     def get(self):
         self.response.out.write('<html><body>')
-        query_str = "SELECT * FROM Greeting ORDER BY date DESC LIMIT 10"
-        greetings = db.GqlQuery (query_str)
+        query_str = "SELECT * FROM JDXFile ORDER BY date DESC LIMIT 10"
+        JDXFiles = db.GqlQuery (query_str)
 
-        for greeting in greetings:
-            if greeting.author:
-                self.response.out.write('<b>%s</b> wrote:' % greeting.author.nickname())
-            else:
-                self.response.out.write('An anonymous person wrote:')
+        '''for JDXFile in JDXFiles:
             self.response.out.write("<div><img src='img?img_id=%s'></img>" %
-                                    greeting.key())
-            self.response.out.write(' %s</div>' %
-                                  cgi.escape(greeting.content))
+                                    JDXFile.key())
+            self.response.out.write('</div>')'''
 
         self.response.out.write("""
               <form action="/sign" enctype="multipart/form-data" method="post">
-                <div><label>Message:</label></div>
-                <div><textarea name="content" rows="3" cols="60"></textarea></div>
-                <div><label>Avatar:</label></div>
-                <div><input type="file" name="img"/></div>
-                <div><input type="submit" value="Sign Guestbook"></div>
+                <div><label>JDX File:</label></div>
+                <div><input type="file" name="jdxFile"/></div>
+                <div><input type="submit" value="Upload"></div>
               </form>
             </body>
           </html>""")
 
-class Image (webapp.RequestHandler):
+class JDX (webapp.RequestHandler):
     def get(self):
-        greeting = db.get(self.request.get("img_id"))
-        if greeting.avatar:
+        JDXFile = db.get(self.request.get("jdxFile_id"))
+        if JDXFile.fileName:
             self.response.headers['Content-Type'] = "image/png"
-            self.response.out.write(greeting.avatar)
+            self.response.out.write(JDXFile.fileName)
         else:
-            self.response.out.write("No image")
+            self.response.out.write("Failed to Upload")
 
-class Guestbook(webapp.RequestHandler):
+class Uploader(webapp.RequestHandler):
     def post(self):
-        greeting = Greeting()
-        if users.get_current_user():
-            greeting.author = users.get_current_user()
-        greeting.content = self.request.get("content")
-        avatar = images.resize(self.request.get("img"), 32, 32)
-        greeting.avatar = db.Blob(avatar)
-        greeting.put()
+        jdxFile = JDXFiles()
+		jdxFile.fileName = db.Blob(fileName)
+        jdxFile.put()
         self.redirect('/')
 
 class Test(webapp.RequestHandler):
@@ -75,8 +62,8 @@ class Test(webapp.RequestHandler):
 
 application = webapp.WSGIApplication([
     ('/', MainPage),
-    ('/img', Image),
-    ('/sign', Guestbook)
+    ('/img', JDX),
+    ('/sign', Uploader)
 ], debug=True)
 
 
