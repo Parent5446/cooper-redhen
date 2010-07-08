@@ -1,10 +1,13 @@
 ﻿import cgi
 import datetime
+import logging
 
 from google.appengine.ext import db
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
+
+logging.getLogger().setLevel(logging.DEBUG)
 
 
 class JDX(db.Model):
