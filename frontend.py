@@ -17,7 +17,12 @@ class MainPage(webapp.RequestHandler):
         </body>
       </html>""")
 
-
+class Greeting(db.Model):
+    author = db.UserProperty()
+    content = db.StringProperty(multiline=True)
+    avatar = db.BlobProperty()
+    date = db.DateTimeProperty(auto_now_add=True)
+	
 class Guestbook(webapp.RequestHandler):
     def post(self):
         greeting = Greeting()
