@@ -264,8 +264,6 @@ class Spectrum(db.Model):
                 integrals = integrals[separator:]
         # Convert to binary and return.
         return int(index, 2)
-    def least_squares(self,other):
-        self.error=error
 
 class DictProperty(db.Property):
     data_type = dict
