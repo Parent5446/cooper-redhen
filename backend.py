@@ -33,7 +33,7 @@ class Spectrum(db.Model):
     to compare the spectrum to the DataStore."""
     # Variables to be stored in the Google DataStore.
     chemical_name = db.StringProperty()
-    #chemical_type = db.StringProperty()
+    chemical_type = db.StringProperty()
     data = db.ListProperty(float)
     
     def parseFile(self, file): #Consider not using a constructor
@@ -41,14 +41,15 @@ class Spectrum(db.Model):
         contents = file.read()
         self.xy = [ float(match.group(1)) for match in re.finditer('[^\r\n]([d.-]+)', contents[contents.index('##XYDATA=(X++(Y..Y))')+20:]) ]
         self.data = [1.0, 2.0, 3.0]
-        #self.chemical_type = 'Unknown'
+        self.chemical_type = 'Unknown'
         self.chemicalName = self.get_field('##TITLE=', contents)
         # Reference: http://www.jcamp-dx.org/
         
     def get_field(self, name, data):
         index = data.index(name) + len(name)
         return data[index:data.index('\n')] #Does not handle Unix format
-    
+        
+    #Method never used:
     def add(self):
         """Add the spectrum to the data store and put its relevant heuristic data in
         the Matcher object."""
@@ -94,8 +95,7 @@ class DictProperty(db.Property):
 
     def validate(self, value):
         if not isinstance(value, dict):
-            raise db.BadValueError('Property %s needs to be convertible '
-                                   'to a dict instance (%s) of class dict' % (self.name, value))
+            raise db.BadValueError('Property %s needs to be convertible to a dict instance (%s)' % (self.name, value))
         return super(DictProperty, self).validate(value)
     
     def empty(self, value):
@@ -140,9 +140,7 @@ class Matcher(db.Model):
                 keys[key] = 10 #10 votes
         keys = sorted(keys.iteritems(), lambda k: k[1])
         keys = [k[0] for k in keys]
-        candidates = Spectrum.get(keys)
-        if type(candidates) is not list: candidates = [candidates]
-        return candidates
+        return Spectrum.get(keys)
     
     @staticmethod
     def bove(a, b):
