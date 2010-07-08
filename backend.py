@@ -42,38 +42,12 @@ class Spectrum(db.Model):
         self.xy = [ float(match.group(1)) for match in re.finditer('[^\r\n]([d.-]+)', contents[contents.index('##XYDATA=(X++(Y..Y))')+20:]) ]
         self.data = [1.0, 2.0, 3.0]
         self.chemical_type = 'Unknown'
-        self.chemicalName = self.get_field('##TITLE=', contents)
+        self.chemical_name = self.get_field('##TITLE=', contents)
         # Reference: http://www.jcamp-dx.org/
         
     def get_field(self, name, data):
         index = data.index(name) + len(name)
-        return data[index:data.index('\n')] #Does not handle Unix format
-        
-    #Method never used:
-    def add(self):
-        """Add the spectrum to the data store and put its relevant heuristic data in
-        the Matcher object."""
-        spectrum_type = 'Infrared'
-        # Get the Matcher, or make a new one if it does not exist.
-        matcher = memcache.get(spectrum_type+'_matcher')
-        if matcher is None:
-            matcher = Matcher.all()
-        if matcher:
-            matcher = matcher[0] #Change this when there is more than one
-        else:
-            matcher = Matcher()
-        # Put to the data store, then to the Matcher.
-        key = self.put()
-        matcher.add(self)
-        memcache.set(spectrum_type+'_matcher', matcher)
-        matcher.put()
-    """
-    def bove(self, other):
-        self.error = Matcher().bove(self, other)
-    
-    def least_squares(self, other):
-        self.error = Matcher().least_squares(self, other)
-    """
+        return data[index:data.index('\n', index)] #Does not handle Unix format
 
 class DictProperty(db.Property):
     data_type = dict
@@ -116,7 +90,6 @@ class Matcher(db.Model):
     def add(self, spectrum):
         """Add new spectrum data to the various Matcher dictionaries. Find the heavyside
         index, peaks, and other indices and add them to the dictionaries."""
-        db.Model.__init__(self)
         # Get the spectrum's key, peaks, and other heuristic data.
         flatHeavysideKey = 21 # Calculate for real later later
         peaks = [1, 2] # Calculate for real later later
