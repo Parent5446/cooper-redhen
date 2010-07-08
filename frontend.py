@@ -10,7 +10,9 @@ class MainPage(webapp.RequestHandler):
         self.response.out.write("""
           <form action="/sign" enctype="multipart/form-data" method="post">
             <div><label>Upload JDX file:</label></div>
-            <div><input type="file" name="img"/></div>
+            <div><input type="file" name="img"/></div><br />
+			<div><label>Name of JDX file:</label></div>
+			<div><input type="text" name="content"/></div>
             <div><input type="submit" value="Upload"></div>
           </form>
         </body>
