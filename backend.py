@@ -32,6 +32,7 @@ def add(file):
     if not matcher: matcher = Matcher(key_name=spectrum_type)
     spectrum.put() #Add to database
     matcher.add(spectrum) #Add to matcher
+    matcher.put()
     
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
@@ -43,6 +44,7 @@ class Spectrum(db.Model):
     
     def __init__(self, file):
         """Parse a string of JCAMP file data and extract all needed data."""
+        db.Model.__init__(self)
         contents = file.read()
         self.data = [ float(match.group(1)) for match in re.finditer('[^\r\n]([d.-]+)', contents[contents.find('##XYDATA=(X++(Y..Y))')+20:]) ]
         # Note on JCAMP parsing syntax:
@@ -253,6 +255,7 @@ class Matcher(db.Model):
     def add(self, spectrum):
         """Add new spectrum data to the various Matcher dictionaries. Find the heavyside
         index, peaks, and other indices and add them to the dictionaries."""
+        db.Model.__init__(self)
         # Get the spectrum's key, peaks, and other heuristic data.
         key = str(spectrum.key())
         heavyside = spectrum.find_heavyside()
