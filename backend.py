@@ -113,6 +113,13 @@ class Spectrum(db.Model):
 		
     def Bove(self, other):
 		self.error = max([abs(self.data[i]-other.data[i]) for i in len(self.data)])
+		return self.error
+	
+	def least_Squares(self, other):
+		variance=0
+		for i in self.data[i]:
+			variance+=self.data[i]*self.data[i]-other.data[i]*other.data[i]
+		return variance
 		
     def	add(self):
         spectrum_type = 'Infrared'
@@ -127,8 +134,8 @@ class Spectrum(db.Model):
         matcher.add(self)
         memcache.set(spectrum_type+'_matcher', matcher)
         matcher.put()
-    
-    def find_peaks(self):
+
+    def find_peaks(self): 
         """Check memcache then the Data Store for the peaks in this Spectrum.
         If they are not found, calculate them and store them."""
         # Check memcached first.
@@ -256,6 +263,8 @@ class Spectrum(db.Model):
                 integrals = integrals[separator:]
         # Convert to binary and return.
         return int(index, 2)
+	def least_squares(self,other):
+		self.error=error
 
 class DictProperty(db.Property):
     data_type = dict
@@ -303,4 +312,3 @@ class Matcher(db.Model):
         return True
 	def get(self, spectrum):
 		pass
-    
