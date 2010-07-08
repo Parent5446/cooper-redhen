@@ -5,7 +5,7 @@ from google.appengine.ext import db, memcache
 #Spectrum database entries and voting data structures will be preloaded
 def search(file):
     spectrum_type = 'Infrared'
-	matcher = memcache.get(spectrum_type+'_matcher')
+    matcher = memcache.get(spectrum_type+'_matcher')
     if matcher is None: matcher = Matcher.all()[0]
     
     # Load the user's spectrum into a Spectrum object.
@@ -17,12 +17,12 @@ def search(file):
     #Once all the data structures are loaded, they vote on their keys
     #and the winners are fetched from the database by key
     spectrum = Spectrum(file)
-	candidates = matcher.get(spectrum)
-	findError(candidates)
+    candidates = matcher.get(spectrum)
+    findError(candidates)
     candidates = sorted(candidates, key=lambda k: k.error)
     #Then return the candidates, and let frontend do the rest
     return "It's me, the backend! Let's do this!\n"
-	
+    
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
     to compare the spectrum to the DataStore."""
@@ -121,7 +121,7 @@ class Spectrum(db.Model):
 			variance+=self.data[i]*self.data[i]-other.data[i]*other.data[i]
 		return variance
 		
-    def	add(self):
+    def add(self):
         spectrum_type = 'Infrared'
         matcher = memcache.get(spectrum_type+'_matcher')
         if matcher is None:
@@ -300,9 +300,9 @@ class Matcher(db.Model):
     peak_table = ListProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
-	
-	def add(self, spectrum):
-		key = str(spectrum.key())
+    
+    def add(self, spectrum):
+        key = str(spectrum.key())
         heavyside = spectrum.find_heavyside()
         peaks = self.find_peaks()
         
@@ -310,5 +310,19 @@ class Matcher(db.Model):
         for peak in peaks:
             self.peak_table[peak].append(key)
         return True
-	def get(self, spectrum):
-		pass
+    
+    def get(self, spectrum):
+        # Get the reference values
+        peaks = spectrum.find_peaks()
+        heavyside = spectrum.find_heavyside()
+        # Get the set of relevant spectra. The keys list should be a zipped pair
+        # of lists with a spectra and and a vote in each.
+        keys = []
+        for peak in peaks:
+            keys.extend([(spec, 10) for spec in self.peak_table if peak - 5 < spec < peak + 5])
+        keys.extend([(spec, 10) for spec in self.heavyside1 if heavyside - 5 < spec < heavyside + 5])
+        keys += [(spec, 10) for spec in high_low_dict[spectrum.highLowKey]]
+        keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
+        # Add together all the votes.
+        keys.sort()
+        return keys
