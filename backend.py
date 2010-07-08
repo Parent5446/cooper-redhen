@@ -113,13 +113,9 @@ class Spectrum(db.Model):
 		
     def Bove(self, other):
 		self.error = max([abs(self.data[i]-other.data[i]) for i in len(self.data)])
-		return self.error
 	
-	def least_Squares(self, other):
-		variance=0
-		for i in self.data[i]:
-			variance+=self.data[i]*self.data[i]-other.data[i]*other.data[i]
-		return variance
+	def leastSquares(self, other):
+		self.error = sum([(self.data[i]-self.other[i])**2 for i in len(self.data)])
 		
     def add(self):
         """Add the spectrum to the data store and put its relevant heuristic data in
