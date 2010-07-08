@@ -48,16 +48,16 @@ class JDX (webapp.RequestHandler):
 class Uploader(webapp.RequestHandler):
     def post(self):
         jdxFile = JDXFiles()
-		jdxFile.fileName = db.Blob(fileName)
+        jdxFile.fileName = db.Blob(fileName)
         jdxFile.put()
         self.redirect('/')
 
 class Test(webapp.RequestHandler):
-	def get(self):
-		self.response.out.write('Testing backend...')
-		file = open('jcamp-test.jdx')
-		response = backend.search(file)
-		self.response.out.write('Done')
+    def get(self):
+        self.response.out.write('Testing backend...')
+        file = open('jcamp-test.jdx')
+        response = backend.search(file)
+        self.response.out.write('Done')
 
 
 application = webapp.WSGIApplication([
