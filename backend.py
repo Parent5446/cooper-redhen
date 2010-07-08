@@ -1,5 +1,4 @@
-﻿import os.path
-import re
+﻿import os.path, re
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
@@ -50,6 +49,7 @@ class Spectrum(db.Model):
         self.chemicalName = self.get_field('##TITLE=', contents)
         db.Model.__init__(self)
         # Reference: http://www.jcamp-dx.org/
+        
     def get_field(self, name, data):
         index = data.index(name) + len(name)
         return data[index:data.index('\n')] #Does not handle Unix format
@@ -77,128 +77,6 @@ class Spectrum(db.Model):
     
     def least_squares(self, other):
         self.error = Matcher().least_squares(self, other)
-    
-    def find_peaks(self): 
-        """Check memcache then the Data Store for the peaks in this Spectrum.
-        If they are not found, calculate them and store them."""
-        # Check memcached first.
-        spectrum_type = 'Infrared'
-        key = str(self.key())
-        peaks_memcached = memcache.get(spectrum_type+'_peak_table')
-        peaks_datastore = Matcher.all()[0].peak_table
-        peaks_local = []
-        if peaks_memcached is not None:
-            # Peak table is a dictionary where the keys are x-values and the
-            # values are dictionaries with Spectrum keys.
-            for peak in peaks_memcached.keys():
-                # Check if there is a peak for this spectrum
-                if key in peaks_memcached[peak]:
-                    peaks_local.append(peak)
-                if len(peaks_local) != 0:
-                    # If we got any peaks, return them.
-                    return peaks_local
-        # Function did not return, so nothing is in memcached. Check data store.
-        if len(peaks_datastore) != 0:
-            # Data store has something, so get the values and return.
-            for peak in peaks_datastore:
-                if key in peak:
-                    peaks_local.append(peak.value)
-            if len(peaks_local) != 0:
-                return peaks_local
-        else:
-            # Now we have to get the peaks ourselves and store them.
-            # FIXME: Find way to define threshold.
-            peaks_local = self._calculate_peaks(thres)
-            if peaks_memcached is None:
-                # Set a default peak table if memcached does not exist
-                peaks_memcached = {}
-            for peak in peaks_local:
-                # Data Store: Add the value to the dictionary.
-                if peaks_datastore[peak] is None:
-                    peaks_datastore[peak] = [key]
-                else:
-                    peaks_datastore[peak].append(key)
-                # Memcached: Add the value to the dictionary.
-                if peaks_memcached[peak] is None:
-                    peaks_memcached[peak] = [key]
-                else:
-                    peaks_memcached[peak].append(key)
-            # Store the final dictionaries.
-            memcache.set(spectrum_type+'_peak_table', peaks_memcached)
-            Matcher.peak_table = peaks_datastore
-            Matcher.put()
-        return peaks_local
-    
-    def find_integrals(self):
-        """Get the integrated XY dat for this spectrum, or calculate it if
-        it does not exist."""
-        if not len(self.xydata_integrated):
-            self.xydata_integrated = self._calculate_integrals()
-        return self.xydata_integrated
-    
-    def _calculate_integrals(self):
-        """Integrate the XY data for the spectrum."""
-        x, y = self.x, self.y
-        deltax = x[2] - x[1]
-        return [deltax * yvalue for yvalue in y]
-    
-    def _calculate_peaks(self, thres):
-        """Looks at the x and y values and finds peaks in the spectrum's
-        graph that are higher than the given numeric threshold."""
-        # Get XY data and set temporary variables
-        x, y = self.x, self.y
-        peaks = []
-        prev = ypeak = end = xpeak = 0
-        start = y[1] # The spectra has to be within the range of 600-3900
-        # This variable is true when ascending a peak and false when
-        # descending a peak.
-        searching = True
-        for k in x:
-            if y[k] < prev and searching:
-                # Found the peak itself
-                ypeak = y[k - 1]
-                xpeak = k
-                searching = False
-            elif y[k] > prev and not searching:
-                # Found the end of the peak
-                end = y[k]
-                if ypeak - start < int(thres):
-                    # Peak not high enough, keep searching
-                    xpeak = ypeak = 0
-                    searching = True
-                elif ypeak - end < int(thres):
-                    # End not low enough, keep looking
-                    end = 0
-                else:
-                    # Peak confirmed, add it to the list
-                    peaks.append(xpeak)
-                    start = end
-                    end = xpeak = ypeak = 0
-                    searching = True
-            prev = y[k]
-        return peaks
-    
-    def find_heavyside(self, bits=8):
-        """Calculate the heavyside index for this spectrum."""
-        # Get the intgrated data for calculation.
-        integrals = self.find_integrals()
-        index = ""
-        # Only run for a user-defined number of bits.
-        for k in range(bits):
-            # Separate the data and find the total area.
-            separator = len(integrals) / 2
-            sum1 = reduce(add, integrals[:separator])
-            sum2 = reduce(add, integrals[separator:])
-            if sum1 > sum2:
-                # The left is bigger, add a zero bit.
-                index += "0"
-                integrals = integrals[:separator]
-            else:
-                # The right is bigger, add a one bit.
-                index += "1"
-                integrals = integrals[separator:]
-        # Convert to binary and return.
-        return int(index, 2)
 
 class DictProperty(db.Property):
     data_type = dict
@@ -244,14 +122,13 @@ class Matcher(db.Model):
         index, peaks, and other indices and add them to the dictionaries."""
         db.Model.__init__(self)
         # Get the spectrum's key, peaks, and other heuristic data.
-        key = str(spectrum.key())
-        heavyside = spectrum.find_heavyside()
-        peaks = self.find_peaks()
-        # Add it to the dictionaries.
-        self.heavyside1[heavyside] = key
+        heavyside = 21 # Fix this later
+        peaks = [1, 2] # Fix this later
+        # Add it to the dictionaries
+        if heavyside in self.heavyside1: self.heavyside1[heavyside].add(spectrum.key())
+        else: self.heavyside1[heavyside] = set([spectrum.key()])
         for peak in peaks:
-            self.peak_table[peak].append(key)
-        return True
+            self.peak_table[peak].append(spectrum.key())
     
     def get(self, spectrum):
         """Find spectra that may represent the given Spectrum object by sorting
