@@ -9,7 +9,6 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 
 logging.getLogger().setLevel(logging.DEBUG)
 
-
 class JDX(db.Model):
     fileName = db.BlobProperty()
     date = db.DateTimeProperty(auto_now_add=True)
@@ -58,6 +57,7 @@ class Test(webapp.RequestHandler):
 application = webapp.WSGIApplication([
     ('/', MainPage),
     ('/uploader', uploadedPage)
+    ('/test', Test)
 ], debug=True)
 
 
