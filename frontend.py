@@ -33,7 +33,6 @@ class Guestbook(webapp.RequestHandler):
         avatar = self.request.get("img")
         greeting.avatar = db.Blob(avatar)
         greeting.put()
-        #self.redirect('/')
 		self.response.out.write('<html><body>You wrote:<pre>')
         self.response.out.write(cgi.escape(self.request.get('content')))
         self.response.out.write('</pre></body></html>')
