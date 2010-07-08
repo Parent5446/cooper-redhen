@@ -42,11 +42,12 @@ class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
         
 class Test(webapp.RequestHandler):
     def get(self):
-        self.response.out.write('Testing backend...')
+        self.response.out.write('<html>Testing backend...<br>')
         file = open('jcamp-test.jdx')
-        backend.add(file)
-        #response = backend.search(file)
-        self.response.out.write('Done')
+        #backend.add(file)
+        response = backend.search(file)
+        self.response.out.write(str(response))
+        self.response.out.write('<br>Done</html>')
 
 def main():
     application = webapp.WSGIApplication(

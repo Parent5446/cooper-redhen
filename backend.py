@@ -6,20 +6,12 @@ from google.appengine.api import memcache
 def search(file):
     spectrum_type = 'Infrared'
     matcher = memcache.get(spectrum_type+'_matcher')
-    if matcher is None: matcher = Matcher.all()[0]
-    
-    # Load the user's spectrum into a Spectrum object.
-    user_spectrum = Spectrum()
-    user_spectrum.parse_string(file_contents)
-    # Get necessary data from spectrum.
-    user_peaks = user_spectrum.find_peaks()
-    
-    #Once all the data structures are loaded, they vote on their keys
-    #and the winners are fetched from the database by key
-    spectrum = Spectrum(file)
+    if matcher is None: matcher = Matcher.get_by_key_name('__'+spectrum_type+'__')
+
+    spectrum = Spectrum(file) # Load the user's spectrum into a Spectrum object.
     candidates = matcher.get(spectrum)
-    findError(candidates)
-    candidates = sorted(candidates, key=lambda k: k.error)
+    candidates = [ (candidate, Matcher.bove(spectrum, candidate)) for candidate in candidates]
+    candidates = sorted(candidates, key=lambda k: k[1])
     #Then return the candidates, and let frontend do the rest
     return "It's me, the backend! Let's do this!\n"
 
@@ -28,10 +20,11 @@ def add(file):
     spectrum_type = 'Infrared'
     matcher = memcache.get(spectrum_type+'_matcher')
     if matcher is None: matcher = Matcher.get_by_key_name(spectrum_type)
-    if not matcher: matcher = Matcher(key_name=spectrum_type)
+    if not matcher: matcher = Matcher(key_name='__'+spectrum_type+'__')
     spectrum.put() #Add to database
     matcher.add(spectrum) #Add to matcher
     matcher.put()
+    memcache.add(spectrum_type+'_matcher', matcher)
     
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
@@ -135,8 +128,8 @@ class Matcher(db.Model):
         the database using different heuristics, having them vote, and returning only
         the spectra deemed similar to the given spectrum."""
         # Get the reference values
-        peaks = spectrum.find_peaks()
-        heavyside = spectrum.find_heavyside()
+        flatHeavysideKey = 21 # Calculate for real later later
+        peaks = [1, 2] # Calculate for real later later
         # Get the set of relevant spectra. The keys list should be a zipped pair
         # of lists with a spectra and and a vote in each.
         keys = []
@@ -147,12 +140,12 @@ class Matcher(db.Model):
         keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
         # Add together all the votes.
         keys.sort()
-        return keys
+        return Spectrum.get(keys)
     
     @staticmethod
-    def bove(one, other):
-        return max([abs(one.data[i]-other.data[i]) for i in len(one.data)])
+    def bove(a, b):
+        return max([abs(a.data[i]-b.data[i]) for i in len(a.data)])
     
     @staticmethod
-    def least_squares(one, other):
-        return sum([(one.data[i]-one.other[i])**2 for i in len(one.data)])
+    def least_squares(a, b):
+        return sum([(a.data[i]-a.b[i])**2 for i in len(a.data)])
