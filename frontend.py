@@ -34,8 +34,8 @@ class Guestbook(webapp.RequestHandler):
         greeting.avatar = db.Blob(avatar)
         greeting.put()
 		self.response.out.write('<html><body>You wrote:<pre>')
-        self.response.out.write(cgi.escape(self.request.get('content')))
-        self.response.out.write('</pre></body></html>')
+		self.response.out.write(cgi.escape(self.request.get('content')))
+		self.response.out.write('</pre></body></html>')
 
 
 application = webapp.WSGIApplication(
