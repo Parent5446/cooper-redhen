@@ -111,8 +111,8 @@ class Matcher(db.Model):
     for candidates that may represent a given spectrum."""
     
     # Variables to be stored in the Google Data Store
-    heavyside1 = DictProperty()
-    heavyside2 = DictProperty()
+    flat_heavyside = DictProperty()
+    ordered_heavyside = DictProperty()
     peak_table = DictProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
@@ -122,13 +122,13 @@ class Matcher(db.Model):
         index, peaks, and other indices and add them to the dictionaries."""
         db.Model.__init__(self)
         # Get the spectrum's key, peaks, and other heuristic data.
-        heavyside = 21 # Fix this later
+        flatHeavysideKey = 21 # Fix this later
         peaks = [1, 2] # Fix this later
         # Add it to the dictionaries
-        if heavyside in self.heavyside1: self.heavyside1[heavyside].add(spectrum.key())
-        else: self.heavyside1[heavyside] = set([spectrum.key()])
+        if heavyside in self.flat_heavyside: self.flat_heavyside[flatHeavysideKey].add(spectrum.key())
+        else: self.flat_heavyside[flatHeavysideKey] = set([spectrum.key()])
         for peak in peaks:
-            self.peak_table[peak].append(spectrum.key())
+            self.peak_table.append( (spectrum.key(), peak) )
     
     def get(self, spectrum):
         """Find spectra that may represent the given Spectrum object by sorting
@@ -142,7 +142,7 @@ class Matcher(db.Model):
         keys = []
         for peak in peaks:
             keys.extend([(spec, 10) for spec in self.peak_table if peak - 5 < spec < peak + 5])
-        keys.extend([(spec, 10) for spec in self.heavyside1 if heavyside - 5 < spec < heavyside + 5])
+        keys.extend([(spec, 10) for spec in self.flat_heavyside if heavyside - 5 < spec < heavyside + 5])
         keys += [(spec, 10) for spec in high_low_dict[spectrum.highLowKey]]
         keys += [(spec, 10) for spec in chemical_types[spectrum.chemical_type]]
         # Add together all the votes.
