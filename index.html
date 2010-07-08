@@ -1,15 +1,20 @@
 <html>
+  <body>
+    {% for greeting in greetings %}
+      {% if greeting.author %}
+        <b>{{ greeting.author.nickname }}</b> wrote:
+      {% else %}
+       An anonymous person wrote:
+      {% endif %}
+      <blockquote>{{ greeting.content|escape }}</blockquote>
+    {% endfor %}
 
-<head>
-<script>
-function alertStuff() {
-	alert({{ testdata }});
-}
-</script>
-</head>
-  <body style='text-align:center; background-color:black; color:red;' onload="alertStuff();">
+    <form action="/sign" method="post">
+      <div><textarea name="content" rows="3" cols="60"></textarea></div>
+      <div><input type="submit" value="Sign Guestbook"></div>
+    </form>
 
-    <h1>{{ greeting }}, {{ userName }}!</h1>
-	{{ testdata }}
+    <a href="{{ url }}">{{ url_linktext }}</a>
+
   </body>
 </html>
