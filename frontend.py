@@ -3,8 +3,11 @@ import datetime
 import logging
 import backend
 
+from google.appengine.ext import blobstore
 from google.appengine.ext import db
 from google.appengine.api import users
+from google.appengine.ext.webapp import template
+from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 
@@ -14,37 +17,27 @@ class JDX(db.Model):
     fileName = db.BlobProperty()
     date = db.DateTimeProperty(auto_now_add=True)
 
-class MainPage(webapp.RequestHandler):
+class MainHandler(webapp.RequestHandler):
     def get(self):
+        upload_url = blobstore.create_upload_url('/upload')
         self.response.out.write('<html><body>')
-        query_str = "SELECT * FROM JDX ORDER BY date DESC LIMIT 10"
-        JDXs = db.GqlQuery(query_str)
-        
-        for jdx in JDXs:
-            self.response.out.write("<a>file uploaded: %s</a>" %
-                                    jdx.key())
-        self.response.out.write("""
-             <form action="/uploader" enctype="multipart/form-data" method="post">
-                <div><input type="file" name="jdxFile"/></div>
-                <div><input type="submit" value="Upload"></div>
-              </form>
-            </body>
-          </html>""")
+        self.response.out.write('<form action="%s" method="POST" enctype="multipart/form-data">' % upload_url)
+        self.response.out.write("""Upload File: <input type="file" name="file"><br> <input type="submit" 
+            name="submit" value="Submit"> </form></body></html>""")
+					
           
-class JDXFile(webapp.RequestHandler):
-    def get(self):
-        jdx = db.get(self.request.get("jdxFile_id"))
-        if jdx.fileName:
-            self.response.out.write(jdx.fileName)
-        else:
-            self.response.out.write("Failed to Upload")
-
-class uploadedPage(webapp.RequestHandler):
+class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self):
-        jdx = JDX()
-        jdx.fileName = db.Blob(fileName)
-        jdx.put()
-        self.redirect('/')
+		upload_files = self.get_uploads('file')  # 'file' is file upload field in the form
+		blob_info = upload_files[0]
+		self.redirect('/serve/%s' % blob_info.key())
+
+		
+class ServeHandler(blobstore_handlers.BlobstoreDownloadHandler):
+    def get(self, resource):
+		resource = str(urllib.unquote(resource))
+		blob_info = blobstore.BlobInfo.get(resource)
+		backend.search(blob_info)
 
         
 class Test(webapp.RequestHandler):
@@ -55,17 +48,14 @@ class Test(webapp.RequestHandler):
         #response = backend.search(file)
         self.response.out.write('Done')
 
-application = webapp.WSGIApplication([
-    ('/', MainPage),
-    ('/uploader', uploadedPage),
-    ('/test', Test)
-], debug=True)
-
-
 def main():
+    application = webapp.WSGIApplication(
+          [('/', MainHandler),
+           ('/upload', UploadHandler),
+           ('/serve/([^/]+)?', ServeHandler),
+		   ('/test', Test)
+          ], debug=True)
     run_wsgi_app(application)
 
-
 if __name__ == '__main__':
-    main()
-        
+  main()
