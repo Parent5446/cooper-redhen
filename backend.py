@@ -122,8 +122,8 @@ class Matcher(db.Model):
         index, peaks, and other indices and add them to the dictionaries."""
         db.Model.__init__(self)
         # Get the spectrum's key, peaks, and other heuristic data.
-        flatHeavysideKey = 21 # Fix this later
-        peaks = [1, 2] # Fix this later
+        flatHeavysideKey = 21 # Calculate for real later later
+        peaks = [1, 2] # Calculate for real later later
         # Add it to the dictionaries
         if heavyside in self.flat_heavyside: self.flat_heavyside[flatHeavysideKey].add(spectrum.key())
         else: self.flat_heavyside[flatHeavysideKey] = set([spectrum.key()])
