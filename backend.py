@@ -121,7 +121,7 @@ class Spectrum(db.Model):
         else:
             matcher = Matcher()
         key = self.put()
-        matcher.add(self, key)
+        matcher.add(self)
         memcache.set(spectrum_type+'_matcher', matcher)
         matcher.put()
     
@@ -289,8 +289,15 @@ class Matcher(db.Model):
     high_low = DictProperty()
     chem_types = DictProperty()
 	
-	def add(self, spectrum, key):
-		pass
+	def add(self, spectrum):
+		key = str(spectrum.key())
+        heavyside = spectrum.find_heavyside()
+        peaks = self.find_peaks()
+        
+        self.heavyside1[heavyside] = key
+        for peak in peaks:
+            self.peak_table[peak].append(key)
+        return True
 	def get(self, spectrum):
 		pass
     
