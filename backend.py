@@ -28,9 +28,8 @@ def add(file):
     spectrum = Spectrum(file)
     spectrum_type = 'Infrared'
     matcher = memcache.get(spectrum_type+'_matcher')
-    if matcher is None: matcher = Matcher.all()
-    if not matcher.count(1): matcher = matcher[0] #Change this when there is more than one
-    else: matcher = Matcher()
+    if matcher is None: matcher = Matcher.get_by_key_name(spectrum_type)
+    if not matcher: matcher = Matcher(key_name=spectrum_type)
     spectrum.put() #Add to database
     matcher.add(spectrum) #Add to matcher
     
