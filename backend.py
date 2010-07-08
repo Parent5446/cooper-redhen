@@ -1,6 +1,7 @@
 ﻿import os.path
 import re
-from google.appengine.ext import db, memcache
+from google.appengine.ext import db
+from google.appengine.api import memcache
 
 #Spectrum database entries and voting data structures will be preloaded
 def search(file):
@@ -301,7 +302,7 @@ class Matcher(db.Model):
     # Variables to be stored in the Google Data Store
     heavyside1 = DictProperty()
     heavyside2 = DictProperty()
-    peak_table = ListProperty()
+    peak_table = db.ListProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
     
