@@ -1,4 +1,4 @@
-﻿import os.path, re
+﻿import os.path, re, pickle
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
@@ -125,10 +125,10 @@ class Matcher(db.Model):
         flatHeavysideKey = 21 # Calculate for real later later
         peaks = [1, 2] # Calculate for real later later
         # Add it to the dictionaries
-        if heavyside in self.flat_heavyside: self.flat_heavyside[flatHeavysideKey].add(spectrum.key())
+        if flatHeavysideKey in self.flat_heavyside: self.flat_heavyside[flatHeavysideKey].add(spectrum.key())
         else: self.flat_heavyside[flatHeavysideKey] = set([spectrum.key()])
         for peak in peaks:
-            self.peak_table.append( (spectrum.key(), peak) )
+            self.peak_table[peak] = spectrum.key() #This will need to be sorted as a list later
     
     def get(self, spectrum):
         """Find spectra that may represent the given Spectrum object by sorting
