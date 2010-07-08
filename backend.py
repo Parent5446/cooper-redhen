@@ -110,7 +110,10 @@ class Spectrum(db.Model):
             # Reset the working line.
             workingline = ""
         return True
-    
+		
+    def Bove(self, other):
+		self.error = max([abs(self.data[i]-other.data[i]) for i in len(self.data)])
+		
     def	add(self):
         spectrum_type = 'Infrared'
         matcher = memcache.get(spectrum_type+'_matcher')
