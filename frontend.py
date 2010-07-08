@@ -48,7 +48,8 @@ class Test(webapp.RequestHandler):
 	def get(self):
 		self.response.out.write('Testing backend...')
 		file = open('jcamp-test.jdx')
-		response = backend.search(file)
+        backend.add(file)
+		#response = backend.search(file)
 		self.response.out.write('Done')
 
 application = webapp.WSGIApplication([

@@ -23,6 +23,16 @@ def search(file):
     candidates = sorted(candidates, key=lambda k: k.error)
     #Then return the candidates, and let frontend do the rest
     return "It's me, the backend! Let's do this!\n"
+
+def add(file):
+    spectrum = Spectrum(file)
+    spectrum_type = 'Infrared'
+    matcher = memcache.get(spectrum_type+'_matcher')
+    if matcher is None: matcher = Matcher.all()
+    if matcher: matcher = matcher[0] #Change this when there is more than one
+    else matcher = Matcher()
+    spectrum.put() #Add to database
+    matcher.add(spectrum) #Add to matcher
     
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
