@@ -43,10 +43,18 @@ class Guestbook(webapp.RequestHandler):
         greeting.content = self.request.get('content')
         greeting.put()
         self.redirect('/')
+		
+class Test(webapp.RequestHandler):
+	def get(self):
+		self.response.out.write('Testing backend...')
+		file = open('jcamp-test.jdx')
+		response = backend.search(file)
+		self.response.out.write('Done')
 
 application = webapp.WSGIApplication(
                                      [('/', MainPage),
-                                      ('/sign', Guestbook)],
+                                      ('/sign', Guestbook),
+									  ('/test', Test)],
                                      debug=True)
 
 def main():
