@@ -131,10 +131,10 @@ class Spectrum(db.Model):
         matcher.put()
     
     def bove(self, other):
-		self.error = Matcher().bove(self, other)
-	
-	def least_squares(self, other):
-		self.error = Matcher().least_squares(self, other)
+        self.error = Matcher().bove(self, other)
+    
+    def least_squares(self, other):
+        self.error = Matcher().least_squares(self, other)
     
     def find_peaks(self): 
         """Check memcache then the Data Store for the peaks in this Spectrum.
@@ -340,8 +340,8 @@ class Matcher(db.Model):
     
     @staticmethod
     def bove(one, other):
-		return max([abs(one.data[i]-other.data[i]) for i in len(one.data)])
-	
+        return max([abs(one.data[i]-other.data[i]) for i in len(one.data)])
+    
     @staticmethod
-	def least_squares(one, other):
-		return sum([(one.data[i]-one.other[i])**2 for i in len(one.data)])
+    def least_squares(one, other):
+        return sum([(one.data[i]-one.other[i])**2 for i in len(one.data)])
