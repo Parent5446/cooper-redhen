@@ -300,7 +300,7 @@ class Matcher(db.Model):
     # Variables to be stored in the Google Data Store
     heavyside1 = DictProperty()
     heavyside2 = DictProperty()
-    peak_table = db.ListProperty()
+    peak_table = DictProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
     

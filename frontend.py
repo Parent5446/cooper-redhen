@@ -11,7 +11,6 @@ from google.appengine.api import images
 
 logging.getLogger().setLevel(logging.DEBUG)
 
-
 class JDXFile(db.Model):
     fileName = db.BlobProperty()
     date = db.DateTimeProperty(auto_now_add=True)
@@ -63,7 +62,8 @@ class Test(webapp.RequestHandler):
 application = webapp.WSGIApplication([
     ('/', MainPage),
     ('/img', JDX),
-    ('/sign', Uploader)
+    ('/sign', Uploader),
+    ('/test', Test)
 ], debug=True)
 
 
