@@ -122,7 +122,10 @@ class Spectrum(db.Model):
 		return variance
 		
     def add(self):
+        """Add the spectrum to the data store and put its relevant heuristic data in
+        the Matcher object."""
         spectrum_type = 'Infrared'
+        # Get the Matcher, or make a new one if it does not exist.
         matcher = memcache.get(spectrum_type+'_matcher')
         if matcher is None:
             matcher = Matcher.all()
@@ -130,6 +133,7 @@ class Spectrum(db.Model):
             matcher = matcher[0] #Change this when there is more than one
         else:
             matcher = Matcher()
+        # Put to the data store, then to the Matcher.
         key = self.put()
         matcher.add(self)
         memcache.set(spectrum_type+'_matcher', matcher)
@@ -295,6 +299,10 @@ class DictProperty(db.Property):
 
 
 class Matcher(db.Model):
+    """Store spectra data necessary for searching the database, then search the database
+    for candidates that may represent a given spectrum."""
+    
+    # Variables to be stored in the Google Data Store
     heavyside1 = DictProperty()
     heavyside2 = DictProperty()
     peak_table = ListProperty()
@@ -302,16 +310,22 @@ class Matcher(db.Model):
     chem_types = DictProperty()
     
     def add(self, spectrum):
+        """Add new spectrum data to the various Matcher dictionaries. Find the heavyside
+        index, peaks, and other indices and add them to the dictionaries."""
+        # Get the spectrum's key, peaks, and other heuristic data.
         key = str(spectrum.key())
         heavyside = spectrum.find_heavyside()
         peaks = self.find_peaks()
-        
+        # Add it to the dictionaries.
         self.heavyside1[heavyside] = key
         for peak in peaks:
             self.peak_table[peak].append(key)
         return True
     
     def get(self, spectrum):
+        """Find spectra that may represent the given Spectrum object by sorting
+        the database using different heuristics, having them vote, and returning only
+        the spectra deemed similar to the given spectrum."""
         # Get the reference values
         peaks = spectrum.find_peaks()
         heavyside = spectrum.find_heavyside()
