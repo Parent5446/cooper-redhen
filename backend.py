@@ -29,8 +29,8 @@ def add(file):
     spectrum_type = 'Infrared'
     matcher = memcache.get(spectrum_type+'_matcher')
     if matcher is None: matcher = Matcher.all()
-    if matcher: matcher = matcher[0] #Change this when there is more than one
-    else matcher = Matcher()
+    if not matcher.count(1): matcher = matcher[0] #Change this when there is more than one
+    else: matcher = Matcher()
     spectrum.put() #Add to database
     matcher.add(spectrum) #Add to matcher
     
@@ -42,25 +42,10 @@ class Spectrum(db.Model):
     chemical_type = db.StringProperty(required=True)
     data = db.ListProperty(float, required=True)
     
-    def __init__(self, file_data):
-        """Parse a string of JCAMP file data and extract all options
-        and XY data."""
-        opt_list  =  {"TITLE":             True,  "JCAMP-DX":           True,
-                      "DATA TYPE":         True,  "ORIGIN":             True,
-                      "OWNER":             True,  "XUNITS":             True,
-                      "YUNITS":            True,  "XFACTOR":            True,
-                      "YFACTOR":           True,  "FIRSTX":             True,
-                      "LASTX":             True,  "NPOINTS":            True,
-                      "FIRSTY":            True,  "XYDATA":             True,
-                      "END":               True,  "CLASS":              False,
-                      "DATE":              False, "SAMPLE DESCRIPTION": False,
-                      "CAS NAME":          False, "MOLOFORM":           False,
-                      "CAS REGISTRY NO":   False, "WISWESSER":          False,
-                      "MP":                False, "BP":                 False,
-                      "SOURCE REFERENCE":  False, "SAMPLING PROCEDURE": False,
-                      "DATA PROCESSING":   False, "RESOLUTION":         False,
-                      "DELTAX":            False}
-
+    def __init__(self, file):
+        """Parse a string of JCAMP file data and extract all needed data."""
+        contents = file.read()
+        self.data = [ float(match.group(1)) for match in re.finditer('[^\r\n]([d.-]+)', contents[contents.find('##XYDATA=(X++(Y..Y))')+20:]) ]
         # Note on JCAMP parsing syntax:
         # The file has a number of special characters to process:
         #   == - Denotes the start of a data label
@@ -73,54 +58,6 @@ class Spectrum(db.Model):
         #        NOTE: Can also be used to delimit string-containing
         #              data groups.
         # Reference: http://www.jcamp-dx.org/
-        if isinstance(data, str):
-            data = data.splitlines()
-        workingline = ""
-        for line in data:
-            workingline += line
-            # Start by removing inline comments
-            line = line.partition("$$")[0]
-            # First check if combining with next line
-            if line[-1] == "=":
-                workingline = workingline[:-1]
-                continue
-            # Now check for special characters
-            if workingline[0:2] == "==":
-                # This line is a data label
-                parts = workingline[2:].partition("=")
-                key, value = parts[0], parts[1]
-                if key[0] == "$":
-                    # Put custom options in a separate list
-                    self.options_custom[key] = value
-                elif key in opt_list.keys():
-                    opt_list[key] = value
-            else:
-                # This line is part of the xy data.
-                # First validate the data labels before continuing.
-                for key in opt_list.keys():
-                    if opt_list[key] and isinstance(opt_list[key], bool):
-                        # This means a required variable has not been set.
-                        return Error("Parse error: Missing required options.")
-                    # Now check how the XY data is sorted.
-                if opt_list["XYDATA"] == "(X++(Y..Y))":
-                    if not opt_list["DELTAX"]:
-                        deltax = (opt_list["LASTX"] - opt_list["FIRSTX"]) / \
-                                 (opt_list["NPOINTS"] - 1)
-                    else:
-                        deltax = opt_list["DELTAX"]
-                    rawpoints = re.findall(r'[0-9].]+', workingline)
-                    firstx = rawpoints[0]
-                    self.x.extend([firstx + k * deltax for k in range(len(rawpoints) - 1)])
-                    self.y.extend(rawpoints[1:])
-                elif opt_list["XYDATA"] == "(XY..XY)":
-                    x, y = re.findall(r'[0-9].]+', workingline)
-                    self.x.append(x)
-                    self.y.append(y)
-                else:
-                    return Error("Parse error: Invalid XY data.")
-            # Reset the working line.
-            workingline = ""
-        return True
     
     def add(self):
         """Add the spectrum to the data store and put its relevant heuristic data in
