@@ -50,7 +50,12 @@ class Test(webapp.RequestHandler):
             response = backend.search(file)
             text = '<br>'.join( [str(r.data) for r in response] )
             self.response.out.write(text)
-        self.response.out.write('<br>Done</html>')
+        self.response.out.write('<form action="/test" method="POST" enctype="multipart/form-data">')
+        self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form></body></html>')
+        
+    def post(self):
+        file_contents = self.request.POST.get('file').file.read()
+        self.response.out.write(file_contents)
 
 def main():
     application = webapp.WSGIApplication(
