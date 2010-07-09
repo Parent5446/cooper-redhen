@@ -25,6 +25,7 @@ def add(file):
     if not matcher: matcher = Matcher(key_name='__'+spectrum_type+'__')
     spectrum.put() #Add to database
     matcher.add(spectrum) #Add to matcher
+    #raise Exception(str(list(matcher.flat_heavyside[21])[0]) + ' - ' + str(spectrum.key()))
     matcher.put()
     memcache.add(spectrum_type+'_matcher', matcher)
     
