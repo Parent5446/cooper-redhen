@@ -48,7 +48,8 @@ class Test(webapp.RequestHandler):
             backend.add(file)
         else:
             response = backend.search(file)
-            self.response.out.write(str(response))
+            text = '<br>'.join( [str(r.data) for r in response] )
+            self.response.out.write(text)
         self.response.out.write('<br>Done</html>')
 
 def main():

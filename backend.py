@@ -11,10 +11,10 @@ def search(file):
     spectrum = Spectrum() # Load the user's spectrum into a Spectrum object.
     spectrum.parseFile(file)
     candidates = matcher.get(spectrum)
-    candidates = [ (candidate, Matcher.bove(spectrum, candidate)) for candidate in candidates]
-    candidates = sorted(candidates, key=lambda k: k[1])
+    for candidate in candidates: candidate.error = Matcher.bove(spectrum, candidate)
+    candidates = sorted(candidates, key=lambda k: k.error)
     #Then return the candidates, and let frontend do the rest
-    return "It's me, the backend! Let's do this!\n"
+    return candidates
 
 def add(file):
     spectrum = Spectrum() # Load the user's spectrum into a Spectrum object.
