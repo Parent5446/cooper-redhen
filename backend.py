@@ -1,4 +1,4 @@
-﻿import os.path, re, pickle
+﻿import os.path, re, pickle, bisect
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
@@ -96,7 +96,7 @@ class Matcher(db.Model):
     # Variables to be stored in the Google Data Store
     flat_heavyside = DictProperty()
     ordered_heavyside = DictProperty()
-    peak_table = GenericListProperty()
+    peak_list = GenericListProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
     
@@ -110,7 +110,8 @@ class Matcher(db.Model):
         if flatHeavysideKey in self.flat_heavyside: self.flat_heavyside[flatHeavysideKey].add(spectrum.key())
         else: self.flat_heavyside[flatHeavysideKey] = set([spectrum.key()])
         for peak in peaks:
-            self.peak_table[peak] = spectrum.key() #This will need to be sorted as a list later
+            index = bisect.bisect( [item[1] for item in self.peak_list], peak) #Find place in teh sorted list
+            self.peak_list.insert( index, (spectrum.key(),peak) ) #Insert in the right place
     
     def get(self, spectrum):
         """Find spectra that may represent the given Spectrum object by sorting
@@ -118,12 +119,23 @@ class Matcher(db.Model):
         the spectra deemed similar to the given spectrum."""
         # Get the reference values
         flatHeavysideKey = 21 # Calculate for real later later
-        peaks = [1, 2] # Calculate for real later later
+        peak = 1 # Calculate for real later later
         # Get the set of relevant spectra. The keys list should be a list of pairs with a spectrum and and a vote in each.
         keys = {}
+        #Add flat heavyside votes
         if flatHeavysideKey in self.flat_heavyside: 
             for key in self.flat_heavyside[flatHeavysideKey]:
                 keys[key] = 10 #10 votes
+                
+        #Add peak list votes
+        index = bisect.bisect( [item[1] for item in self.peak_list], peak)
+        for offset in xrange(10):
+            if index+offset-5 < 0 or index+offset-5 >= len(self.peak_list): continue
+            if self.peak_list[index+offset-5][0] in keys:
+                keys[self.peak_list[index+offset-5][0]] += abs(offset-5)
+            else:
+                keys[self.peak_list[index+offset-5][0]] = abs(offset-5)
+        
         keys = sorted(keys.iteritems(), lambda k: k[1])
         keys = [k[0] for k in keys]
         return Spectrum.get(keys)
