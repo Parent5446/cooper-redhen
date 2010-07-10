@@ -52,30 +52,42 @@ class Spectrum(db.Model):
 
 class DictProperty(db.Property):
     data_type = dict
-    
     def get_value_for_datastore(self, model_instance):
         value = super(DictProperty, self).get_value_for_datastore(model_instance)
         return db.Blob(pickle.dumps(value))
-    
     def make_value_from_datastore(self, value):
         if value is None:
             return dict()
         return pickle.loads(value)
-
     def default_value(self):
         if self.default is None:
             return dict()
         else:
             return super(DictProperty, self).default_value().copy()
-
     def validate(self, value):
         if not isinstance(value, dict):
             raise db.BadValueError('Property %s needs to be convertible to a dict instance (%s)' % (self.name, value))
         return super(DictProperty, self).validate(value)
-    
     def empty(self, value):
         return value is None
-
+        
+class GenericListProperty(db.Property):
+    data_type = list
+    def get_value_for_datastore(self, model_instance):
+        value = super(GenericListProperty, self).get_value_for_datastore(model_instance)
+        return db.Blob(pickle.dumps(value))
+    def make_value_from_datastore(self, value):
+        if value is None: return []
+        return pickle.loads(value)
+    def default_value(self):
+        if self.default is None: return []
+        else: return super(GenericListProperty, self).default_value().copy()
+    def validate(self, value):
+        if not isinstance(value, list):
+            raise db.BadValueError('Property %s needs to be convertible to a list instance (%s)' % (self.name, value))
+        return super(GenericListProperty, self).validate(value)
+    def empty(self, value):
+        return value is None
 
 class Matcher(db.Model):
     """Store spectra data necessary for searching the database, then search the database
@@ -84,7 +96,7 @@ class Matcher(db.Model):
     # Variables to be stored in the Google Data Store
     flat_heavyside = DictProperty()
     ordered_heavyside = DictProperty()
-    peak_table = DictProperty()
+    peak_table = GenericListProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
     
