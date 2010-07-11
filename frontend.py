@@ -10,6 +10,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.api import quota
 
 logging.getLogger().setLevel(logging.DEBUG)
 
@@ -44,14 +45,15 @@ class Test(webapp.RequestHandler):
     def get(self):
         self.response.out.write('<html>Testing backend...<br>')
         file = open('jcamp-test.jdx')
-        if 0:
+        if 1:
             backend.add(file)
         else:
             response = backend.search(file)
             #text = '<br>'.join( [str(r.data) for r in response] )
             #self.response.out.write(text)
-        self.response.out.write('<form action="/test" method="POST" enctype="multipart/form-data">')
-        self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form></body></html>')
+        self.response.out.write('<br><form action="/test" method="POST" enctype="multipart/form-data">')
+        self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form>')
+        self.response.out.write('<br>CPU megacycles: ' + str(quota.get_request_cpu_usage()) + '</body></html>')
         
     def post(self):
         file_contents = self.request.POST.get('file').file.read()

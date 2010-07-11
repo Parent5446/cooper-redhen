@@ -1,4 +1,4 @@
-﻿import os.path, re, pickle, bisect
+﻿import os.path, re, pickle, bisect, operator
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
@@ -12,7 +12,7 @@ def search(file):
     spectrum.parseFile(file)
     candidates = matcher.get(spectrum)
     for candidate in candidates: candidate.error = Matcher.bove(spectrum, candidate)
-    candidates = sorted(candidates, key=lambda k: k.error)
+    list.sort(candidates, key = operator.attrgetter('error'), reverse=True)
     #Then return the candidates, and let frontend do the rest
     return candidates
 
@@ -39,13 +39,15 @@ class Spectrum(db.Model):
     
     def parseFile(self, file):
         """Parse a string of JCAMP file data and extract all needed data."""
-        contents = file.read()
-        x = float(self.get_field('##FIRSTX=', contents))
-        deltaX = float(self.get_field('##DELTAX=', contents))
+        self.contents = file.read()
+        x = float(self.get_field('##FIRSTX='))
+        deltaX = float(self.get_field('##DELTAX='))
+        xFactor = float(self.get_field('##XFACTOR='))
+        yFactor = float(self.get_field('##YFACTOR='))
         self.xy = [] # list of (x,y) pairs
-        for match in re.finditer(r'(\D)([\d.-]+)', contents[contents.index('##XYDATA=(X++(Y..Y))')+20:]):
-            if match.group(1) == '\n': x = float(match.group(2))
-            else: self.xy.append( (x, float(match.group(2))) ); x += deltaX
+        for match in re.finditer(r'(\D)([\d.-]+)', self.contents[self.contents.index('##XYDATA=(X++(Y..Y))')+20:]):
+            if match.group(1) == '\n': x = float(match.group(2))*xFactor
+            else: self.xy.append( (x, float(match.group(2))*yFactor) ); x += deltaX
         if deltaX < 0: self.xy.reverse() #Keep in ascending order of x
         #Integrate self.xy numerically over a fixed range:
         range = (700.0, 3900.0) #Define range to integrate
@@ -65,12 +67,12 @@ class Spectrum(db.Model):
             if x > range[1]: break #If finished, break
             oldX,oldY = x,y #Otherwise keep going
         self.chemical_type = 'Unknown'
-        self.chemical_name = self.get_field('##TITLE=', contents)
+        self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
         
-    def get_field(self, name, string):
-        index = string.index(name) + len(name)
-        return string[index:string.index('\n', index)] #Does not handle Unix format
+    def get_field(self, name):
+        index = self.contents.index(name) + len(name)
+        return self.contents[index:self.contents.index('\n', index)] #Does not handle Unix format
 
 class DictProperty(db.Property):
     data_type = dict
@@ -123,12 +125,27 @@ class Matcher(db.Model):
     chem_types = DictProperty()
     
     def add(self, spectrum):
-        """Add new spectrum data to the various Matcher dictionaries. Find the heavyside
-        index, peaks, and other indices and add them to the dictionaries."""
-        # Get the spectrum's key, peaks, and other heuristic data.
+        """Add new spectrum data to the various Matcher data structures. Find the heavyside
+        index, peaks, and other indices and add them to the data structures."""
+        # Get the spectrum's key, peaks, and other heuristic data:
         flatHeavysideKey = 21 # Calculate for real later later
-        peaks = [1, 2] # Calculate for real later later
-        # Add it to the dictionaries
+        
+        #peak_list - positions of highest peaks:
+        xy = sorted(spectrum.xy, key = operator.itemgetter(1), reverse = True)
+        peaks = []
+        for x,y in xy:
+            if y < xy[0][1]*0.95: break
+            add = True
+            for peak in peaks:
+                if abs(peak-x) < 1: add = False #Must be more than 1 cm-1 from other peaks
+            if add: peaks.append(x)
+        
+        # maxY = float(spectrum.get_field('##MAXY='))
+        # oldPeak = (0, maxY*0.9)
+        # for x,y in spectrum.xy:
+            # if y > oldPeak[1]: oldPeak = x,y
+        
+        # Add it to the data structures:
         if flatHeavysideKey in self.flat_heavyside: self.flat_heavyside[flatHeavysideKey].add(spectrum.key())
         else: self.flat_heavyside[flatHeavysideKey] = set([spectrum.key()])
         for peak in peaks:
@@ -158,7 +175,7 @@ class Matcher(db.Model):
             else:
                 keys[self.peak_list[index+offset-5][0]] = abs(offset-5)
         
-        keys = sorted(keys.iteritems(), lambda k: k[1])
+        keys = sorted(keys.iteritems(), key = operator.itemgetter(1))
         keys = [k[0] for k in keys]
         return Spectrum.get(keys)
     
