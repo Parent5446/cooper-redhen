@@ -49,9 +49,9 @@ class Test(webapp.RequestHandler):
             backend.add(file)
         else:
             response = backend.search(file)
-            #text = '<br>'.join( [str(r.data) for r in response] )
-            #self.response.out.write(text)
-        self.response.out.write('<br><form action="/test" method="POST" enctype="multipart/form-data">')
+            text = '<pre>' + '\n'.join( [str(r)[1:-1] for r in response] ) + '</pre>'
+            self.response.out.write(text)
+        self.response.out.write('<form action="/test" method="POST" enctype="multipart/form-data">')
         self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form>')
         self.response.out.write('<br>CPU megacycles: ' + str(quota.get_request_cpu_usage()) + '</body></html>')
         

@@ -2,12 +2,16 @@
 from google.appengine.ext import db
 from google.appengine.api import memcache
 
+#Testing:
+import time
+from google.appengine.api import quota
+import logging
+
 #Spectrum database entries and voting data structures will be preloaded
 def search(file):
     spectrum_type = 'Infrared'
     matcher = memcache.get(spectrum_type+'_matcher')
-    if matcher is None: matcher = Matcher.get_by_key_name('__'+spectrum_type+'__')
-
+    if matcher is None: matcher = Matcher.get_by_key_name(spectrum_type)
     spectrum = Spectrum() # Load the user's spectrum into a Spectrum object.
     spectrum.parseFile(file)
     candidates = matcher.get(spectrum)
@@ -22,7 +26,7 @@ def add(file):
     spectrum_type = 'Infrared'
     matcher = memcache.get(spectrum_type+'_matcher')
     if matcher is None: matcher = Matcher.get_by_key_name(spectrum_type)
-    if not matcher: matcher = Matcher(key_name='__'+spectrum_type+'__')
+    if not matcher: matcher = Matcher(key_name=spectrum_type)
     spectrum.put() #Add to database
     matcher.add(spectrum) #Add to matcher
     #raise Exception(str(list(matcher.flat_heavyside[21])[0]) + ' - ' + str(spectrum.key()))
@@ -128,7 +132,25 @@ class Matcher(db.Model):
         """Add new spectrum data to the various Matcher data structures. Find the heavyside
         index, peaks, and other indices and add them to the data structures."""
         # Get the spectrum's key, peaks, and other heuristic data:
-        flatHeavysideKey = 21 # Calculate for real later later
+        
+        #Flat heavyside: hash table of heavyside keys
+        stack = [(0,0,0,len(spectrum.data))] #List of (key, whichBit, leftEdge, width)
+        MAX_BITS = 8
+        while len(stack) > 0:
+            key, whichBit, leftEdge, width = stack.pop()
+            if whichBit == MAX_BITS: #We're done with this key, so add it to the table
+                if key in self.flat_heavyside: self.flat_heavyside[key].add(spectrum.key())
+                else: self.flat_heavyside[key] = set([spectrum.key()])
+            else:
+                left = sum(spectrum.data[leftEdge:leftEdge+width/2]) #Sum integrals
+                right = sum(spectrum.data[leftEdge+width/2:leftEdge+width]) #on both sides
+                if leftEdge+width == len(spectrum.data): leftEdge = 0; width = width/2 #Adjust boundaries
+                else: leftEdge += width #for next iteration
+                if abs(left-right) < left*0.03: #If too close to call add twice
+                    stack.append( (key, whichBit+1, leftEdge, width) ) #Once, leave key unchanged
+                    stack.append( (key+(1<<(MAX_BITS-whichBit)), whichBit+1, leftEdge, width) ) #and once change key
+                else: stack.append( (key+((left<right)<<(MAX_BITS-whichBit)), whichBit+1, leftEdge, width) )
+        raise Exception(self.flat_heavyside)
         
         #peak_list - positions of highest peaks:
         xy = sorted(spectrum.xy, key = operator.itemgetter(1), reverse = True)
@@ -139,15 +161,6 @@ class Matcher(db.Model):
             for peak in peaks:
                 if abs(peak-x) < 1: add = False #Must be more than 1 cm-1 from other peaks
             if add: peaks.append(x)
-        
-        # maxY = float(spectrum.get_field('##MAXY='))
-        # oldPeak = (0, maxY*0.9)
-        # for x,y in spectrum.xy:
-            # if y > oldPeak[1]: oldPeak = x,y
-        
-        # Add it to the data structures:
-        if flatHeavysideKey in self.flat_heavyside: self.flat_heavyside[flatHeavysideKey].add(spectrum.key())
-        else: self.flat_heavyside[flatHeavysideKey] = set([spectrum.key()])
         for peak in peaks:
             index = bisect.bisect( [item[1] for item in self.peak_list], peak) #Find place in the sorted list
             self.peak_list.insert( index, (spectrum.key(),peak) ) #Insert in the right place
@@ -158,8 +171,9 @@ class Matcher(db.Model):
         the spectra deemed similar to the given spectrum."""
         # Get the reference values
         flatHeavysideKey = 21 # Calculate for real later later
-        peak = 1 # Calculate for real later later
-        # Get the set of relevant spectra. The keys list should be a list of pairs with a spectrum and and a vote in each.
+        peak = max(spectrum.xy, key=operator.itemgetter(1))[0] # Find x with highest y
+        
+        # Get the candidates in a hash table
         keys = {}
         #Add flat heavyside votes
         if flatHeavysideKey in self.flat_heavyside: 
@@ -174,10 +188,9 @@ class Matcher(db.Model):
                 keys[self.peak_list[index+offset-5][0]] += abs(offset-5)
             else:
                 keys[self.peak_list[index+offset-5][0]] = abs(offset-5)
-        
+                
         keys = sorted(keys.iteritems(), key = operator.itemgetter(1))
-        keys = [k[0] for k in keys]
-        return Spectrum.get(keys)
+        return Spectrum.get([k[0] for k in keys])
     
     @staticmethod
     def bove(a, b):
