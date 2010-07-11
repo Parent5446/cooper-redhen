@@ -37,18 +37,40 @@ class Spectrum(db.Model):
     chemical_type = db.StringProperty()
     data = db.ListProperty(float)
     
-    def parseFile(self, file): #Consider not using a constructor
+    def parseFile(self, file):
         """Parse a string of JCAMP file data and extract all needed data."""
         contents = file.read()
-        self.xy = [ float(match.group(1)) for match in re.finditer('[^\r\n]([d.-]+)', contents[contents.index('##XYDATA=(X++(Y..Y))')+20:]) ]
-        self.data = [1.0, 2.0, 3.0]
+        x = float(self.get_field('##FIRSTX=', contents))
+        deltaX = float(self.get_field('##DELTAX=', contents))
+        self.xy = [] # list of (x,y) pairs
+        for match in re.finditer(r'(\D)([\d.-]+)', contents[contents.index('##XYDATA=(X++(Y..Y))')+20:]):
+            if match.group(1) == '\n': x = float(match.group(2))
+            else: self.xy.append( (x, float(match.group(2))) ); x += deltaX
+        if deltaX < 0: self.xy.reverse() #Keep in ascending order of x
+        #Integrate self.xy numerically over a fixed range:
+        range = (700.0, 3900.0) #Define range to integrate
+        self.data = [0.0 for i in xrange(1000)] # Intialize data to zero
+        interval = (range[1]-range[0])/len(self.data) #Find width of each integral
+        start = 0
+        while self.xy[start][0] < range[0]: start+=1 #Find index in self.xy where integrals start
+        oldX, oldY = range[0], self.xy[start-1][1] + (self.xy[start][1]-self.xy[start-1][1])*(range[0]-self.xy[start][0])/(self.xy[start-1][0] - self.xy[start][0]) #x = start of range, y = linear interpolation of corresponding y
+        for x,y in self.xy[start:]: #Iterate over self.xy from start
+            newIndex, oldIndex = int((x-range[0])/interval), int((oldX-range[0])/interval)
+            if newIndex != oldIndex: #If we're starting a new integral
+                boundary = newIndex*interval, (y-oldY)*(newIndex*interval-oldX)/(x-oldX) + oldY #Linear interpolation
+                self.data[oldIndex] += (boundary[1]+oldY)*(boundary[0]-oldX)/2 #Add area
+                if newIndex < len(self.data):
+                    self.data[newIndex] += (boundary[1]+y)*(x-boundary[0])/2 #Add area
+            else: self.data[newIndex] += (y+oldY)*(x-oldX)/2 #Add area
+            if x > range[1]: break #If finished, break
+            oldX,oldY = x,y #Otherwise keep going
         self.chemical_type = 'Unknown'
         self.chemical_name = self.get_field('##TITLE=', contents)
         # Reference: http://www.jcamp-dx.org/
         
-    def get_field(self, name, data):
-        index = data.index(name) + len(name)
-        return data[index:data.index('\n', index)] #Does not handle Unix format
+    def get_field(self, name, string):
+        index = string.index(name) + len(name)
+        return string[index:string.index('\n', index)] #Does not handle Unix format
 
 class DictProperty(db.Property):
     data_type = dict
@@ -110,7 +132,7 @@ class Matcher(db.Model):
         if flatHeavysideKey in self.flat_heavyside: self.flat_heavyside[flatHeavysideKey].add(spectrum.key())
         else: self.flat_heavyside[flatHeavysideKey] = set([spectrum.key()])
         for peak in peaks:
-            index = bisect.bisect( [item[1] for item in self.peak_list], peak) #Find place in teh sorted list
+            index = bisect.bisect( [item[1] for item in self.peak_list], peak) #Find place in the sorted list
             self.peak_list.insert( index, (spectrum.key(),peak) ) #Insert in the right place
     
     def get(self, spectrum):
