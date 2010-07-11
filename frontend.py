@@ -45,7 +45,7 @@ class Test(webapp.RequestHandler):
     def get(self):
         self.response.out.write('<html>Testing backend...<br>')
         file = open('jcamp-test.jdx')
-        if 1:
+        if 0:
             backend.add(file)
         else:
             response = backend.search(file)

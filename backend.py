@@ -127,6 +127,7 @@ class Matcher(db.Model):
     peak_list = GenericListProperty()
     high_low = DictProperty()
     chem_types = DictProperty()
+    FLAT_HEAVYSIDE_BITS = 8
     
     def add(self, spectrum):
         """Add new spectrum data to the various Matcher data structures. Find the heavyside
@@ -135,10 +136,9 @@ class Matcher(db.Model):
         
         #Flat heavyside: hash table of heavyside keys
         stack = [(0,0,0,len(spectrum.data))] #List of (key, whichBit, leftEdge, width)
-        MAX_BITS = 8
         while len(stack) > 0:
             key, whichBit, leftEdge, width = stack.pop()
-            if whichBit == MAX_BITS: #We're done with this key, so add it to the table
+            if whichBit == Matcher.FLAT_HEAVYSIDE_BITS: #We're done with this key, so add it to the table
                 if key in self.flat_heavyside: self.flat_heavyside[key].add(spectrum.key())
                 else: self.flat_heavyside[key] = set([spectrum.key()])
             else:
@@ -148,9 +148,8 @@ class Matcher(db.Model):
                 else: leftEdge += width #for next iteration
                 if abs(left-right) < left*0.03: #If too close to call add twice
                     stack.append( (key, whichBit+1, leftEdge, width) ) #Once, leave key unchanged
-                    stack.append( (key+(1<<(MAX_BITS-whichBit)), whichBit+1, leftEdge, width) ) #and once change key
-                else: stack.append( (key+((left<right)<<(MAX_BITS-whichBit)), whichBit+1, leftEdge, width) )
-        raise Exception(self.flat_heavyside)
+                    stack.append( (key+(1<<(Matcher.FLAT_HEAVYSIDE_BITS-whichBit)), whichBit+1, leftEdge, width) ) #and once change key
+                else: stack.append( (key+((left<right)<<(Matcher.FLAT_HEAVYSIDE_BITS-whichBit)), whichBit+1, leftEdge, width) )
         
         #peak_list - positions of highest peaks:
         xy = sorted(spectrum.xy, key = operator.itemgetter(1), reverse = True)
@@ -170,7 +169,16 @@ class Matcher(db.Model):
         the database using different heuristics, having them vote, and returning only
         the spectra deemed similar to the given spectrum."""
         # Get the reference values
-        flatHeavysideKey = 21 # Calculate for real later later
+        
+        #Get flat heayside key:
+        flatHeavysideKey, leftEdge, width = 0, 0, len(spectrum.data)
+        for whichBit in xrange(Matcher.FLAT_HEAVYSIDE_BITS):
+            left = sum(spectrum.data[leftEdge:leftEdge+width/2]) #Sum integrals
+            right = sum(spectrum.data[leftEdge+width/2:leftEdge+width]) #on both sides
+            if leftEdge+width == len(spectrum.data): leftEdge = 0; width = width/2 #Adjust boundaries
+            else: leftEdge += width #for next iteration
+            flatHeavysideKey += (left<right)<<(Matcher.FLAT_HEAVYSIDE_BITS-whichBit)
+        #Get x position of highest peak:
         peak = max(spectrum.xy, key=operator.itemgetter(1))[0] # Find x with highest y
         
         # Get the candidates in a hash table
