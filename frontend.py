@@ -27,7 +27,7 @@ class MainPage(webapp.RequestHandler):
 				</form>
 				</body></html>""")
 
-class UploadedFile(webapp.REquestHandler):
+class UploadedFile(webapp.RequestHandler):
 		def post(self):
 			jdxFile = JDXFile()
 			jdxFile.fileName = db.Blob(fileName)
