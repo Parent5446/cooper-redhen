@@ -16,9 +16,12 @@ from google.appengine.api import users
 class MyHandler(webapp.RequestHandler):
     def get(self):
         user = users.get_current_user()
-        if user:
-            greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" %
+        if user and users.is_current_user_admin():
+            greeting = ("Welcome, Administrator %s! (<a href=\"%s\">sign out</a>)" %
                         (user.nickname(), users.create_logout_url("/")))
+		if user and !users.is_current_user_admin():
+            greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" %
+                        (user.nickname(), users.create_logout_url("/")))			
         else:
             greeting = ("<a href=\"%s\">Sign in or register</a>." %
                         users.create_login_url("/"))
