@@ -1,11 +1,11 @@
 ﻿'''This is a program for identifying spectra'''
 
-import re #regex(regular expressions)
-import pickle #datastorage(converts variables into string form)
-import bisect #binary search of a list
-import operator #fast functions for getting data from objects (used for key methods)
-from google.appengine.ext import db #import database
-from google.appengine.api import memcache #import memory cache
+import re # re.finditer (regex searches)
+import pickle # pickle.loads, pickle.dumps (data serialization)
+import bisect # bisect.bisect (binary search of a list)
+import operator # operator.attrgetter, operator.itemgetter (functions for getting data from objects)
+from google.appengine.ext import db # import database
+from google.appengine.api import memcache # import memory cache
 
 #Testing:
 import time
@@ -15,112 +15,173 @@ import logging
 #Spectrum database entries and voting data structures will be preloaded
 def search(file):
     """Search for a spectrum based on a given file descriptor."""
-    spectrum = Spectrum() # Load the user's spectrum into a Spectrum object.
+    # Load the user's spectrum into a Spectrum object.
+    spectrum = Spectrum()
     spectrum.parseFile(file)
-    matcher = memcache.get(spectrum.type+'_matcher') # Get Matcher from cache.
-    if matcher is None: matcher = Matcher.get_by_key_name(spectrum.type) # If not in cache, get from database.
-    candidates = matcher.get(spectrum) # Find similar spectra
-    for candidate in candidates: candidate.error = Matcher.bove(spectrum, candidate) # Do one-to-one on candidates.
-    list.sort(candidates, key = operator.attrgetter('error'), reverse=True) # Sort by error
-    #Then return the candidates, and let frontend do the rest
+    # Check cache for the Matcher. If not, get from database.
+    matcher = memcache.get(spectrum.type+'_matcher')
+    if matcher is None:
+        matcher = Matcher.get_by_key_name(spectrum.type)
+    # Get the candidates for similar spectra.
+    candidates = matcher.get(spectrum)
+    # Do one-to-one on candidates and sort by error.
+    for candidate in candidates:
+        candidate.error = Matcher.bove(spectrum, candidate)
+    list.sort(candidates, key=operator.attrgetter('error'), reverse=True)
+    # Let frontend do the rest
     return candidates
 
 def add(file):
     """Add a new spectrum to the database from a given file descriptor."""
-    spectrum = Spectrum() # Load the user's spectrum into a Spectrum object.
+    # Load the user's spectrum into a Spectrum object.
+    spectrum = Spectrum()
     spectrum.parseFile(file)
-    matcher = memcache.get(spectrum.type+'_matcher') # Get Matcher from cache.
-    if matcher is None: matcher = Matcher.get_by_key_name(spectrum.type) # If not in cache, get from database.
-    if not matcher: matcher = Matcher(key_name=spectrum.type) # If not in database, make new one.
-    spectrum.put() #Add to database
-    matcher.add(spectrum) #Add to matcher 
-    matcher.put() # Update matcher to database.
-    memcache.add(spectrum.type+'_matcher', matcher) # Put into the cache for easy access.
+    # Check cache for the Matcher. If not, get from database. If it's not there,
+    # make a new one.
+    matcher = memcache.get(spectrum.type+'_matcher')
+    if matcher is None:
+        matcher = Matcher.get_by_key_name(spectrum.type)
+    if not matcher:
+        matcher = Matcher(key_name=spectrum.type)
+    # Add the spectrum to the database and Matcher.
+    spectrum.put()
+    matcher.add(spectrum)
+    # Update the Matcher to the database and the cache.
+    matcher.put()
+    memcache.add(spectrum.type+'_matcher', matcher)
     
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
     to compare the spectrum to the DataStore."""
+    
     # Variables to be stored in the Google DataStore.
-    chemical_name = db.StringProperty()  # stores the name of the chemical
-    chemical_type = db.StringProperty() # stores the type of the chemical
-    data = db.ListProperty(float)  # stores the data of the chemical
+    chemical_name = db.StringProperty()
+    chemical_type = db.StringProperty()
+    data = db.ListProperty(float)
     
     def parseFile(self, file):
         """Parse a string of JCAMP file data and extract all needed data."""
-        self.contents = file.read() # reading the string 
+        self.contents = file.read()
         self.type = 'Infrared' # Later this will be variable
-        x = float(self.get_field('##FIRSTX=')) # just gets the float after first x 
-        deltaX = float(self.get_field('##DELTAX='))   # space between adjacent x values
+        x = float(self.get_field('##FIRSTX=')) # The first x-value
+        deltaX = float(self.get_field('##DELTAX='))   # The Space between adjacent x values
         xFactor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
         yFactor = float(self.get_field('##YFACTOR=')) # some very small number, but if not use this instead
-        self.xy = [] # list of (x,y) pairs
-        for match in re.finditer(r'(\D)([\d.-]+)', self.contents[self.contents.index('##XYDATA=(X++(Y..Y))')+20:]): # match whatever comes before the number and the whole number
-            if match.group(1) == '\n': x = float(match.group(2))*xFactor # if thing before the number is a new line then it's a x value 
-            else: self.xy.append( (x, float(match.group(2))*yFactor) ); x += deltaX # otherwise it's a y value 
-        if deltaX < 0: self.xy.reverse() #Keep in ascending order of x
-        #Integrate self.xy numerically over a fixed range:
-        range = (700.0, 3900.0) #Define range to integrate 
-        self.data = [0.0 for i in xrange(1000)] # Intialize data to zero
-        interval = (range[1]-range[0])/len(self.data) #Find the horizontal distance between each integral 
+        self.xy = []
+        # Process the XY data from JCAMP's (X++(Y..Y)) format.
+        raw_xy = self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]
+        for match in re.finditer(r'(\D)([\d.-]+)', raw_xy):
+            if match.group(1) == '\n':
+                # Number is the first on the line and is an x-value
+                x = float(match.group(2)) * xFactor
+            else:
+                # Number is a relative y-value.
+                self.xy.append((x, float(match.group(2))*yFactor))
+                x += deltaX
+        # Keep the data in ascending order. It will be descending in the file
+        # if our delta X is negative.
+        if deltaX < 0:
+            self.xy.reverse()
+        # Integrate self.xy numerically over a fixed range.
+        range = (700.0, 3900.0)
+        # Initialize the data and find the interval of integration.
+        self.data = [0.0 for i in xrange(1000)]
+        interval = (range[1] - range[0]) / len(self.data)
+        # Find index in self.xy where integrals start
         start = 0
-        while self.xy[start][0] < range[0]: start+=1 #Find index in self.xy where integrals start
-        oldX, oldY = range[0], self.xy[start-1][1] + (self.xy[start][1]-self.xy[start-1][1])*(range[0]-self.xy[start][0])/(self.xy[start-1][0] - self.xy[start][0]) #x = start of range, y = linear interpolation of corresponding y
-        for x,y in self.xy[start:]: #Iterate over self.xy from start
+        while self.xy[start][0] < range[0]:
+            start+=1
+        # oldX = start of range, oldY = linear interpolation of corresponding y
+        oldX, oldY = range[0], (self.xy[start - 1][1] + (self.xy[start][1] - self.xy[start - 1][1]) * (range[0] - self.xy[start][0]) / (self.xy[start - 1][0] - self.xy[start][0]))
+        for x, y in self.xy[start:]: #Iterate over self.xy from start
             newIndex, oldIndex = int((x-range[0])/interval), int((oldX-range[0])/interval) # finds the positions in the data array 
-            if newIndex != oldIndex: #If we're starting a new integral
+            if newIndex != oldIndex:
+                # We're starting a new integral.
                 boundary = newIndex*interval, (y-oldY)*(newIndex*interval-oldX)/(x-oldX) + oldY #Linear interpolation
                 self.data[oldIndex] += (boundary[1]+oldY)*(boundary[0]-oldX)/2 #Add area
                 if newIndex < len(self.data): # if data isn't filled 
                     self.data[newIndex] += (boundary[1]+y)*(x-boundary[0])/2 #Add area
-            else: self.data[newIndex] += (y+oldY)*(x-oldX)/2 #Add area
-            if x > range[1]: break #If finished, break
-            oldX,oldY = x,y #Otherwise keep going
+            else:
+                self.data[newIndex] += (y+oldY)*(x-oldX)/2 #Add area
+            if x > range[1]:
+                break #If finished, break
+            oldX, oldY = x, y #Otherwise keep going
         self.chemical_type = 'Unknown' # We will find this later 
         self.chemical_name = self.get_field('##TITLE=') # assuming chemical name is in title field 
         # Reference: http://www.jcamp-dx.org/
         
     def get_field(self, name):
+        """Get a specific data label from the file."""
         index = self.contents.index(name) + len(name) # means find where the field name ends 
         return self.contents[index:self.contents.index('\n', index)] #Does not handle Windows format
 
 class DictProperty(db.Property):
-    data_type = dict #data_type is dict
+
+    data_type = dict
+    
     def get_value_for_datastore(self, model_instance):
-        value = super(DictProperty, self).get_value_for_datastore(model_instance) #get string for database
-        return db.Blob(pickle.dumps(value)) #convert into a string and stores it
+        """Use pickle to serialize a dictionary for database storage."""
+        value = super(DictProperty, self).get_value_for_datastore(model_instance)
+        return db.Blob(pickle.dumps(value))
+    
     def make_value_from_datastore(self, value):
-        if value is None: #if there is no value
-            return dict() #returns an empty dict
-        return pickle.loads(value) #gets a value from a string
+        """Use pickle to deserialize a dictionary from the database."""
+        if value is None:
+            # Make a new dictionary if it does not exist.
+            return dict()
+        return pickle.loads(value)
+    
     def default_value(self):
-        if self.default is None: #if there is no default
-            return dict() #returns empty dict
+        """Get the default value for the property."""
+        if self.default is None:
+            return dict()
         else:
-            return super(DictProperty, self).default_value().copy() #returns default value
+            return super(DictProperty, self).default_value().copy()
+    
     def validate(self, value):
-        if not isinstance(value, dict): #if it is not a dict
-            raise db.BadValueError('Property %s needs to be convertible to a dict instance (%s)' % (self.name, value)) #sends error report back to user
-        return super(DictProperty, self).validate(value) #parent class validates it
+        """Check if the value is actually a dictionary."""
+        if not isinstance(value, dict):
+            raise db.BadValueError('Property %s needs to be convertible to a dict instance (%s)' % (self.name, value))
+        # Have db.Property validate it as well.
+        return super(DictProperty, self).validate(value)
+    
     def empty(self, value):
-        return value is None #whether or not its empty
+        """Check if the value is empty."""
+        return value is None
         
 class GenericListProperty(db.Property):
-    data_type = list #data type is list
+    
+    data_type = list
+    
     def get_value_for_datastore(self, model_instance):
-        value = super(GenericListProperty, self).get_value_for_datastore(model_instance) #get string from database
-        return db.Blob(pickle.dumps(value))#convert into a string and stores it
+        """Use pickle to serialize a list for database storage."""
+        value = super(GenericListProperty, self).get_value_for_datastore(model_instance)
+        return db.Blob(pickle.dumps(value))
+    
     def make_value_from_datastore(self, value):
-        if value is None: return [] #if there is no value it returns an empty dict
-        return pickle.loads(value) #gets a value from a string
+        """Use pickle to deserialize a list from the database."""
+        if value is None:
+            # Make a new list if it does not exist.
+            return []
+        return pickle.loads(value)
+    
     def default_value(self):
-        if self.default is None: return [] #if there is no default it returns an empty dict
-        else: return super(GenericListProperty, self).default_value().copy() #returns default value
+        """Get the default value for the property."""
+        if self.default is None:
+            return []
+        else:
+            return super(GenericListProperty, self).default_value().copy()
+    
     def validate(self, value):
-        if not isinstance(value, list): #if it is not a dict
-            raise db.BadValueError('Property %s needs to be convertible to a list instance (%s)' % (self.name, value)) #sends error report back to user
-        return super(GenericListProperty, self).validate(value) #parent class validates it
+        """Check if the value is actually a list."""
+        if not isinstance(value, list):
+            raise db.BadValueError('Property %s needs to be convertible to a list instance (%s)' % (self.name, value))
+        # Have db.Property validate it as well.
+        return super(GenericListProperty, self).validate(value)
+    
     def empty(self, value):
-        return value is None #whether or not its empty
+        """Check if the value is empty."""
+        return value is None
 
 class Matcher(db.Model):
     """Store spectra data necessary for searching the database, then search the database
