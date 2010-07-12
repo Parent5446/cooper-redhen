@@ -54,7 +54,7 @@ class Test(webapp.RequestHandler):
 
 application = webapp.WSGIApplication([
 	('/', MainPage),
-	('/sign', UploadedFile),
+	('/upload', UploadedFile),
 	('/test', Test)
 ], debug=True)
 
