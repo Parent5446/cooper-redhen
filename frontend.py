@@ -19,7 +19,7 @@ class MyHandler(webapp.RequestHandler):
         if user and users.is_current_user_admin():
             greeting = ("Welcome, Administrator %s! (<a href=\"%s\">sign out</a>)" %
                         (user.nickname(), users.create_logout_url("/")))
-		if user and !users.is_current_user_admin():
+		elif user and !users.is_current_user_admin():
             greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" %
                         (user.nickname(), users.create_logout_url("/")))			
         else:
