@@ -12,7 +12,7 @@ class JDXFile(db.Model):
 class MainPage(webapp.RequestHandler):
 	def get(self): 
 		self.response.out.write('<html><body>')
-		query_str = "SELECT * FROM JDXFile DESC LIMIT 10"
+		query_str = "SELECT * FROM JDXFile"
 		jdxFiles = db.GqlQuery (query_str)
 			
 		for jdxFile in jdxFiles:
