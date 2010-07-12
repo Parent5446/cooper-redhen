@@ -1,4 +1,5 @@
 ﻿import cgi
+import backend
 
 from google.appengine.ext import db
 from google.appengine.api import users
@@ -16,8 +17,8 @@ class MainPage(webapp.RequestHandler):
 		jdxFiles = db.GqlQuery (query_str)
 			
 		for jdxFile in jdxFiles:
-			self.response.out.write("<a> File Name is: %s</a> <br />" %
-									jdxFile.key())
+			#self.response.out.write("<a> File Name is: %s</a> <br />" %
+			#						jdxFile.key())
 			self.response.out.write(jdxFile.fileName)
 										
 		self.response.out.write("""
