@@ -30,7 +30,7 @@ class MainPage(webapp.RequestHandler):
 class UploadedFile(webapp.RequestHandler):
 		def post(self):
 			jdxFile = JDXFile()
-			//jdxFile.fileName = db.Blob(fileName)
+			#jdxFile.fileName = db.Blob(fileName)
 			jdxFile.put()
 			self.redirect('/')
 
