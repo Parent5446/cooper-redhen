@@ -3,15 +3,10 @@ import datetime
 import logging
 import backend
 
-from google.appengine.ext import blobstore
-from google.appengine.ext import db
-from google.appengine.api import users
-from google.appengine.ext.webapp import template
-from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.ext import webapp
+from google.appengine.ext import blobstore, db, webapp
+from google.appengine.api import users, quota
+from google.appengine.ext.webapp import template, blobstore_handlers
 from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.api import quota
-from google.appengine.api import users
 
 class MyHandler(webapp.RequestHandler):
     def get(self):

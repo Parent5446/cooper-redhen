@@ -3,7 +3,7 @@
 import re # re.finditer (regex searches)
 import pickle # pickle.loads, pickle.dumps (data serialization)
 import bisect # bisect.bisect (binary search of a list)
-import operator # operator.attrgetter, operator.itemgetter (functions for getting data from objects)
+import operator # operator.attrgetter, operator.itemgetter
 from google.appengine.ext import db # import database
 from google.appengine.api import memcache # import memory cache
 
@@ -64,7 +64,7 @@ class Spectrum(db.Model):
         self.contents = file.read()
         self.type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
-        deltaX = float(self.get_field('##DELTAX='))   # The Space between adjacent x values
+        deltaX = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
         xFactor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
         yFactor = float(self.get_field('##YFACTOR=')) # some very small number, but if not use this instead
         self.xy = []
@@ -92,22 +92,29 @@ class Spectrum(db.Model):
         while self.xy[start][0] < range[0]:
             start+=1
         # oldX = start of range, oldY = linear interpolation of corresponding y
-        oldX, oldY = range[0], (self.xy[start - 1][1] + (self.xy[start][1] - self.xy[start - 1][1]) * (range[0] - self.xy[start][0]) / (self.xy[start - 1][0] - self.xy[start][0]))
+        xy = self.xy
+        oldX, oldY = range[0], (self.xy[start - 1][1] +
+             (xy[start][1] - xy[start - 1][1]) * (range[0] - xy[start][0]) /
+             (xy[start - 1][0] - xy[start][0]))
         for x, y in self.xy[start:]: #Iterate over self.xy from start
-            newIndex, oldIndex = int((x-range[0])/interval), int((oldX-range[0])/interval) # finds the positions in the data array 
+            newIndex = int((x - range[0]) / interval)
+            oldIndex = int((oldX - range[0]) / interval)
             if newIndex != oldIndex:
                 # We're starting a new integral.
-                boundary = newIndex*interval, (y-oldY)*(newIndex*interval-oldX)/(x-oldX) + oldY #Linear interpolation
-                self.data[oldIndex] += (boundary[1]+oldY)*(boundary[0]-oldX)/2 #Add area
+                boundary = newIndex * interval,\
+                           ((y - oldY) * (newIndex * interval - oldX) /
+                           (x - oldX) + oldY) #Linear interpolation
+                self.data[oldIndex] += (boundary[1] + oldY) * (boundary[0] - oldX) / 2 #Add area
                 if newIndex < len(self.data): # if data isn't filled 
-                    self.data[newIndex] += (boundary[1]+y)*(x-boundary[0])/2 #Add area
+                    self.data[newIndex] += (boundary[1] + y) * (x - boundary[0]) / 2 #Add area
             else:
-                self.data[newIndex] += (y+oldY)*(x-oldX)/2 #Add area
+                self.data[newIndex] += (y + oldY) * (x - oldX) / 2 #Add area
             if x > range[1]:
                 break #If finished, break
             oldX, oldY = x, y #Otherwise keep going
-        self.chemical_type = 'Unknown' # We will find this later 
-        self.chemical_name = self.get_field('##TITLE=') # assuming chemical name is in title field 
+        self.chemical_type = 'Unknown' # We will find this later
+        # FIXME: Assumes chemical name is in TITLE label.
+        self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
         
     def get_field(self, name):
@@ -116,7 +123,8 @@ class Spectrum(db.Model):
         return self.contents[index:self.contents.index('\n', index)] #Does not handle Windows format
 
 class DictProperty(db.Property):
-
+    """Store a dictionary object in the Google Data Store."""
+    
     data_type = dict
     
     def get_value_for_datastore(self, model_instance):
@@ -150,6 +158,7 @@ class DictProperty(db.Property):
         return value is None
         
 class GenericListProperty(db.Property):
+    """Store a list object in the Google Data Store."""
     
     data_type = list
     
