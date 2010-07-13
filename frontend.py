@@ -27,7 +27,7 @@ class Test(webapp.RequestHandler):
     def get(self):
         self.response.out.write('<html>Testing backend...<br>')
         file = open('jcamp-test.jdx')
-        if 0:
+        if 1:
             for s in backend.Spectrum.all(): s.delete()
             for m in backend.Matcher.all(): m.delete()
             memcache.flush_all()
