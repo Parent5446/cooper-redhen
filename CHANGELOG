@@ -68,9 +68,66 @@
 	* backend.py (__init__): Added functionality to parse XY data.
 	Spectrum class now parses both (X+(Y..Y)) and (XY..XY) format data.
 
+2010-07-08  James Stevenson  <jminuse@gmail.com>
+    * backend.py (search): Moved matching functionality into Matcher class.
+    * backend.py (add): New function to add spectra.
+    Began movement of add and search functions into the Matcher class.
 
-	TODO:
-	* Handle multiple XY datasets according to JCAMP file standards.
-	* Functions to integrate and differentiate XY data.
-	* Functions to find peaks, etc. from XY data.
-	* Data structures which store spectra's database keys and vote on them.
+2010-07-08  Tyler Romeo  <tylerromeo@gmail.com>
+    * backend.py (add): Moved to Spectrum class.
+    * backend.py (Matcher.add): New function to add spectra to Matcher class.
+    
+2010-07-08  Tony Hung  <tony.h.hung@gmail.com>
+    * backend.py (Spectrum.Bove): New function.
+    Added Bove's alogrithm to the Spectrum class.
+
+2010-07-08  James Stevenson  <jminuse@gmail.com>
+    * backend.py (Spectrum.least_Squares): New function.
+    Added least squares alogrithm to the Spectrum class.
+
+2010-07-08  Tyler Romeo  <tylerromeo@gmail.com>
+    * backend.py (Matcher.get): New function to get spectra from Matcher class.
+    
+    Added various comments and docstrings to code.
+
+2010-07-08  James Stevenson  <jminuse@gmail.com>
+    * backend.py (leastSquares): Reduced function size.
+
+2010-07-08  Tyler Romeo  <tylerromeo@gmail.com>
+    * backend.py (Spectrum.Bove, Spectrum.leastSquares): Moved to Matcher class.
+    Made one-to-one algorithms static methods in the Matcher class.
+
+2010-07-08  James Stevenson  <jminuse@gmail.com>
+    * backend.py (add): New function.
+    * backend.py (__init__): Reduced function size.
+    * backend.py (Spectrum.get_field): New function.
+    * backend.py (Spectrum.__init__, Spectrum.add): Added call to the parent's constructor.
+    Debugging to get class to work.
+    
+    * backend.py (Spectrum.find_peaks, Spectrum.find_integrals,
+                  Spectrum._calculate_integrals, Spectrum._calculate_peaks,
+                  Spectrum.find_heavyside): Deleted functions.
+    Will be added to Matcher class functionality.
+    
+    * backend.py (Matcher): Changed variable names for heavyside indices.
+    
+    A whole bunch of other debugging.
+
+2010-07-10  James Stevenson  <jminuse@gmail.com>
+    * backend.py (GenericListProperty): New class.
+    * backend.py (Matcher.get, Matcher.add, Spectrum.parseFile): Added peak table and heavyside functionality.
+    
+    * backend.py (Spectrum.parseFile): Added integrated XY data functionality.
+    Moved out of __init__ for Google App Engine reasons.
+
+2010-07-12  James Stevenson  <jminuse@gmail.com>
+    Added preliminary comments to code.
+
+2010-07-12  Tyler Romeo  <tylerromeo@gmail.com>
+    Removed some unnecessary comments and improved readability.
+
+2010-07-12  James Stevenson  <jminuse@gmail.com>
+    * README: New file.
+
+2010-07-12  Mottaqui Karim  <mottaqui.karim.9@gmail.com>
+    * frontend.py (MyHandler): New class with login functionality.
