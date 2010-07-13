@@ -272,7 +272,7 @@ class Matcher(db.Model):
                 continue # If bisect gives us an index too near the beginning or end of list
             keys[self.peak_list[index+offset-5][0]] += abs(offset-5) # Add offset-5 votes
                 
-        keys = sorted(keys.iteritems(), key = operator.itemgetter(1)) # Sort by number of votes
+        keys = keys.most_common(10)
         return Spectrum.get([k[0] for k in keys]) # Return Spectrum objects for each one.
     
     @staticmethod # Make a static method for faster execution
