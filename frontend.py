@@ -26,8 +26,11 @@ class Test(webapp.RequestHandler):
     def get(self):
         self.response.out.write('<html>Testing backend...<br>')
         file = open('jcamp-test.jdx')
-        if 0:
-            backend.add(file)
+        if 1:
+            import os
+            for entry in os.entries('library')
+                if entry[-4:]=='.jdx'
+                    backend.add(os.path.join('library', entry))
         else:
             response = backend.search(file)
             text = '<pre>' + '\n'.join( [str(r)[1:-1] for r in response] ) + '</pre>'
