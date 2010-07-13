@@ -231,6 +231,7 @@ class Matcher(db.Model):
         #peak_list - positions of highest peaks:
         xy = sorted(spectrum.xy, key = operator.itemgetter(1), reverse = True) #sort xy data by y value
         peaks = [] #make peaks empty list
+        #peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
         for x,y in xy: #go through all the points in xy
             if y < xy[0][1]*0.95: break #if y is less than 95% of the previous peak, stop
             add = True #add starts as true
