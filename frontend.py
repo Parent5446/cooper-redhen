@@ -28,12 +28,12 @@ class Test(webapp.RequestHandler):
         file = open('jcamp-test.jdx')
         if 1:
             import os
-            for entry in os.entries('library')
-                if entry[-4:]=='.jdx'
+            for entry in os.listdir('library'):
+                if entry[-4:]=='.jdx':
                     backend.add(os.path.join('library', entry))
         else:
             response = backend.search(file)
-            text = '<pre>' + '\n'.join( [str(r)[1:-1] for r in response] ) + '</pre>'
+            text = '<pre>' + '\n'.join( [r.chemName for r in response] ) + '</pre>'
             self.response.out.write(text)
         self.response.out.write('<form action="/test" method="POST" enctype="multipart/form-data">')
         self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form>')
