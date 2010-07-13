@@ -9,19 +9,18 @@ from google.appengine.ext.webapp import template, blobstore_handlers
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 class MyHandler(webapp.RequestHandler):
-    def get(self):
+    def get(self): pass
+    '''
         user = users.get_current_user()
         if user and users.is_current_user_admin():
-            greeting = ("Welcome, Administrator %s! (<a href=\"%s\">sign out</a>)" %
-                        (user.nickname(), users.create_logout_url("/")))
+            greeting = ("Welcome, Administrator %s! (<a href=\"%s\">sign out</a>)" % (user.nickname(), users.create_logout_url("/")))
 		elif user and !users.is_current_user_admin():
-            greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" %
-                        (user.nickname(), users.create_logout_url("/")))			
+            greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" % (user.nickname(), users.create_logout_url("/")))			
         else:
-            greeting = ("<a href=\"%s\">Sign in or register</a>." %
-                        users.create_login_url("/"))
+            greeting = ("<a href=\"%s\">Sign in or register</a>." % users.create_login_url("/"))
 
         self.response.out.write("<html><body>%s</body></html>" % greeting)
+    '''
 
 class Test(webapp.RequestHandler):
     def get(self):
