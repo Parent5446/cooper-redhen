@@ -25,7 +25,7 @@ def search(file):
         matcher = Matcher.get_by_key_name(spectrum.type)
     # Get the candidates for similar spectra.
     candidates = matcher.get(spectrum)
-    # Do one-to-one on candidates and sort by error.
+    # Do one-to-one on candidates and sort by error
     for candidate in candidates:
         candidate.error = Matcher.bove(spectrum, candidate)
     list.sort(candidates, key=operator.attrgetter('error'), reverse=True)
@@ -245,7 +245,9 @@ class Matcher(db.Model):
         """Find spectra that may represent the given Spectrum object by sorting
         the database using different heuristics, having them vote, and returning only
         the spectra deemed similar to the given spectrum."""
-        # Get the reference values
+        
+        #raise Exception( '\n' + '\n'.join([str(s.chemical_name) for s in Spectrum.all()]) )
+        raise Exception('\n' + '\n'.join(Spectrum.get(key[0]).chemical_name for key in self.peak_list))
         
         #Get flat heayside key:
         flatHeavysideKey, leftEdge, width = 0, 0, len(spectrum.data) # Initialize variables
@@ -259,20 +261,24 @@ class Matcher(db.Model):
         peak = max(spectrum.xy, key=operator.itemgetter(1))[0] # Find x with highest y
         
         # Get the candidates in a hash table
-        keys = collections.Counter()
+        keys = collections.defaultdict(lambda:0) #Default to zero
         #Add flat heavyside votes
         if flatHeavysideKey in self.flat_heavyside: # if the key is in the pre-determined dictionary
             for key in self.flat_heavyside[flatHeavysideKey]: # for every spectrum with that key
                 keys[key] += 10 #10 votes
         
+        #raise Exception('\n' + '\n'.join(str(key)+' -> '+str(votes) for key,votes in keys.iteritems()))
+        
         #Add peak list votes
         index = bisect.bisect( [item[1] for item in self.peak_list], peak) # Find nearest location for item[1] in peak_list
-        for offset in xrange(10): # From one to ten
-            if index+offset-5 < 0 or index+offset-5 >= len(self.peak_list):
+        for offset in xrange(-5,5): # From -5 to 5
+            if index+offset < 0 or index+offset >= len(self.peak_list):
                 continue # If bisect gives us an index too near the beginning or end of list
-            keys[self.peak_list[index+offset-5][0]] += abs(offset-5) # Add offset-5 votes
-                
-        keys = keys.most_common(10)
+            keys[self.peak_list[index+offset][0]] += abs(offset) # Add offset votes
+            
+        #raise Exception('\n' + '\n'.join(str(key)+' -> '+str(votes) for key,votes in keys.iteritems()))
+            
+        keys = sorted(keys.iteritems(), key = operator.itemgetter(1))
         return Spectrum.get([k[0] for k in keys]) # Return Spectrum objects for each one.
     
     @staticmethod # Make a static method for faster execution
