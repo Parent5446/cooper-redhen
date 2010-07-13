@@ -28,13 +28,15 @@ class Test(webapp.RequestHandler):
         file = open('jcamp-test.jdx')
         if 1:
             import os
+            fileNames = []
             for entry in os.listdir('library'):
+                fileNames.append(entry)
                 if entry[-4:]=='.jdx':
-                    backend.add(os.path.join('library', entry))
+                    backend.add(open(os.path.join('library', entry)))
+            self.response.out.write('<pre>' + '\n'.join( [s for s in fileNames] ) + '</pre>')
         else:
             response = backend.search(file)
-            text = '<pre>' + '\n'.join( [r.chemName for r in response] ) + '</pre>'
-            self.response.out.write(text)
+            self.response.out.write('<pre>' + '\n'.join( [r.chemName for r in response] ) + '</pre>')
         self.response.out.write('<form action="/test" method="POST" enctype="multipart/form-data">')
         self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form>')
         self.response.out.write('<br>CPU megacycles: ' + str(quota.get_request_cpu_usage()) + '</body></html>')
