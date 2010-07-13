@@ -4,6 +4,7 @@ import re # re.finditer (regex searches)
 import pickle # pickle.loads, pickle.dumps (data serialization)
 import bisect # bisect.bisect (binary search of a list)
 import operator # operator.attrgetter, operator.itemgetter
+import collections # High performance data containers
 from google.appengine.ext import db # import database
 from google.appengine.api import memcache # import memory cache
 
@@ -258,20 +259,18 @@ class Matcher(db.Model):
         peak = max(spectrum.xy, key=operator.itemgetter(1))[0] # Find x with highest y
         
         # Get the candidates in a hash table
-        keys = {}
+        keys = collections.Counter()
         #Add flat heavyside votes
         if flatHeavysideKey in self.flat_heavyside: # if the key is in the pre-determined dictionary
             for key in self.flat_heavyside[flatHeavysideKey]: # for every spectrum with that key
-                keys[key] = 10 #10 votes
-                
+                keys[key] += 10 #10 votes
+        
         #Add peak list votes
         index = bisect.bisect( [item[1] for item in self.peak_list], peak) # Find nearest location for item[1] in peak_list
         for offset in xrange(10): # From one to ten
-            if index+offset-5 < 0 or index+offset-5 >= len(self.peak_list): continue # If bisect gives us an index too near the beginning or end of list
-            if self.peak_list[index+offset-5][0] in keys: # if the spectrum is already in the list of candidtes
-                keys[self.peak_list[index+offset-5][0]] += abs(offset-5) # Add offset-5 votes
-            else:
-                keys[self.peak_list[index+offset-5][0]] = abs(offset-5) # Set it to offset-5 votes
+            if index+offset-5 < 0 or index+offset-5 >= len(self.peak_list):
+                continue # If bisect gives us an index too near the beginning or end of list
+            keys[self.peak_list[index+offset-5][0]] += abs(offset-5) # Add offset-5 votes
                 
         keys = sorted(keys.iteritems(), key = operator.itemgetter(1)) # Sort by number of votes
         return Spectrum.get([k[0] for k in keys]) # Return Spectrum objects for each one.
