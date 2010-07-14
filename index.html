@@ -1,5 +1,5 @@
 <html>
-
+<!--CURRENTLY NO IE AND (P[RBLY) CHROME SUPPORT-DEVELOPED ONLY FOR FIREFOX -->
 <head>
 <title>Red Hen Spectra</title>
 <link rel="stylesheet" href="static_files/index.css" />
@@ -15,6 +15,14 @@ function getMySize(id) {
 		wrapDIV.style.left = 0;
 	}	
 }
+
+function showDiv() {
+	var foo = document.getElementById('hiddenDiv');
+	if (foo.style.visibility == 'hidden')
+		foo.style.visibility = 'visible';
+	else 
+		foo.style.visibility = 'hidden';
+}
 </script>
 </head>
 
@@ -24,10 +32,9 @@ function getMySize(id) {
 <div id="logBox"></div>
 <div id="optBox">
 <div id="formBox">
-<form action="/" method="POST" enctype="multipart/form-data">
-<input type="file" name="file"><br />
-<input type="submit" name="submit" value="Submit">
-</form>
+<div id="uploadButton" onclick="showDiv();">
+Upload
+</div>
 </div>
 </div>
 <div id="mainBody">
@@ -45,6 +52,15 @@ Blah blah blah blah, these are instructions on how to use the website, but it's
 irrelevant right now for you.
 <h3>Search Results:</h3>
 <pre style="line-height:1.5em">{{ search_results }}</pre>
+</div>
+<div id="hiddenDiv">
+<div id="uploadDiv">
+<div id="uploadFormWrapper">
+<form action="#" method="GET">
+<input id="fileUP" type="file" name="fileUP"/>
+</form>
+</div>
+</div>
 </div>
 </div>
 

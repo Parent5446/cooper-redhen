@@ -48,23 +48,54 @@
 	left: 0px;
 	width: 600px;
 	height: 150px;
-	background-image: url('tempbanner.jpg');
+	background-image: url('3.gif');
 }
 
 #formBox {
 	position: absolute;
 	top: 10px;
 	left: 3px;
-
 	width: 206px;
+	height: 426px;
 }
 
-#fileUP {
+
+
+#uploadButton {
 	position: absolute;
-	top: 0px;
-	left: 0px;
-
+	top: 5px;
+	left: 28px;
+	width: 140px;
+	height: 20px;
+	background-image: url('sideBarButton.png');
+	text-align: center;
+	color: rgb(230,150,149);
+	font-weight: bolder;
+	padding: 5px;
 }
 
-#fakeInputBar {
+#hiddenDiv {
+	position: absolute; 
+	top: 250px; 
+	left: 300px; 
+	width: 400px; 
+	height: 150px; 
+	background-color: gray;
+	visibility: hidden;
+}
+
+#uploadDiv {
+	position: absolute;
+	top:10px;
+	left: 10px;
+	height: 130px;
+	width: 380px;
+	background-color: white;
+}
+
+#uploadFormWrapper {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	
 }
