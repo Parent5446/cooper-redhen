@@ -1,8 +1,9 @@
 #GlobalWrapper {
 	position: absolute;
-	top: -50px;
+	top: 0px;
 	left: 0px;
 	height: 968px;
+
 }
 
 #mainBody {
@@ -29,7 +30,6 @@
 	left:607px;
 	width: 206px;
 	height: 186px;
-
 	background-image: url('logbox.jpg');
 }
 
@@ -39,7 +39,6 @@
 	left: 607px;
 	width: 206px;
 	height: 426px;
-
 	background-image: url('optBox.jpg');
 }
 
@@ -58,6 +57,13 @@
 	left: 3px;
 
 	width: 206px;
+}
+
+#fileUP {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+
 }
 
 #fakeInputBar {
