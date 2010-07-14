@@ -41,8 +41,7 @@ def search(file_obj):
     # Get the candidates for similar spectra.
     candidates = matcher.get(spectrum)
     # Do one-to-one on candidates and sort by error
-    for candidate in candidates:
-        candidate.error = Matcher.bove(spectrum, candidate)
+    candidates = [Matcher.bove(spectrum, candidate) for candidate in candidates]
     list.sort(candidates, key=operator.attrgetter('error'))
     # Let frontend do the rest
     return candidates
@@ -126,9 +125,7 @@ class Spectrum(db.Model):
         self.data = [0.0 for i in xrange(1000)]
         interval = (range[1] - range[0]) / len(self.data)
         # Find index in self.xy where integrals start
-        start = 0
-        while self.xy[start][0] < range[0]:
-            start+=1
+        start = bisect.bisect_left(self.xy, (range[0], 0))
         # oldX = start of range, oldY = linear interpolation of corresponding y
         xy = self.xy
         oldX, oldY = range[0], (self.xy[start - 1][1] +
@@ -316,16 +313,10 @@ class Matcher(db.Model):
         #peak_list - positions of highest peaks:
         xy = sorted(spectrum.xy, key = operator.itemgetter(1), reverse = True) #sort xy data by y value
         peaks = [] #make peaks empty list
-        #peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
-        for x,y in xy: #go through all the points in xy
-            if y < xy[0][1]*0.95: break #if y is less than 95% of the previous peak, stop
-            add = True #add starts as true
-            for peak in peaks: 
-                if abs(peak-x) < 1: add = False #Must be more than 1 cm-1 from other peaks
-            if add: peaks.append(x) #add peak to peaks
+        peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
         for peak in peaks:
-            index = bisect.bisect( [item[1] for item in self.peak_list], peak) #Find place in the sorted list
-            self.peak_list.insert( index, (spectrum.key(),peak) ) #Insert in the right place
+            index = bisect.bisect([item[1] for item in self.peak_list], peak) #Find place in the sorted list
+            self.peak_list.insert(index, (spectrum.key(), peak)) #Insert in the right place
     
     ## Find spectra similar to the given one.
     # 
@@ -356,11 +347,11 @@ class Matcher(db.Model):
         # Give ten votes to each spectrum with the same heavyside key.
         if flatHeavysideKey in self.flat_heavyside:
             for key in self.flat_heavyside[flatHeavysideKey]:
-                keys[key] += 10
+                keys[key] = keys.get(key) + 10
         
         # If a spectrum has a peak within five indices of our given spectrum's
         # peaks in either direction, give it votes depending on how close it is.
-        index = bisect.bisect( [item[1] for item in self.peak_list], peak)
+        index = bisect.bisect([item[1] for item in self.peak_list], peak)
         for offset in xrange(-5,5):
             if index+offset < 0 or index+offset >= len(self.peak_list):
                 # If bisect gives us an index near the beginning or end of list.
