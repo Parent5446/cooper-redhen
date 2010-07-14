@@ -13,7 +13,6 @@ import re # re.finditer (regex searches)
 import pickle # pickle.loads, pickle.dumps (data serialization)
 import bisect # bisect.bisect (binary search of a list)
 import operator # operator.attrgetter, operator.itemgetter
-import collections # High performance data containers
 from google.appengine.ext import db # import database
 from google.appengine.api import memcache # import memory cache
 
@@ -353,7 +352,7 @@ class Matcher(db.Model):
         peak = max(spectrum.xy, key=operator.itemgetter(1))[0] # Find x with highest y
         
         # Get the candidates in a hash table
-        keys = collections.defaultdict(lambda:0) #Default to zero
+        keys = {}
         # Give ten votes to each spectrum with the same heavyside key.
         if flatHeavysideKey in self.flat_heavyside:
             for key in self.flat_heavyside[flatHeavysideKey]:
@@ -367,7 +366,8 @@ class Matcher(db.Model):
                 # If bisect gives us an index near the beginning or end of list.
                 continue
             # Give the spectrum (5 - offest) votes
-            keys[self.peak_list[index+offset][0]] += 5 - abs(offset)
+			index = self.peak_list[index+offset][0]
+            keys[index] = keys.get(index, 0) + (5 - abs(offset))
         # Sort candidates by number of votes and return Spectrum objects.
         keys = sorted(keys.iteritems(), key = operator.itemgetter(1))
         return Spectrum.get([k[0] for k in keys])
