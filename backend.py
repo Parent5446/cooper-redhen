@@ -312,11 +312,9 @@ class Matcher(db.Model):
         
         #peak_list - positions of highest peaks:
         xy = sorted(spectrum.xy, key = operator.itemgetter(1), reverse = True) #sort xy data by y value
-        peaks = [] #make peaks empty list
         peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
         for peak in peaks:
-            index = bisect.bisect([item[1] for item in self.peak_list], peak) #Find place in the sorted list
-            self.peak_list.insert(index, (spectrum.key(), peak)) #Insert in the right place
+            bisect.insort(self.peak_list, (peak, spectrum.key()))
     
     ## Find spectra similar to the given one.
     # 
@@ -334,11 +332,14 @@ class Matcher(db.Model):
         # Get flat heayside key.
         flatHeavysideKey, leftEdge, width = 0, 0, len(spectrum.data) # Initialize variables
         for whichBit in xrange(Matcher.FLAT_HEAVYSIDE_BITS): # Count from zero to number of bits
-            left = sum(spectrum.data[leftEdge:leftEdge+width/2]) #Sum integrals
-            right = sum(spectrum.data[leftEdge+width/2:leftEdge+width]) #on both sides
-            if leftEdge+width == len(spectrum.data): leftEdge = 0; width = width/2 #Adjust boundaries
-            else: leftEdge += width #for next iteration
-            flatHeavysideKey += (left<right)<<(Matcher.FLAT_HEAVYSIDE_BITS-whichBit) # Adds on to the key
+            left = sum(spectrum.data[leftEdge:leftEdge + width / 2]) #Sum integrals
+            right = sum(spectrum.data[leftEdge + width / 2:leftEdge + width]) #on both sides
+            if leftEdge + width == len(spectrum.data):
+                leftEdge = 0
+                width = width / 2 #Adjust boundaries
+            else:
+                leftEdge += width #for next iteration
+            flatHeavysideKey += (left < right) << (Matcher.FLAT_HEAVYSIDE_BITS - whichBit) # Adds on to the key
         # Get x position of highest peak.
         peak = max(spectrum.xy, key=operator.itemgetter(1))[0] # Find x with highest y
         
@@ -351,16 +352,16 @@ class Matcher(db.Model):
         
         # If a spectrum has a peak within five indices of our given spectrum's
         # peaks in either direction, give it votes depending on how close it is.
-        index = bisect.bisect([item[1] for item in self.peak_list], peak)
+        index = bisect.bisect(self.peak_list, peak)
         for offset in xrange(-5,5):
             if index+offset < 0 or index+offset >= len(self.peak_list):
                 # If bisect gives us an index near the beginning or end of list.
                 continue
             # Give the spectrum (5 - offest) votes
-            index = self.peak_list[index+offset][0]
+            index = self.peak_list[index+offset][1]
             keys[index] = keys.get(index, 0) + (5 - abs(offset))
         # Sort candidates by number of votes and return Spectrum objects.
-        keys = sorted(keys.iteritems(), key = operator.itemgetter(1))
+        keys = sorted(keys.iteritems(), key=operator.itemgetter(1))
         return Spectrum.get([k[0] for k in keys])
     
     ## Calculate the difference or error between two spectra using Bove's algorithm.
