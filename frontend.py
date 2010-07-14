@@ -15,8 +15,8 @@ class MyHandler(webapp.RequestHandler):
         user = users.get_current_user()
         if user and users.is_current_user_admin():
             greeting = ("Welcome, Administrator %s! (<a href=\"%s\">sign out</a>)" % (user.nickname(), users.create_logout_url("/")))
-        elif user and !users.is_current_user_admin():
-            greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" % (user.nickname(), users.create_logout_url("/")))
+		elif user and !users.is_current_user_admin():
+            greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" % (user.nickname(), users.create_logout_url("/")))			
         else:
             greeting = ("<a href=\"%s\">Sign in or register</a>." % users.create_login_url("/"))
 
@@ -33,32 +33,32 @@ class Test(webapp.RequestHandler):
             memcache.flush_all()
             import os
             fileNames = []
-            for count, entry in enumerate(os.listdir('library')):
-                if count > 10: break
+            for count, entry in enumerate(os.listdir('short_library')):
+                #if count > 10: break
                 fileNames.append(entry)
                 if entry[-4:]=='.jdx':
-                    backend.add(open(os.path.join('library', entry)))
+                    backend.add(open(os.path.join('short_library', entry)))
             self.response.out.write('<pre>' + '\n'.join( [s for s in fileNames] ) + '</pre>')
             #backend.add(file)
         else:
             response = backend.search(file)
             self.response.out.write('<pre>' + '\n'.join( [r.chemical_name+' - '+str(r.error) for r in response] ) + '</pre>')
-
+            
         self.response.out.write('<form action="/test" method="POST" enctype="multipart/form-data">')
         self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form>')
         self.response.out.write('<br>CPU megacycles: ' + str(quota.get_request_cpu_usage()) + '</body></html>')
-
+        
     def post(self):
         file_contents = self.request.POST.get('file').file.read()
         self.response.out.write(file_contents)
 
 application = webapp.WSGIApplication([
-    ('/', MyHandler),
-    ('/test', Test)
+	('/', MyHandler),
+	('/test', Test)
 ], debug=True)
 
 def main():
-    run_wsgi_app(application)
+	run_wsgi_app(application)
 
 if __name__ == '__main__':
-    main()
+	main()
