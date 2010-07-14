@@ -27,7 +27,7 @@ class Test(webapp.RequestHandler):
     def get(self):
         self.response.out.write('<html>Testing backend...<br>')
         file = open('jcamp-test.jdx')
-        if 1:
+        if 0:
             for s in backend.Spectrum.all(): s.delete()
             for m in backend.Matcher.all(): m.delete()
             memcache.flush_all()
@@ -42,7 +42,7 @@ class Test(webapp.RequestHandler):
             #backend.add(file)
         else:
             response = backend.search(file)
-            self.response.out.write('<pre>' + '\n'.join( [r.chemical_name for r in response] ) + '</pre>')
+            self.response.out.write('<pre>' + '\n'.join( [r.chemical_name+' - '+str(r.error) for r in response] ) + '</pre>')
 
         self.response.out.write('<form action="/test" method="POST" enctype="multipart/form-data">')
         self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form>')
