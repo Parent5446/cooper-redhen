@@ -15,8 +15,8 @@ class MyHandler(webapp.RequestHandler):
         user = users.get_current_user()
         if user and users.is_current_user_admin():
             greeting = ("Welcome, Administrator %s! (<a href=\"%s\">sign out</a>)" % (user.nickname(), users.create_logout_url("/")))
-		elif user and !users.is_current_user_admin():
-            greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" % (user.nickname(), users.create_logout_url("/")))			
+        elif user and !users.is_current_user_admin():
+            greeting = ("Welcome, %s! (<a href=\"%s\">sign out</a>)" % (user.nickname(), users.create_logout_url("/")))
         else:
             greeting = ("<a href=\"%s\">Sign in or register</a>." % users.create_login_url("/"))
 
@@ -43,22 +43,22 @@ class Test(webapp.RequestHandler):
         else:
             response = backend.search(file)
             self.response.out.write('<pre>' + '\n'.join( [r.chemical_name for r in response] ) + '</pre>')
-            
+
         self.response.out.write('<form action="/test" method="POST" enctype="multipart/form-data">')
         self.response.out.write('Upload File: <input type="file" name="file"><br> <input type="submit" name="submit" value="Submit"> </form>')
         self.response.out.write('<br>CPU megacycles: ' + str(quota.get_request_cpu_usage()) + '</body></html>')
-        
+
     def post(self):
         file_contents = self.request.POST.get('file').file.read()
         self.response.out.write(file_contents)
 
 application = webapp.WSGIApplication([
-	('/', MyHandler),
-	('/test', Test)
+    ('/', MyHandler),
+    ('/test', Test)
 ], debug=True)
 
 def main():
-	run_wsgi_app(application)
+    run_wsgi_app(application)
 
 if __name__ == '__main__':
-	main()
+    main()
