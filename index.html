@@ -1,20 +1,54 @@
 <html>
-  <body>
-    {% for greeting in greetings %}
-      {% if greeting.author %}
-        <b>{{ greeting.author.nickname }}</b> wrote:
-      {% else %}
-       An anonymous person wrote:
-      {% endif %}
-      <blockquote>{{ greeting.content|escape }}</blockquote>
-    {% endfor %}
 
-    <form action="/sign" method="post">
-      <div><textarea name="content" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Sign Guestbook"></div>
-    </form>
+<head>
+<title>Red Hen Spectra</title>
+<link rel="stylesheet" href="static/index.css" />
+<script>
+function getMySize(id) {
+	windX = window.innerWidth;
+	var wrapDIV = document.getElementById(id);
+	var setLeft = (windX - parseInt(wrapDIV.style.width) ) / 2;
+	if (setLeft >= 0) {
+		wrapDIV.style.left = setLeft;
+	}
+	else {
+		wrapDIV.style.left = 0;
+	}	
+}
+</script>
+</head>
 
-    <a href="{{ url }}">{{ url_linktext }}</a>
+<body onload="getMySize('GlobalWrapper');" >
+<div id="GlobalWrapper" style="width: 812px;">
+<div id="ourBanner"></div>
+<div id="logBox"></div>
+<div id="optBox">
+<div id="formBox">
+<form action="/test" method="POST" enctype="multipart/form-data">
+<input type="file" name="file" style="width: 65px;"><br />
+<input type="submit" name="submit" value="Submit" style="width: 65px;">
+</form>
+</div>
+</div>
+<div id="mainBody">
+<div id="theText">
+<h3>Hello from Red Hen</h3>
+Welcome to Red Hen Spectra.  To get started, select your search and analysis
+options from the box on the right, upload your spectrum and click "Analyze!"
+to search through our large database of chemical compounds. 
 
-  </body>
+<h3> What is Red Hen? </h3> 
+Blah blah blah blah blah Red Hen is awesome, yo dawg, my man 
+
+<h3> How do I get started? </h3> 
+Blah blah blah blah, these are instructions on how to use the website, but it's
+irrelevant right now for you.
+<h3>Search Results:</h3>
+<pre style="line-height:1.5em">{{ search_results }}</pre>
+</div>
+</div>
+
+</div>
+</body>
+
 </html>
