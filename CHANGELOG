@@ -131,3 +131,19 @@
 
 2010-07-12  Mottaqui Karim  <mottaqui.karim.9@gmail.com>
     * frontend.py (MyHandler): New class with login functionality.
+
+2010-07-12  Tyler Romeo  <tylerromeo@gmail.com>
+    * backend.py: Improved readability.
+    
+    * frontend.py: Removed duplicate module imports
+
+2010-07-13  James Stevenson  <jminuse@gmail.com>
+    * backend.py (Matcher.get): Using collections.defaultdict instead of dict.
+    * backend.py (Matcher.get): Fixed hack to get range from -5 to 5.
+    General debugging. The search function in backend.py seems operational.
+
+2010-07-13  Tyler Romeo  <tylerromeo@gmail.com>
+    * backend.py: Added Doxygen-style documentation blocks.
+    
+    * backend.py (Spectrum.parseFile): Renamed to parse_file.
+    * backend.py: Replaced variable name file with file_obj to avoid inteference.

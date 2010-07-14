@@ -1,4 +1,13 @@
-﻿'''This is a program for identifying spectra'''
+'''Provide functions for identifying a spectrum for an unknown substance using
+various methods of database searching.'''
+
+## Provide functions for identifying a spectrum for an unknown substance using
+# various methods of database searching.
+# 
+# @package redhen.backend
+# @author The Cooper Union for the Advancement of the Science and the Arts
+# @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
+# @copyright Copyright (c) 2010, Cooper Union (Some Right Reserved)
 
 import re # re.finditer (regex searches)
 import pickle # pickle.loads, pickle.dumps (data serialization)
@@ -8,19 +17,26 @@ import collections # High performance data containers
 from google.appengine.ext import db # import database
 from google.appengine.api import memcache # import memory cache
 
-#Testing:
+# Testing:
 import time
 from google.appengine.api import quota
 import logging
 
-#Spectrum database entries and voting data structures will be preloaded
-def search(file):
+## Search for a spectrum.
+# 
+# Parse the given file and create a Spectrum object for it. Use the Matcher
+# object to find candidates for similar spectra in the database and compare
+# all candidates to the original spectrum using linear comparison algorithms.
+#
+# @param file File descriptor for the spectrum
+# @return List of Spectrum objects
+def search(file_obj):
     """Search for a spectrum based on a given file descriptor."""
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
-    spectrum.parseFile(file)
+    spectrum.parse_file(file_obj)
     # Check cache for the Matcher. If not, get from database.
-    matcher = memcache.get(spectrum.type+'_matcher')
+    matcher = memcache.get(spectrum.type + '_matcher')
     if matcher is None:
         matcher = Matcher.get_by_key_name(spectrum.type)
     # Get the candidates for similar spectra.
@@ -32,14 +48,21 @@ def search(file):
     # Let frontend do the rest
     return candidates
 
-def add(file):
+## Add a new spectrum to the database.
+# 
+# Parse the given file and create a Spectrum object for it. If the Matcher
+# object does not yet exist, create it. Then store the spectrum in the database
+# and add any necessary sorting data to the Matcher object.
+# 
+# @param file File descriptor for the spectrum
+def add(file_obj):
     """Add a new spectrum to the database from a given file descriptor."""
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
-    spectrum.parseFile(file)
+    spectrum.parse_file(file_obj)
     # Check cache for the Matcher. If not, get from database. If it's not there,
     # make a new one.
-    matcher = memcache.get(spectrum.type+'_matcher')
+    matcher = memcache.get(spectrum.type + '_matcher')
     if matcher is None:
         matcher = Matcher.get_by_key_name(spectrum.type)
     if not matcher:
@@ -49,20 +72,35 @@ def add(file):
     matcher.add(spectrum)
     # Update the Matcher to the database and the cache.
     matcher.put()
-    memcache.add(spectrum.type+'_matcher', matcher)
-    
+    memcache.add(spectrum.type + '_matcher', matcher)
+
+## Store a spectrum and its related data.
+# 
+# Store a spectrum's chemical name, type, and graph data. Also provide functions
+# to make a new Spectrum from a JCAMP file.
 class Spectrum(db.Model):
     """Store a spectrum, its related data, and any algorithms necessary
     to compare the spectrum to the DataStore."""
     
-    # Variables to be stored in the Google DataStore.
+    ## The chemical name associated with the spectrum.
     chemical_name = db.StringProperty()
+    
+    ## The chemical type of the substance the spectrum represents.
     chemical_type = db.StringProperty()
+    
+    ## A list of integrated X,Y points for the spectrum's graph.
     data = db.ListProperty(float)
     
-    def parseFile(self, file):
+    ## Parse a string of JCAMP file data and extract all needed data.
+    # 
+    # Search a JCAMP file for the chemical's name, type, and spectrum data.
+    # Then integrate the X, Y data and store alGet a specific data label from the file.l variables in the object.
+    # @warning Does not handle Windows-format line breaks.
+    # 
+    # @param file_obj File descriptor for the JCAMP file.
+    def parse_file(self, file_obj):
         """Parse a string of JCAMP file data and extract all needed data."""
-        self.contents = file.read()
+        self.contents = file_obj.read()
         self.type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
         deltaX = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
@@ -117,22 +155,32 @@ class Spectrum(db.Model):
         # FIXME: Assumes chemical name is in TITLE label.
         self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
-        
+    
+    ## Get a specific data label from the file.
+    # @param name Name of the data label to retrieve
+    # @return Value of the data label
     def get_field(self, name):
         """Get a specific data label from the file."""
         index = self.contents.index(name) + len(name) # means find where the field name ends 
         return self.contents[index:self.contents.index('\n', index)] #Does not handle Windows format
 
+## Store a dictionary object in the Google Data Store.
 class DictProperty(db.Property):
     """Store a dictionary object in the Google Data Store."""
     
     data_type = dict
     
+    ## Serialize the dictionary for storage in the database.
+    # @param model_instance An instance of this class
+    # @return String with the serialized dictionary
     def get_value_for_datastore(self, model_instance):
         """Use pickle to serialize a dictionary for database storage."""
         value = super(DictProperty, self).get_value_for_datastore(model_instance)
         return db.Blob(pickle.dumps(value))
     
+    ## Unserialize a dictionary retrieved from the database.
+    # @param value String with the serialized dictionary
+    # @return Dictionary (dict) with the unserialized value
     def make_value_from_datastore(self, value):
         """Use pickle to deserialize a dictionary from the database."""
         if value is None:
@@ -140,6 +188,7 @@ class DictProperty(db.Property):
             return dict()
         return pickle.loads(value)
     
+    ## Get the default value for the property.
     def default_value(self):
         """Get the default value for the property."""
         if self.default is None:
@@ -147,6 +196,9 @@ class DictProperty(db.Property):
         else:
             return super(DictProperty, self).default_value().copy()
     
+    ## Check if the value is actually a dictionary.
+    # @param value Value to be validated
+    # @return True for valid, false for invalid
     def validate(self, value):
         """Check if the value is actually a dictionary."""
         if not isinstance(value, dict):
@@ -154,20 +206,30 @@ class DictProperty(db.Property):
         # Have db.Property validate it as well.
         return super(DictProperty, self).validate(value)
     
+    ## Check if the dictionary is empty.
+    # @param value Dictionary to be checked
+    # @return True for empty, false for not empty
     def empty(self, value):
         """Check if the value is empty."""
         return value is None
-        
+
+## Store a list object in the Google Data Store.
 class GenericListProperty(db.Property):
     """Store a list object in the Google Data Store."""
     
     data_type = list
     
+    ## Serialize the list for storage in the database.
+    # @param model_instance An instance of this class
+    # @return String with the serialized list
     def get_value_for_datastore(self, model_instance):
         """Use pickle to serialize a list for database storage."""
         value = super(GenericListProperty, self).get_value_for_datastore(model_instance)
         return db.Blob(pickle.dumps(value))
     
+    ## Unserialize a list retrieved from the database.
+    # @param value String with the serialized list
+    # @return List with the unserialized value
     def make_value_from_datastore(self, value):
         """Use pickle to deserialize a list from the database."""
         if value is None:
@@ -175,6 +237,7 @@ class GenericListProperty(db.Property):
             return []
         return pickle.loads(value)
     
+    ## Get the default value for the property.
     def default_value(self):
         """Get the default value for the property."""
         if self.default is None:
@@ -182,6 +245,9 @@ class GenericListProperty(db.Property):
         else:
             return super(GenericListProperty, self).default_value().copy()
     
+    ## Check if the value is actually a list.
+    # @param value Value to be validated
+    # @return True for valid, false for invalid
     def validate(self, value):
         """Check if the value is actually a list."""
         if not isinstance(value, list):
@@ -189,23 +255,43 @@ class GenericListProperty(db.Property):
         # Have db.Property validate it as well.
         return super(GenericListProperty, self).validate(value)
     
+    ## Check if the list is empty.
+    # @param value List to be checked
+    # @return True for empty, false for not empty
     def empty(self, value):
         """Check if the value is empty."""
         return value is None
 
+## Store data necessary for sorting spectra in a searchable manner.
 class Matcher(db.Model):
     """Store spectra data necessary for searching the database, then search the database
     for candidates that may represent a given spectrum."""
     
-    FLAT_HEAVYSIDE_BITS = 8 #number of bits in the heavyside index
+    ## Number of bits in the heavyside index.
+    FLAT_HEAVYSIDE_BITS = 8
     
-    # Variables to be stored in the Google Data Store
+    ## List of flat-heavyside indices.
     flat_heavyside = DictProperty()
+    
+    ## List of ordered-heavyside indices.
     ordered_heavyside = DictProperty()
+    
+    ## List of x-values for peaks and their associated spectra.
     peak_list = GenericListProperty()
+    
+    ## List of high-low table indices.
     high_low = DictProperty()
+    
+    ## List of chemical types.
     chem_types = DictProperty()
     
+    ## Add a new spectrum to the Matcher.
+    # 
+    # Add new spectrum data to the various Matcher data structures. Find the
+    # heavyside index, peaks, and other indices and add them to the data
+    # structures.
+    # 
+    # @param spectrum Spectrum object
     def add(self, spectrum):
         """Add new spectrum data to the various Matcher data structures. Find the heavyside
         index, peaks, and other indices and add them to the data structures."""
@@ -242,15 +328,20 @@ class Matcher(db.Model):
             index = bisect.bisect( [item[1] for item in self.peak_list], peak) #Find place in the sorted list
             self.peak_list.insert( index, (spectrum.key(),peak) ) #Insert in the right place
     
+    ## Find spectra similar to the given one.
+    # 
+    # Find spectra that may represent the given Spectrum object by sorting
+    # the database using different heuristics, having them vote, and returning only
+    # the spectra deemed similar to the given spectrum.
+    # 
+    # @param spectrum Spectrum object
+    # @return List of similar Spectrum objects
     def get(self, spectrum):
         """Find spectra that may represent the given Spectrum object by sorting
         the database using different heuristics, having them vote, and returning only
         the spectra deemed similar to the given spectrum."""
         
-        #raise Exception( '\n' + '\n'.join([str(s.chemical_name) for s in Spectrum.all()]) )
-        raise Exception('\n' + '\n'.join(Spectrum.get(key[0]).chemical_name for key in self.peak_list))
-        
-        #Get flat heayside key:
+        # Get flat heayside key.
         flatHeavysideKey, leftEdge, width = 0, 0, len(spectrum.data) # Initialize variables
         for whichBit in xrange(Matcher.FLAT_HEAVYSIDE_BITS): # Count from zero to number of bits
             left = sum(spectrum.data[leftEdge:leftEdge+width/2]) #Sum integrals
@@ -258,34 +349,41 @@ class Matcher(db.Model):
             if leftEdge+width == len(spectrum.data): leftEdge = 0; width = width/2 #Adjust boundaries
             else: leftEdge += width #for next iteration
             flatHeavysideKey += (left<right)<<(Matcher.FLAT_HEAVYSIDE_BITS-whichBit) # Adds on to the key
-        #Get x position of highest peak:
+        # Get x position of highest peak.
         peak = max(spectrum.xy, key=operator.itemgetter(1))[0] # Find x with highest y
         
         # Get the candidates in a hash table
         keys = collections.defaultdict(lambda:0) #Default to zero
-        #Add flat heavyside votes
-        if flatHeavysideKey in self.flat_heavyside: # if the key is in the pre-determined dictionary
-            for key in self.flat_heavyside[flatHeavysideKey]: # for every spectrum with that key
-                keys[key] += 10 #10 votes
+        # Give ten votes to each spectrum with the same heavyside key.
+        if flatHeavysideKey in self.flat_heavyside:
+            for key in self.flat_heavyside[flatHeavysideKey]:
+                keys[key] += 10
         
-        #raise Exception('\n' + '\n'.join(str(key)+' -> '+str(votes) for key,votes in keys.iteritems()))
-        
-        #Add peak list votes
-        index = bisect.bisect( [item[1] for item in self.peak_list], peak) # Find nearest location for item[1] in peak_list
-        for offset in xrange(-5,5): # From -5 to 5
+        # If a spectrum has a peak within five indices of our given spectrum's
+        # peaks in either direction, give it votes depending on how close it is.
+        index = bisect.bisect( [item[1] for item in self.peak_list], peak)
+        for offset in xrange(-5,5):
             if index+offset < 0 or index+offset >= len(self.peak_list):
-                continue # If bisect gives us an index too near the beginning or end of list
-            keys[self.peak_list[index+offset][0]] += abs(offset) # Add offset votes
-            
-        #raise Exception('\n' + '\n'.join(str(key)+' -> '+str(votes) for key,votes in keys.iteritems()))
-            
+                # If bisect gives us an index near the beginning or end of list.
+                continue
+            # Give the spectrum (5 - offest) votes
+            keys[self.peak_list[index+offset][0]] += 5 - abs(offset)
+        # Sort candidates by number of votes and return Spectrum objects.
         keys = sorted(keys.iteritems(), key = operator.itemgetter(1))
-        return Spectrum.get([k[0] for k in keys]) # Return Spectrum objects for each one.
+        return Spectrum.get([k[0] for k in keys])
     
+    ## Calculate the difference or error between two spectra using Bove's algorithm.
+    # @param a Spectrum object to compare
+    # @param b Other Spectrum object to compare
+    # @return Integer representing the error
     @staticmethod # Make a static method for faster execution
     def bove(a, b):
         return max([abs(a.data[i]-b.data[i]) for i in xrange(len(a.data))]) # Do Bove's algorithm
     
+    ## Calculate the difference or error between two spectra using least squares.
+    # @param a Spectrum object to compare
+    # @param b Other Spectrum object to compare
+    # @return Integer representing the error
     @staticmethod # Make a static method for faster execution
     def least_squares(a, b):
         return sum([(a.data[i]-a.b[i])**2 for i in xrange(len(a.data))]) # Compare to spectra with least squares
