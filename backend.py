@@ -27,7 +27,7 @@ import logging
 # object to find candidates for similar spectra in the database and compare
 # all candidates to the original spectrum using linear comparison algorithms.
 #
-# @param file File descriptor for the spectrum
+# @param file_obj File descriptor for the spectrum
 # @return List of Spectrum objects
 def search(file_obj):
     """Search for a spectrum based on a given file descriptor."""
@@ -52,7 +52,7 @@ def search(file_obj):
 # object does not yet exist, create it. Then store the spectrum in the database
 # and add any necessary sorting data to the Matcher object.
 # 
-# @param file File descriptor for the spectrum
+# @param file_obj File descriptor for the spectrum
 def add(file_obj):
     """Add a new spectrum to the database from a given file descriptor."""
     # Load the user's spectrum into a Spectrum object.

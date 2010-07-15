@@ -43,28 +43,45 @@ if not os.environ.get("APPLICATION_ID", False):
         return True
 
 if os.environ.get("APPLICATION_ID", False):
+    import sys
+    import traceback
     from google.appengine.ext import webapp
     from google.appengine.ext.webapp.util import run_wsgi_app
+    from google.appengine.api import users
     import backend
     
     class Uploader(webapp.RequestHandler):
         def post(self):
-            data = self.request.POST.get('file').file.read()
-            obj = pickle.loads(data)
-            spectrum = Spectrum(chemical_name=obj.chemical_name,
-                                chemical_type=obj.chemical_type,
-                                data=obj.data)
-            matcher = memcache.get(spectrum.type + '_matcher')
-            if matcher is None:
-                matcher = Matcher.get_by_key_name(spectrum.type)
-            if not matcher:
-                matcher = Matcher(key_name=spectrum.type)
-            # Add the spectrum to the database and Matcher.
-            spectrum.put()
-            matcher.add(spectrum)
-            # Update the Matcher to the database and the cache.
-            matcher.put()
-            memcache.set(spectrum.type + '_matcher', matcher)
+            # Check if user is admin. If not, error code 401.
+            if not is_current_user_admin():
+                self.error(401)
+                self.response.out.write("Unauthorized user.")
+                return False
+            # Load the spectrum object. If unsuccessful, error code 400
+            try:
+                data = self.request.POST.get('file').file.read()
+                obj = pickle.loads(data)
+                spectrum = Spectrum(chemical_name=obj.chemical_name,
+                                    chemical_type=obj.chemical_type,
+                                    data=obj.data)
+            except Exception as exception:
+                self.error(400)
+                self.response.out.write(traceback.format_exc())
+                return False
+            else:
+                # Proceed to add spectrum to database.
+                matcher = memcache.get(spectrum.type + '_matcher')
+                if matcher is None:
+                    matcher = Matcher.get_by_key_name(spectrum.type)
+                if not matcher:
+                    matcher = Matcher(key_name=spectrum.type)
+                # Add the spectrum to the database and Matcher.
+                spectrum.put()
+                matcher.add(spectrum)
+                # Update the Matcher to the database and the cache.
+                matcher.put()
+                memcache.set(spectrum.type + '_matcher', matcher)
+                return True
 
 class SpectrumTransfer():
     """Store a spectrum, its related data, and any algorithms necessary
