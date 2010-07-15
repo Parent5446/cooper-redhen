@@ -9,3 +9,6 @@ handlers:
 
 - url: .*
   script: frontend.py
+
+- url: /upload
+  script: uploader.py

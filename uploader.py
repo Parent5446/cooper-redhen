@@ -1,40 +1,70 @@
 from __future__ import with_statement
 import cgi
-import httplib
-import urllib
 import pickle
 import os
-import os.path
 
-def main(dir):
-    if not os.path.exists(dir) or not os.path.isdir(dir):
-        raise Exception("Not a directory.")
-    files = os.listdir(dir)
-    for file_name in files:
-        with open(file_name) as file_obj:
-            transfer(file_obj)
+if not os.environ.get("APPLICATION_ID", False):
+    import httplib
+    import urllib
+    import os.path
+    
+    def main_client(dir, recursive=False):
+        if not os.path.exists(dir) or not os.path.isdir(dir):
+            raise Exception("Not a directory.")
+        files = os.listdir(dir)
+        for file_name in files:
+            if os.path.isdir(file_name):
+                if recursive:
+                    main_client(file_name)
+                else:
+                    continue
+            with open(file_name) as file_obj:
+                transfer(file_obj)
+    
+    def transfer(file_obj):
+        # Generate a SpectrumTransfer object
+        spectrum = SpectrumTransfer()
+        spectrum.parse_file(file_obj)
+        # Serialize into a string
+        data = pickle.dumps(spectrum)
+        
+        # Set up HTTP connection
+        host = "cooper-redhen.appspot.com"
+        headers = {"Content-type": "application/x-www-form-urlencoded",
+                   "Accept": "text/plain"}
+        params = urllib.encode({"spectrum": data})
+        conn = HTTPConnection("cooper-redhen.appspot.com", strict=True)
+        conn.request("POST", "/upload", params, headers)
+        
+        # Process response
+        response = conn.getresponse()
+        if int(response.status) != 200:
+            raise Exception("Upload error: %s" % response.read())
+        return True
 
-def transfer(file_obj):
-    # Generate a SpectrumTransfer object
-    contents = file_obj.read()
-    spectrum = SpectrumTransfer()
-    spectrum.parse_file(spectrum)
-    # Serialize into a string
-    data = pickle.dumps(spectrum)
+if os.environ.get("APPLICATION_ID", False):
+    from google.appengine.ext import webapp
+    from google.appengine.ext.webapp.util import run_wsgi_app
+    import backend
     
-    # Set up HTTP connection
-    host = "cooper-redhen.appspot.com"
-    headers = {"Content-type": "application/x-www-form-urlencoded",
-               "Accept": "text/plain"}
-    params = urllib.encode({"spectrum": data})
-    conn = HTTPConnection("cooper-redhen.appspot.com", strict=True)
-    conn.request("POST", "/upload", params, headers)
-    
-    # Process response
-    response = conn.getresponse()
-    if int(response.status) != 200:
-        raise Exception("Upload error: %s" % response.read())
-    return True
+    class Uploader(webapp.RequestHandler):
+        def post(self):
+            data = self.request.POST.get('file').file.read()
+            obj = pickle.loads(data)
+            spectrum = Spectrum(chemical_name=obj.chemical_name,
+                                chemical_type=obj.chemical_type,
+                                data=obj.data)
+            matcher = memcache.get(spectrum.type + '_matcher')
+            if matcher is None:
+                matcher = Matcher.get_by_key_name(spectrum.type)
+            if not matcher:
+                matcher = Matcher(key_name=spectrum.type)
+            # Add the spectrum to the database and Matcher.
+            spectrum.put()
+            matcher.add(spectrum)
+            # Update the Matcher to the database and the cache.
+            matcher.put()
+            memcache.set(spectrum.type + '_matcher', matcher)
 
 class SpectrumTransfer():
     """Store a spectrum, its related data, and any algorithms necessary
@@ -119,11 +149,12 @@ class SpectrumTransfer():
         """Get a specific data label from the file."""
         index = self.contents.index(name) + len(name) # means find where the field name ends 
         return self.contents[index:self.contents.index('\n', index)] #Does not handle Windows format
-    
-    def convert(self):
-        return Spectrum(chemical_name=self.chemical_name,
-                        chemical_type=self.chemical_type,
-                        data=self.data)
-        
+
 if __name__ == '__main__':
-	main(os.getcwd())
+    if os.environ.get("APPLICATION_ID", False):
+        application = webapp.WSGIApplication([
+            ('/', MainHandler)
+        ], debug=True)
+        run_wsgi_app(application)
+    else:
+        main_client(os.getcwd())
