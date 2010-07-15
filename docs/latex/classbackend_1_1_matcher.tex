@@ -1,0 +1,171 @@
+\hypertarget{classbackend_1_1_matcher}{
+\section{Matcher Class Reference}
+\label{classbackend_1_1_matcher}\index{backend::Matcher@{backend::Matcher}}
+}
+
+
+Store data necessary for sorting spectra in a searchable manner.  
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classbackend_1_1_matcher_a66aa7c8063db6217a0a0061f8b7ba206}{add}
+\begin{DoxyCompactList}\small\item\em Add a new spectrum to the \hyperlink{classbackend_1_1_matcher}{Matcher}. \item\end{DoxyCompactList}\item 
+def \hyperlink{classbackend_1_1_matcher_a444a1328efb32d5d9d2dcb2efe855d3b}{get}
+\begin{DoxyCompactList}\small\item\em Find spectra similar to the given one. \item\end{DoxyCompactList}\item 
+def \hyperlink{classbackend_1_1_matcher_a989553190033eaa893e27d2907fce91e}{bove}
+\begin{DoxyCompactList}\small\item\em Calculate the difference or error between two spectra using Bove's algorithm. \item\end{DoxyCompactList}\item 
+def \hyperlink{classbackend_1_1_matcher_ab324f6c7c11f54b7617ecdee14f76049}{least\_\-squares}
+\begin{DoxyCompactList}\small\item\em Calculate the difference or error between two spectra using least squares. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{classbackend_1_1_matcher_a489df5b5c1e345f76ee524685e0856c1}{FLAT\_\-HEAVYSIDE\_\-BITS} = 8
+\begin{DoxyCompactList}\small\item\em Number of bits in the heavyside index. \item\end{DoxyCompactList}\item 
+tuple \hyperlink{classbackend_1_1_matcher_a8edb3e00a469bccb3c6a988e2162f51e}{flat\_\-heavyside} = \hyperlink{classbackend_1_1_dict_property}{DictProperty}()
+\begin{DoxyCompactList}\small\item\em List of flat-\/heavyside indices. \item\end{DoxyCompactList}\item 
+tuple \hyperlink{classbackend_1_1_matcher_a57274e1e90ee992a9ae6b89edb934a43}{ordered\_\-heavyside} = \hyperlink{classbackend_1_1_dict_property}{DictProperty}()
+\begin{DoxyCompactList}\small\item\em List of ordered-\/heavyside indices. \item\end{DoxyCompactList}\item 
+tuple \hyperlink{classbackend_1_1_matcher_a38ebd0204232520ab5a9d90a6c17b971}{peak\_\-list} = \hyperlink{classbackend_1_1_generic_list_property}{GenericListProperty}()
+\begin{DoxyCompactList}\small\item\em List of x-\/values for peaks and their associated spectra. \item\end{DoxyCompactList}\item 
+tuple \hyperlink{classbackend_1_1_matcher_abbbeca0d3792b2ad0d9046572fd7f16f}{high\_\-low} = \hyperlink{classbackend_1_1_dict_property}{DictProperty}()
+\begin{DoxyCompactList}\small\item\em List of high-\/low table indices. \item\end{DoxyCompactList}\item 
+tuple \hyperlink{classbackend_1_1_matcher_aaf40dbbcd44a623683ceae35f6e5e9ea}{chem\_\-types} = \hyperlink{classbackend_1_1_dict_property}{DictProperty}()
+\begin{DoxyCompactList}\small\item\em List of chemical types. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Store data necessary for sorting spectra in a searchable manner. \begin{DoxyVerb}Store spectra data necessary for searching the database, then search the database
+for candidates that may represent a given spectrum.\end{DoxyVerb}
+ 
+
+Definition at line 262 of file backend.py.
+
+\subsection{Member Function Documentation}
+\hypertarget{classbackend_1_1_matcher_a66aa7c8063db6217a0a0061f8b7ba206}{
+\index{backend::Matcher@{backend::Matcher}!add@{add}}
+\index{add@{add}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{add}]{\setlength{\rightskip}{0pt plus 5cm}def add ( {\em self}, \/   {\em spectrum})}}
+\label{classbackend_1_1_matcher_a66aa7c8063db6217a0a0061f8b7ba206}
+
+
+Add a new spectrum to the \hyperlink{classbackend_1_1_matcher}{Matcher}. Add new spectrum data to the various \hyperlink{classbackend_1_1_matcher}{Matcher} data structures. Find the heavyside index, peaks, and other indices and add them to the data structures.
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em spectrum}]\hyperlink{classbackend_1_1_spectrum}{Spectrum} object\begin{DoxyVerb}Add new spectrum data to the various Matcher data structures. Find the heavyside
+index, peaks, and other indices and add them to the data structures.\end{DoxyVerb}
+ \end{DoxyParams}
+
+
+Definition at line 291 of file backend.py.\hypertarget{classbackend_1_1_matcher_a989553190033eaa893e27d2907fce91e}{
+\index{backend::Matcher@{backend::Matcher}!bove@{bove}}
+\index{bove@{bove}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{bove}]{\setlength{\rightskip}{0pt plus 5cm}def bove ( {\em a}, \/   {\em b})}}
+\label{classbackend_1_1_matcher_a989553190033eaa893e27d2907fce91e}
+
+
+Calculate the difference or error between two spectra using Bove's algorithm. 
+\begin{DoxyParams}{Parameters}
+\item[{\em a}]\hyperlink{classbackend_1_1_spectrum}{Spectrum} object to compare \item[{\em b}]Other \hyperlink{classbackend_1_1_spectrum}{Spectrum} object to compare \end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Integer representing the error 
+\end{DoxyReturn}
+
+
+Definition at line 372 of file backend.py.\hypertarget{classbackend_1_1_matcher_a444a1328efb32d5d9d2dcb2efe855d3b}{
+\index{backend::Matcher@{backend::Matcher}!get@{get}}
+\index{get@{get}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{get}]{\setlength{\rightskip}{0pt plus 5cm}def get ( {\em self}, \/   {\em spectrum})}}
+\label{classbackend_1_1_matcher_a444a1328efb32d5d9d2dcb2efe855d3b}
+
+
+Find spectra similar to the given one. Find spectra that may represent the given \hyperlink{classbackend_1_1_spectrum}{Spectrum} object by sorting the database using different heuristics, having them vote, and returning only the spectra deemed similar to the given spectrum.
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em spectrum}]\hyperlink{classbackend_1_1_spectrum}{Spectrum} object \end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+List of similar \hyperlink{classbackend_1_1_spectrum}{Spectrum} objects\begin{DoxyVerb}Find spectra that may represent the given Spectrum object by sorting
+the database using different heuristics, having them vote, and returning only
+the spectra deemed similar to the given spectrum.\end{DoxyVerb}
+ 
+\end{DoxyReturn}
+
+
+Definition at line 327 of file backend.py.\hypertarget{classbackend_1_1_matcher_ab324f6c7c11f54b7617ecdee14f76049}{
+\index{backend::Matcher@{backend::Matcher}!least\_\-squares@{least\_\-squares}}
+\index{least\_\-squares@{least\_\-squares}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{least\_\-squares}]{\setlength{\rightskip}{0pt plus 5cm}def least\_\-squares ( {\em a}, \/   {\em b})}}
+\label{classbackend_1_1_matcher_ab324f6c7c11f54b7617ecdee14f76049}
+
+
+Calculate the difference or error between two spectra using least squares. 
+\begin{DoxyParams}{Parameters}
+\item[{\em a}]\hyperlink{classbackend_1_1_spectrum}{Spectrum} object to compare \item[{\em b}]Other \hyperlink{classbackend_1_1_spectrum}{Spectrum} object to compare \end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Integer representing the error 
+\end{DoxyReturn}
+
+
+Definition at line 380 of file backend.py.
+
+\subsection{Member Data Documentation}
+\hypertarget{classbackend_1_1_matcher_aaf40dbbcd44a623683ceae35f6e5e9ea}{
+\index{backend::Matcher@{backend::Matcher}!chem\_\-types@{chem\_\-types}}
+\index{chem\_\-types@{chem\_\-types}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{chem\_\-types}]{\setlength{\rightskip}{0pt plus 5cm}tuple {\bf chem\_\-types} = {\bf DictProperty}()\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}
+\label{classbackend_1_1_matcher_aaf40dbbcd44a623683ceae35f6e5e9ea}
+
+
+List of chemical types. 
+
+Definition at line 282 of file backend.py.\hypertarget{classbackend_1_1_matcher_a8edb3e00a469bccb3c6a988e2162f51e}{
+\index{backend::Matcher@{backend::Matcher}!flat\_\-heavyside@{flat\_\-heavyside}}
+\index{flat\_\-heavyside@{flat\_\-heavyside}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{flat\_\-heavyside}]{\setlength{\rightskip}{0pt plus 5cm}tuple {\bf flat\_\-heavyside} = {\bf DictProperty}()\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}
+\label{classbackend_1_1_matcher_a8edb3e00a469bccb3c6a988e2162f51e}
+
+
+List of flat-\/heavyside indices. 
+
+Definition at line 270 of file backend.py.\hypertarget{classbackend_1_1_matcher_a489df5b5c1e345f76ee524685e0856c1}{
+\index{backend::Matcher@{backend::Matcher}!FLAT\_\-HEAVYSIDE\_\-BITS@{FLAT\_\-HEAVYSIDE\_\-BITS}}
+\index{FLAT\_\-HEAVYSIDE\_\-BITS@{FLAT\_\-HEAVYSIDE\_\-BITS}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{FLAT\_\-HEAVYSIDE\_\-BITS}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf FLAT\_\-HEAVYSIDE\_\-BITS} = 8\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}
+\label{classbackend_1_1_matcher_a489df5b5c1e345f76ee524685e0856c1}
+
+
+Number of bits in the heavyside index. 
+
+Definition at line 267 of file backend.py.\hypertarget{classbackend_1_1_matcher_abbbeca0d3792b2ad0d9046572fd7f16f}{
+\index{backend::Matcher@{backend::Matcher}!high\_\-low@{high\_\-low}}
+\index{high\_\-low@{high\_\-low}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{high\_\-low}]{\setlength{\rightskip}{0pt plus 5cm}tuple {\bf high\_\-low} = {\bf DictProperty}()\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}
+\label{classbackend_1_1_matcher_abbbeca0d3792b2ad0d9046572fd7f16f}
+
+
+List of high-\/low table indices. 
+
+Definition at line 279 of file backend.py.\hypertarget{classbackend_1_1_matcher_a57274e1e90ee992a9ae6b89edb934a43}{
+\index{backend::Matcher@{backend::Matcher}!ordered\_\-heavyside@{ordered\_\-heavyside}}
+\index{ordered\_\-heavyside@{ordered\_\-heavyside}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{ordered\_\-heavyside}]{\setlength{\rightskip}{0pt plus 5cm}tuple {\bf ordered\_\-heavyside} = {\bf DictProperty}()\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}
+\label{classbackend_1_1_matcher_a57274e1e90ee992a9ae6b89edb934a43}
+
+
+List of ordered-\/heavyside indices. 
+
+Definition at line 273 of file backend.py.\hypertarget{classbackend_1_1_matcher_a38ebd0204232520ab5a9d90a6c17b971}{
+\index{backend::Matcher@{backend::Matcher}!peak\_\-list@{peak\_\-list}}
+\index{peak\_\-list@{peak\_\-list}!backend::Matcher@{backend::Matcher}}
+\subsubsection[{peak\_\-list}]{\setlength{\rightskip}{0pt plus 5cm}tuple {\bf peak\_\-list} = {\bf GenericListProperty}()\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}
+\label{classbackend_1_1_matcher_a38ebd0204232520ab5a9d90a6c17b971}
+
+
+List of x-\/values for peaks and their associated spectra. 
+
+Definition at line 276 of file backend.py.
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/parent5446/Repositories/cooper-\/redhen/\hyperlink{backend_8py}{backend.py}\end{DoxyCompactItemize}

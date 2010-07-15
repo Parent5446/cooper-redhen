@@ -1,0 +1,48 @@
+.TH "frontend" 3 "15 Jul 2010" "Version 0.1" "RedHen" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+frontend \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBMainHandler\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "def \fBmain\fP"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "tuple \fBapplication\fP"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "def frontend::main ()"
+.PP
+Definition at line 41 of file frontend.py.
+.SH "Variable Documentation"
+.PP 
+.SS "tuple \fBapplication\fP"\fBInitial value:\fP
+.PP
+.nf
+webapp.WSGIApplication([
+    ('/', MainHandler)
+], debug=True)
+.fi
+.PP
+Definition at line 37 of file frontend.py.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedHen from the source code.
