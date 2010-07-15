@@ -1,0 +1,157 @@
+.TH "backend::GenericListProperty" 3 "14 Jul 2010" "Version 0.1" "RedHen" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+backend::GenericListProperty \- 
+.PP
+Store a list object in the Google Data Store.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "def \fBget_value_for_datastore\fP"
+.br
+.RI "\fISerialize the list for storage in the database. \fP"
+.ti -1c
+.RI "def \fBmake_value_from_datastore\fP"
+.br
+.RI "\fIUnserialize a list retrieved from the database. \fP"
+.ti -1c
+.RI "def \fBdefault_value\fP"
+.br
+.RI "\fIGet the default value for the property. \fP"
+.ti -1c
+.RI "def \fBvalidate\fP"
+.br
+.RI "\fICheck if the value is actually a list. \fP"
+.ti -1c
+.RI "def \fBempty\fP"
+.br
+.RI "\fICheck if the list is empty. \fP"
+.in -1c
+.SS "Static Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBdata_type\fP = list"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Store a list object in the Google Data Store. 
+
+.PP
+.nf
+Store a list object in the Google Data Store..fi
+.PP
+ 
+.PP
+Definition at line 213 of file backend.py.
+.SH "Member Function Documentation"
+.PP 
+.SS "def default_value ( self)"
+.PP
+Get the default value for the property. .PP
+.nf
+Get the default value for the property..fi
+.PP
+ 
+.PP
+Definition at line 237 of file backend.py.
+.SS "def empty ( self,  value)"
+.PP
+Check if the list is empty. \fBParameters:\fP
+.RS 4
+\fIvalue\fP List to be checked 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+True for empty, false for not empty
+.PP
+.nf
+Check if the value is empty.
+.fi
+.PP
+ 
+.RE
+.PP
+
+.PP
+Definition at line 257 of file backend.py.
+.SS "def get_value_for_datastore ( self,  model_instance)"
+.PP
+Serialize the list for storage in the database. \fBParameters:\fP
+.RS 4
+\fImodel_instance\fP An instance of this class 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+String with the serialized list
+.PP
+.nf
+Use pickle to serialize a list for database storage.
+.fi
+.PP
+ 
+.RE
+.PP
+
+.PP
+Definition at line 221 of file backend.py.
+.SS "def make_value_from_datastore ( self,  value)"
+.PP
+Unserialize a list retrieved from the database. \fBParameters:\fP
+.RS 4
+\fIvalue\fP String with the serialized list 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+List with the unserialized value
+.PP
+.nf
+Use pickle to deserialize a list from the database.
+.fi
+.PP
+ 
+.RE
+.PP
+
+.PP
+Definition at line 229 of file backend.py.
+.SS "def validate ( self,  value)"
+.PP
+Check if the value is actually a list. \fBParameters:\fP
+.RS 4
+\fIvalue\fP Value to be validated 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+True for valid, false for invalid
+.PP
+.nf
+Check if the value is actually a list.
+.fi
+.PP
+ 
+.RE
+.PP
+
+.PP
+Definition at line 247 of file backend.py.
+.SH "Member Data Documentation"
+.PP 
+.SS "\fBdata_type\fP = list\fC [static]\fP"
+.PP
+Definition at line 216 of file backend.py.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for RedHen from the source code.

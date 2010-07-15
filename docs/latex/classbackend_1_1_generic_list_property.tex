@@ -1,0 +1,149 @@
+\hypertarget{classbackend_1_1_generic_list_property}{
+\section{GenericListProperty Class Reference}
+\label{classbackend_1_1_generic_list_property}\index{backend::GenericListProperty@{backend::GenericListProperty}}
+}
+
+
+Store a list object in the Google Data Store.  
+
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classbackend_1_1_generic_list_property_a54cc138e6df3ad55c38fa5db72327963}{get\_\-value\_\-for\_\-datastore}
+\begin{DoxyCompactList}\small\item\em Serialize the list for storage in the database. \item\end{DoxyCompactList}\item 
+def \hyperlink{classbackend_1_1_generic_list_property_a464c5a5f52df989128b5fc067ea34512}{make\_\-value\_\-from\_\-datastore}
+\begin{DoxyCompactList}\small\item\em Unserialize a list retrieved from the database. \item\end{DoxyCompactList}\item 
+def \hyperlink{classbackend_1_1_generic_list_property_a64bfffc058d933b3b0599f5bc7c049d1}{default\_\-value}
+\begin{DoxyCompactList}\small\item\em Get the default value for the property. \item\end{DoxyCompactList}\item 
+def \hyperlink{classbackend_1_1_generic_list_property_a8f3dc5c8aaf85c281c2f52cda259aa56}{validate}
+\begin{DoxyCompactList}\small\item\em Check if the value is actually a list. \item\end{DoxyCompactList}\item 
+def \hyperlink{classbackend_1_1_generic_list_property_aad7084fad37d1cf9b41a738ecfbbd249}{empty}
+\begin{DoxyCompactList}\small\item\em Check if the list is empty. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classbackend_1_1_generic_list_property_ac2ad7f431e3446fddcd9b6b9f93c4c14}{data\_\-type} = list
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Store a list object in the Google Data Store. \begin{DoxyVerb}Store a list object in the Google Data Store.\end{DoxyVerb}
+ 
+
+Definition at line 213 of file backend.py.
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classbackend_1_1_generic_list_property_a64bfffc058d933b3b0599f5bc7c049d1}{
+\index{backend::GenericListProperty@{backend::GenericListProperty}!default\_\-value@{default\_\-value}}
+\index{default\_\-value@{default\_\-value}!backend::GenericListProperty@{backend::GenericListProperty}}
+\subsubsection[{default\_\-value}]{\setlength{\rightskip}{0pt plus 5cm}def default\_\-value ( {\em self})}}
+\label{classbackend_1_1_generic_list_property_a64bfffc058d933b3b0599f5bc7c049d1}
+
+
+Get the default value for the property. 
+
+\begin{DoxyVerb}Get the default value for the property.\end{DoxyVerb}
+ 
+
+Definition at line 237 of file backend.py.
+
+\hypertarget{classbackend_1_1_generic_list_property_aad7084fad37d1cf9b41a738ecfbbd249}{
+\index{backend::GenericListProperty@{backend::GenericListProperty}!empty@{empty}}
+\index{empty@{empty}!backend::GenericListProperty@{backend::GenericListProperty}}
+\subsubsection[{empty}]{\setlength{\rightskip}{0pt plus 5cm}def empty ( {\em self}, \/   {\em value})}}
+\label{classbackend_1_1_generic_list_property_aad7084fad37d1cf9b41a738ecfbbd249}
+
+
+Check if the list is empty. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em value}]List to be checked \end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True for empty, false for not empty\begin{DoxyVerb}Check if the value is empty.\end{DoxyVerb}
+ 
+\end{DoxyReturn}
+
+
+Definition at line 257 of file backend.py.
+
+\hypertarget{classbackend_1_1_generic_list_property_a54cc138e6df3ad55c38fa5db72327963}{
+\index{backend::GenericListProperty@{backend::GenericListProperty}!get\_\-value\_\-for\_\-datastore@{get\_\-value\_\-for\_\-datastore}}
+\index{get\_\-value\_\-for\_\-datastore@{get\_\-value\_\-for\_\-datastore}!backend::GenericListProperty@{backend::GenericListProperty}}
+\subsubsection[{get\_\-value\_\-for\_\-datastore}]{\setlength{\rightskip}{0pt plus 5cm}def get\_\-value\_\-for\_\-datastore ( {\em self}, \/   {\em model\_\-instance})}}
+\label{classbackend_1_1_generic_list_property_a54cc138e6df3ad55c38fa5db72327963}
+
+
+Serialize the list for storage in the database. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em model\_\-instance}]An instance of this class \end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+String with the serialized list\begin{DoxyVerb}Use pickle to serialize a list for database storage.\end{DoxyVerb}
+ 
+\end{DoxyReturn}
+
+
+Definition at line 221 of file backend.py.
+
+\hypertarget{classbackend_1_1_generic_list_property_a464c5a5f52df989128b5fc067ea34512}{
+\index{backend::GenericListProperty@{backend::GenericListProperty}!make\_\-value\_\-from\_\-datastore@{make\_\-value\_\-from\_\-datastore}}
+\index{make\_\-value\_\-from\_\-datastore@{make\_\-value\_\-from\_\-datastore}!backend::GenericListProperty@{backend::GenericListProperty}}
+\subsubsection[{make\_\-value\_\-from\_\-datastore}]{\setlength{\rightskip}{0pt plus 5cm}def make\_\-value\_\-from\_\-datastore ( {\em self}, \/   {\em value})}}
+\label{classbackend_1_1_generic_list_property_a464c5a5f52df989128b5fc067ea34512}
+
+
+Unserialize a list retrieved from the database. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em value}]String with the serialized list \end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+List with the unserialized value\begin{DoxyVerb}Use pickle to deserialize a list from the database.\end{DoxyVerb}
+ 
+\end{DoxyReturn}
+
+
+Definition at line 229 of file backend.py.
+
+\hypertarget{classbackend_1_1_generic_list_property_a8f3dc5c8aaf85c281c2f52cda259aa56}{
+\index{backend::GenericListProperty@{backend::GenericListProperty}!validate@{validate}}
+\index{validate@{validate}!backend::GenericListProperty@{backend::GenericListProperty}}
+\subsubsection[{validate}]{\setlength{\rightskip}{0pt plus 5cm}def validate ( {\em self}, \/   {\em value})}}
+\label{classbackend_1_1_generic_list_property_a8f3dc5c8aaf85c281c2f52cda259aa56}
+
+
+Check if the value is actually a list. 
+
+
+\begin{DoxyParams}{Parameters}
+\item[{\em value}]Value to be validated \end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True for valid, false for invalid\begin{DoxyVerb}Check if the value is actually a list.\end{DoxyVerb}
+ 
+\end{DoxyReturn}
+
+
+Definition at line 247 of file backend.py.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classbackend_1_1_generic_list_property_ac2ad7f431e3446fddcd9b6b9f93c4c14}{
+\index{backend::GenericListProperty@{backend::GenericListProperty}!data\_\-type@{data\_\-type}}
+\index{data\_\-type@{data\_\-type}!backend::GenericListProperty@{backend::GenericListProperty}}
+\subsubsection[{data\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}{\bf data\_\-type} = list\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}
+\label{classbackend_1_1_generic_list_property_ac2ad7f431e3446fddcd9b6b9f93c4c14}
+
+
+Definition at line 216 of file backend.py.
+
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+/home/parent5446/Repositories/cooper-\/redhen/\hyperlink{backend_8py}{backend.py}\end{DoxyCompactItemize}
