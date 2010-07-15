@@ -27,7 +27,7 @@ class MainHandler(webapp.RequestHandler):
             self.response.out.write('<pre>' + '\n'.join( [s for s in fileNames] ) + '</pre>')
             
         self.response.out.write(template.render('index.html', {}))
-        
+
     def post(self):
         file = self.request.POST.get('file').file
         response = backend.search(file)
