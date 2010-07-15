@@ -4,7 +4,7 @@ various methods of database searching.'''
 ## Provide functions for identifying a spectrum for an unknown substance using
 # various methods of database searching.
 # 
-# @package redhen.backend
+# @package backend
 # @author The Cooper Union for the Advancement of the Science and the Arts
 # @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
 # @copyright Copyright (c) 2010, Cooper Union (Some Right Reserved)
