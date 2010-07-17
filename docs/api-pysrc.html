@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>api</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/cooper-redhen">RedHen</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Module&nbsp;api
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="api-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="api-module.html">Module api</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">Take a POST request with JSON data and process it. If it contains a spectrum</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">file, send it to the back end to search the database.</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">In order for the request to be handled properly, a POST request should be</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring">submitted to this script with a JSON object as the body of the request.</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">File uploads are handled automatically by Google's Blob Store. Note that</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">the purpose of this script is because Pyjamas will compile static HTML,</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">Javascript, and CSS files that cannot have App Engine Python in them. This</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">script allows the user to still interact dynamically with the server through</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring">an HTTP request.</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-docstring">@organization: The Cooper Union for the Advancement of the Science and the Arts</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-docstring">@license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-docstring">@copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">json</tt> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">google</tt><tt class="py-op">.</tt><tt class="py-name">appengine</tt><tt class="py-op">.</tt><tt class="py-name">ext</tt> <tt class="py-keyword">import</tt> <tt class="py-name">blobstore</tt><tt class="py-op">,</tt> <tt class="py-name">webapp</tt> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">google</tt><tt class="py-op">.</tt><tt class="py-name">appengine</tt><tt class="py-op">.</tt><tt class="py-name">ext</tt><tt class="py-op">.</tt><tt class="py-name">webapp</tt> <tt class="py-keyword">import</tt> <tt class="py-name">blobstore_handlers</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">google</tt><tt class="py-op">.</tt><tt class="py-name">appengine</tt><tt class="py-op">.</tt><tt class="py-name">ext</tt><tt class="py-op">.</tt><tt class="py-name">webapp</tt><tt class="py-op">.</tt><tt class="py-name">util</tt> <tt class="py-keyword">import</tt> <tt class="py-name">run_wsgi_app</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Module backend=backend-module.html"><a title="backend" class="py-name" href="#" onclick="return doclink('link-0', 'backend', 'link-0');">backend</a></tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Module common=common-module.html"><a title="common" class="py-name" href="#" onclick="return doclink('link-1', 'common', 'link-1');">common</a></tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"> </tt>
+<a name="ApiHandler"></a><div id="ApiHandler-def"><a name="L27"></a><tt class="py-lineno"> 27</tt> <a class="py-toggle" href="#" id="ApiHandler-toggle" onclick="return toggle('ApiHandler');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="api.ApiHandler-class.html">ApiHandler</a><tt class="py-op">(</tt><tt class="py-base-class">webapp</tt><tt class="py-op">.</tt><tt class="py-base-class">RequestHandler</tt><tt class="py-op">,</tt> <tt class="py-base-class">blobstore_handlers</tt><tt class="py-op">.</tt><tt class="py-base-class">BlobstoreUploadHandler</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ApiHandler-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ApiHandler-expanded"><a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">    <tt class="py-docstring">"""Handle any API requests and return a JSON response."""</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">     </tt>
+<a name="ApiHandler.post"></a><div id="ApiHandler.post-def"><a name="L30"></a><tt class="py-lineno"> 30</tt> <a class="py-toggle" href="#" id="ApiHandler.post-toggle" onclick="return toggle('ApiHandler.post');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="api.ApiHandler-class.html#post">post</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ApiHandler.post-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ApiHandler.post-expanded"><a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-docstring">        Handle a POST request to the API.</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-docstring">        Load the JSON object in the request and hand it off to self.process_request.</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"><tt class="py-docstring">        Then put the response back in JSON format and give back to the user.</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line">        <tt class="py-name">request</tt> <tt class="py-op">=</tt> <tt class="py-name">json</tt><tt class="py-op">.</tt><tt class="py-name">loads</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">request</tt><tt class="py-op">.</tt><tt class="py-name">body</tt><tt class="py-op">)</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">        <tt class="py-comment"># The script needs a dictionary with an action key to continue.</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">request</tt><tt class="py-op">,</tt> <tt id="link-2" class="py-name" targets="Class dict=dict-class.html"><a title="dict" class="py-name" href="#" onclick="return doclink('link-2', 'dict', 'link-2');">dict</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt id="link-3" class="py-name"><a title="common" class="py-name" href="#" onclick="return doclink('link-3', 'common', 'link-1');">common</a></tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Class common.InputError=common.InputError-class.html"><a title="common.InputError" class="py-name" href="#" onclick="return doclink('link-4', 'InputError', 'link-4');">InputError</a></tt><tt class="py-op">(</tt><tt class="py-name">request</tt><tt class="py-op">,</tt> <tt class="py-string">"JSON object must be an indexed array."</tt><tt class="py-op">)</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">        <tt class="py-comment"># Pop action and send the rest to the process_request function.</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">        <tt class="py-name">action</tt> <tt class="py-op">=</tt> <tt class="py-name">request</tt><tt class="py-op">.</tt><tt class="py-name">pop</tt><tt class="py-op">(</tt><tt class="py-string">"action"</tt><tt class="py-op">,</tt> <tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">        <tt class="py-name">result</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Method api.ApiHandler.process_request()=api.ApiHandler-class.html#process_request"><a title="api.ApiHandler.process_request" class="py-name" href="#" onclick="return doclink('link-5', 'process_request', 'link-5');">process_request</a></tt><tt class="py-op">(</tt><tt class="py-name">action</tt><tt class="py-op">,</tt> <tt class="py-name">request</tt><tt class="py-op">)</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">        <tt class="py-comment"># Put back into JSON and send to user.</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">        <tt class="py-name">response</tt> <tt class="py-op">=</tt> <tt class="py-name">json</tt><tt class="py-op">.</tt><tt class="py-name">dumps</tt><tt class="py-op">(</tt><tt class="py-name">result</tt><tt class="py-op">)</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">response</tt><tt class="py-op">.</tt><tt class="py-name">out</tt><tt class="py-op">.</tt><tt class="py-name">write</tt><tt class="py-op">(</tt><tt class="py-name">response</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">     </tt>
+<a name="ApiHandler.handle_exception"></a><div id="ApiHandler.handle_exception-def"><a name="L48"></a><tt class="py-lineno"> 48</tt> <a class="py-toggle" href="#" id="ApiHandler.handle_exception-toggle" onclick="return toggle('ApiHandler.handle_exception');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="api.ApiHandler-class.html#handle_exception">handle_exception</a><tt class="py-op">(</tt><tt class="py-param">exception</tt><tt class="py-op">,</tt> <tt class="py-param">debug_mode</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ApiHandler.handle_exception-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ApiHandler.handle_exception-expanded"><a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line"><tt class="py-docstring">        Handle any exceptions raised by the handler.</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line"><tt class="py-docstring">        This is called by App Engine if an exception is raised. If there is a</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"><tt class="py-docstring">        server error, let Google handle it appropriately. If there is an input</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"><tt class="py-docstring">        error, print a custom error message.</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"><tt class="py-docstring">        @param exception: The Exception that was raised</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"><tt class="py-docstring">        @type  exception: C{Exception} or one of its children</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line"><tt class="py-docstring">        @param debug_mode: Whether to print deubgging information or not</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-docstring">        @type  debug_mode: C{bool}</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">        <tt class="py-comment"># TODO: Convert errors into a JSON response so the front end can handle</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">        <tt class="py-comment">#       them easily.</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">exception</tt><tt class="py-op">,</tt> <tt id="link-6" class="py-name" targets="Class common.ServerError=common.ServerError-class.html"><a title="common.ServerError" class="py-name" href="#" onclick="return doclink('link-6', 'ServerError', 'link-6');">ServerError</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">            <tt class="py-comment"># Server error: let Google handle this the usual way.</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">            <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-7" class="py-name" targets="Class api.ApiHandler=api.ApiHandler-class.html"><a title="api.ApiHandler" class="py-name" href="#" onclick="return doclink('link-7', 'ApiHandler', 'link-7');">ApiHandler</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Method api.ApiHandler.handle_exception()=api.ApiHandler-class.html#handle_exception"><a title="api.ApiHandler.handle_exception" class="py-name" href="#" onclick="return doclink('link-8', 'handle_exception', 'link-8');">handle_exception</a></tt><tt class="py-op">(</tt><tt class="py-name">exception</tt><tt class="py-op">,</tt> <tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">exception</tt><tt class="py-op">,</tt> <tt id="link-9" class="py-name"><a title="common.InputError" class="py-name" href="#" onclick="return doclink('link-9', 'InputError', 'link-4');">InputError</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">            <tt class="py-comment"># Input error: in normal cases, Google would send a 500 error code</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">            <tt class="py-comment"># for all exception, but we want a 400 for an invalid request.</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">error</tt><tt class="py-op">(</tt><tt class="py-number">400</tt><tt class="py-op">)</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">            <tt class="py-name">response</tt> <tt class="py-op">=</tt> <tt class="py-string">"Invalid user input.\nInput: %s\nReason: %s"</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">            <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">response</tt><tt class="py-op">.</tt><tt class="py-name">out</tt><tt class="py-op">.</tt><tt class="py-name">write</tt><tt class="py-op">(</tt><tt class="py-name">response</tt> <tt class="py-op">%</tt> <tt class="py-name">exception</tt><tt class="py-op">.</tt><tt class="py-name">expr</tt><tt class="py-op">,</tt> <tt class="py-name">expression</tt><tt class="py-op">.</tt><tt class="py-name">msg</tt><tt class="py-op">)</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">            <tt class="py-comment"># Send all else to Google.</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">            <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-10" class="py-name"><a title="api.ApiHandler" class="py-name" href="#" onclick="return doclink('link-10', 'ApiHandler', 'link-7');">ApiHandler</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="api.ApiHandler.handle_exception" class="py-name" href="#" onclick="return doclink('link-11', 'handle_exception', 'link-8');">handle_exception</a></tt><tt class="py-op">(</tt><tt class="py-name">exception</tt><tt class="py-op">,</tt> <tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">     </tt>
+<a name="ApiHandler.process_request"></a><div id="ApiHandler.process_request-def"><a name="L76"></a><tt class="py-lineno"> 76</tt> <a class="py-toggle" href="#" id="ApiHandler.process_request-toggle" onclick="return toggle('ApiHandler.process_request');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="api.ApiHandler-class.html#process_request">process_request</a><tt class="py-op">(</tt><tt class="py-param">action</tt><tt class="py-op">,</tt> <tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ApiHandler.process_request-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ApiHandler.process_request-expanded"><a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">        <tt class="py-docstring">"""</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"><tt class="py-docstring">        Process an API request.</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line"><tt class="py-docstring">        Take a given action and args and process an API request. If the action</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"><tt class="py-docstring">        is 'search', search the database for any spectrum files uploaded or get</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-docstring">        any history items if they are provided as the 'target'. If the action is</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"><tt class="py-docstring">        'history', get the history of searches for the current user.</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"><tt class="py-docstring">        </tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"><tt class="py-docstring">        @param action: What to do</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"><tt class="py-docstring">        @type  action: C{str}</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"><tt class="py-docstring">        @param args: List of arguments for the action</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line"><tt class="py-docstring">        @type  args: C{dict}</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"><tt class="py-docstring">        @return: Response to the request</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"><tt class="py-docstring">        @rtype: C{list}</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">        <tt class="py-name">response</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">]</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">action</tt> <tt class="py-op">==</tt> <tt class="py-string">"search"</tt><tt class="py-op">:</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line">            <tt class="py-comment"># Search the database for something</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">args</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Method backend.Matcher.get()=backend.Matcher-class.html#get,Method frontend.MainHandler.get()=frontend.MainHandler-class.html#get"><a title="backend.Matcher.get
+frontend.MainHandler.get" class="py-name" href="#" onclick="return doclink('link-12', 'get', 'link-12');">get</a></tt><tt class="py-op">(</tt><tt class="py-string">"target"</tt><tt class="py-op">,</tt> <tt class="py-string">""</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">str</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line">                <tt class="py-comment"># User wants to find an already completed search.</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line">                <tt class="py-comment"># First validate the target. It should be a list.</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line">                <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">args</tt><tt class="py-op">[</tt><tt class="py-string">"target"</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt id="link-13" class="py-name" targets="Class list=list-class.html"><a title="list" class="py-name" href="#" onclick="return doclink('link-13', 'list', 'link-13');">list</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">                    <tt class="py-keyword">raise</tt> <tt id="link-14" class="py-name"><a title="common" class="py-name" href="#" onclick="return doclink('link-14', 'common', 'link-1');">common</a></tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="common.InputError" class="py-name" href="#" onclick="return doclink('link-15', 'InputError', 'link-4');">InputError</a></tt><tt class="py-op">(</tt><tt class="py-name">args</tt><tt class="py-op">[</tt><tt class="py-string">"target"</tt><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-string">"Invalid search target."</tt><tt class="py-op">)</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">                <tt class="py-comment"># Get the targeted searches and extract relevant information.</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">                <tt class="py-comment"># TODO: Make script entirely re-do the search if the 'force'</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line">                <tt class="py-comment">#       argument is set to True.</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line">                <tt class="py-name">searches</tt> <tt class="py-op">=</tt> <tt id="link-16" class="py-name" targets="Module frontend=frontend-module.html"><a title="frontend" class="py-name" href="#" onclick="return doclink('link-16', 'frontend', 'link-16');">frontend</a></tt><tt class="py-op">.</tt><tt id="link-17" class="py-name" targets="Class frontend.Search=frontend.Search-class.html"><a title="frontend.Search" class="py-name" href="#" onclick="return doclink('link-17', 'Search', 'link-17');">Search</a></tt><tt class="py-op">(</tt><tt class="py-name">args</tt><tt class="py-op">[</tt><tt class="py-string">"target"</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">                <tt class="py-name">info</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">(</tt><tt class="py-name">searches</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name" targets="Variable frontend.Search.spectrum_out=frontend.Search-class.html#spectrum_out"><a title="frontend.Search.spectrum_out" class="py-name" href="#" onclick="return doclink('link-18', 'spectrum_out', 'link-18');">spectrum_out</a></tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name" targets="Variable backend.Spectrum.chemical_name=backend.Spectrum-class.html#chemical_name,Variable uploader.SpectrumTransfer.chemical_name=uploader.SpectrumTransfer-class.html#chemical_name"><a title="backend.Spectrum.chemical_name
+uploader.SpectrumTransfer.chemical_name" class="py-name" href="#" onclick="return doclink('link-19', 'chemical_name', 'link-19');">chemical_name</a></tt><tt class="py-op">,</tt> <tt class="py-name">searches</tt><tt class="py-op">.</tt><tt class="py-name">error</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">                        <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">searches</tt><tt class="py-op">.</tt><tt id="link-20" class="py-name"><a title="frontend.Search.spectrum_out" class="py-name" href="#" onclick="return doclink('link-20', 'spectrum_out', 'link-18');">spectrum_out</a></tt><tt class="py-op">)</tt><tt class="py-op">]</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line">                <tt class="py-name">response</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">info</tt><tt class="py-op">)</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">            <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line">                <tt class="py-comment"># User wants to commit a new search with a file upload.</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line">                <tt class="py-comment"># Send each file upload to the back end for searching.</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">                <tt class="py-keyword">for</tt> <tt class="py-name">upload</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">get_uploads</tt><tt class="py-op">(</tt><tt class="py-string">'spectrum'</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">                    <tt class="py-name">file_obj</tt> <tt class="py-op">=</tt> <tt class="py-name">blobstore</tt><tt class="py-op">.</tt><tt class="py-name">BlobReader</tt><tt class="py-op">(</tt><tt class="py-name">upload</tt><tt class="py-op">.</tt><tt class="py-name">key</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">                    <tt class="py-name">result</tt> <tt class="py-op">=</tt> <tt id="link-21" class="py-name"><a title="backend" class="py-name" href="#" onclick="return doclink('link-21', 'backend', 'link-0');">backend</a></tt><tt class="py-op">.</tt><tt id="link-22" class="py-name" targets="Function backend.search()=backend-module.html#search"><a title="backend.search" class="py-name" href="#" onclick="return doclink('link-22', 'search', 'link-22');">search</a></tt><tt class="py-op">(</tt><tt class="py-name">file_obj</tt><tt class="py-op">)</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">                    <tt class="py-comment"># Extract relevant information and add to the response.</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">                    <tt class="py-name">info</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-op">(</tt><tt class="py-name">result</tt><tt class="py-op">.</tt><tt id="link-23" class="py-name"><a title="backend.Spectrum.chemical_name
+uploader.SpectrumTransfer.chemical_name" class="py-name" href="#" onclick="return doclink('link-23', 'chemical_name', 'link-19');">chemical_name</a></tt><tt class="py-op">,</tt> <tt class="py-name">result</tt><tt class="py-op">.</tt><tt class="py-name">error</tt><tt class="py-op">)</tt> <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">result</tt><tt class="py-op">]</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">                    <tt class="py-name">response</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">info</tt><tt class="py-op">)</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">                    <tt class="py-comment"># Add to search history</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">                    <tt class="py-comment"># FIXME: Find way to limit the number of stored searches</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">                    <tt id="link-24" class="py-name"><a title="backend.search" class="py-name" href="#" onclick="return doclink('link-24', 'search', 'link-22');">search</a></tt> <tt class="py-op">=</tt> <tt id="link-25" class="py-name"><a title="frontend" class="py-name" href="#" onclick="return doclink('link-25', 'frontend', 'link-16');">frontend</a></tt><tt class="py-op">.</tt><tt id="link-26" class="py-name"><a title="frontend.Search" class="py-name" href="#" onclick="return doclink('link-26', 'Search', 'link-17');">Search</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">                    <tt id="link-27" class="py-name"><a title="backend.search" class="py-name" href="#" onclick="return doclink('link-27', 'search', 'link-22');">search</a></tt><tt class="py-op">.</tt><tt id="link-28" class="py-name" targets="Variable frontend.Search.spectrum_in=frontend.Search-class.html#spectrum_in"><a title="frontend.Search.spectrum_in" class="py-name" href="#" onclick="return doclink('link-28', 'spectrum_in', 'link-28');">spectrum_in</a></tt> <tt class="py-op">=</tt> <tt class="py-name">upload</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">                    <tt id="link-29" class="py-name"><a title="backend.search" class="py-name" href="#" onclick="return doclink('link-29', 'search', 'link-22');">search</a></tt><tt class="py-op">.</tt><tt id="link-30" class="py-name"><a title="frontend.Search.spectrum_out" class="py-name" href="#" onclick="return doclink('link-30', 'spectrum_out', 'link-18');">spectrum_out</a></tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-name">spectrum</tt><tt class="py-op">.</tt><tt class="py-name">key</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-keyword">for</tt> <tt class="py-name">spectrum</tt> <tt class="py-keyword">in</tt> <tt class="py-name">result</tt><tt class="py-op">]</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">                    <tt id="link-31" class="py-name"><a title="backend.search" class="py-name" href="#" onclick="return doclink('link-31', 'search', 'link-22');">search</a></tt><tt class="py-op">.</tt><tt class="py-name">error</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-name">spectrum</tt><tt class="py-op">.</tt><tt class="py-name">error</tt> <tt class="py-keyword">for</tt> <tt class="py-name">spectrum</tt> <tt class="py-keyword">in</tt> <tt class="py-name">result</tt><tt class="py-op">]</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">                    <tt id="link-32" class="py-name"><a title="backend.search" class="py-name" href="#" onclick="return doclink('link-32', 'search', 'link-22');">search</a></tt><tt class="py-op">.</tt><tt class="py-name">put</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">        <tt class="py-keyword">elif</tt> <tt class="py-name">action</tt> <tt class="py-op">==</tt> <tt class="py-string">"history"</tt><tt class="py-op">:</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">            <tt class="py-comment"># Get a list of previous searches for the current user.</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line">            <tt class="py-name">curr_user</tt> <tt class="py-op">=</tt> <tt class="py-name">users</tt><tt class="py-op">.</tt><tt class="py-name">get_current_user</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">            <tt class="py-name">history</tt> <tt class="py-op">=</tt> <tt id="link-33" class="py-name"><a title="frontend" class="py-name" href="#" onclick="return doclink('link-33', 'frontend', 'link-16');">frontend</a></tt><tt class="py-op">.</tt><tt id="link-34" class="py-name"><a title="frontend.Search" class="py-name" href="#" onclick="return doclink('link-34', 'Search', 'link-17');">Search</a></tt><tt class="py-op">.</tt><tt class="py-name">gql</tt><tt class="py-op">(</tt><tt class="py-string">"WHERE user = :user"</tt><tt class="py-op">,</tt> <tt id="link-35" class="py-name" targets="Variable frontend.Search.user=frontend.Search-class.html#user"><a title="frontend.Search.user" class="py-name" href="#" onclick="return doclink('link-35', 'user', 'link-35');">user</a></tt><tt class="py-op">=</tt><tt class="py-name">curr_user</tt><tt class="py-op">)</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line">            <tt class="py-keyword">for</tt> <tt class="py-name">item</tt> <tt class="py-keyword">in</tt> <tt class="py-name">history</tt><tt class="py-op">:</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">                <tt class="py-name">info</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-name">item</tt><tt class="py-op">.</tt><tt class="py-name">key</tt><tt class="py-op">,</tt> <tt class="py-name">item</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name" targets="Variable frontend.Search.datetime=frontend.Search-class.html#datetime"><a title="frontend.Search.datetime" class="py-name" href="#" onclick="return doclink('link-36', 'datetime', 'link-36');">datetime</a></tt><tt class="py-op">,</tt> <tt id="link-37" class="py-name"><a title="list" class="py-name" href="#" onclick="return doclink('link-37', 'list', 'link-13');">list</a></tt><tt class="py-op">(</tt><tt class="py-name">item</tt><tt class="py-op">.</tt><tt id="link-38" class="py-name"><a title="frontend.Search.spectrum_out" class="py-name" href="#" onclick="return doclink('link-38', 'spectrum_out', 'link-18');">spectrum_out</a></tt><tt class="py-op">)</tt><tt class="py-op">]</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">                <tt class="py-name">response</tt><tt class="py-op">.</tt><tt class="py-name">append</tt><tt class="py-op">(</tt><tt class="py-name">info</tt><tt class="py-op">)</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">            <tt class="py-comment"># Invalid action. Raise an error.</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">            <tt class="py-keyword">raise</tt> <tt id="link-39" class="py-name"><a title="common" class="py-name" href="#" onclick="return doclink('link-39', 'common', 'link-1');">common</a></tt><tt class="py-op">.</tt><tt id="link-40" class="py-name"><a title="common.InputError" class="py-name" href="#" onclick="return doclink('link-40', 'InputError', 'link-4');">InputError</a></tt><tt class="py-op">(</tt><tt class="py-name">action</tt><tt class="py-op">,</tt> <tt class="py-string">"Invalid API action."</tt><tt class="py-op">)</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">response</tt> </tt>
+</div></div><a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"><tt id="link-41" class="py-name" targets="Variable api.application=api-module.html#application,Variable frontend.application=frontend-module.html#application"><a title="api.application
+frontend.application" class="py-name" href="#" onclick="return doclink('link-41', 'application', 'link-41');">application</a></tt> <tt class="py-op">=</tt> <tt class="py-name">webapp</tt><tt class="py-op">.</tt><tt class="py-name">WSGIApplication</tt><tt class="py-op">(</tt><tt class="py-op">[</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">        <tt class="py-op">(</tt><tt class="py-string">'/'</tt><tt class="py-op">,</tt> <tt id="link-42" class="py-name" targets="Class frontend.MainHandler=frontend.MainHandler-class.html"><a title="frontend.MainHandler" class="py-name" href="#" onclick="return doclink('link-42', 'MainHandler', 'link-42');">MainHandler</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"><tt class="py-op">]</tt><tt class="py-op">,</tt> <tt class="py-name">debug</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"> </tt>
+<a name="main"></a><div id="main-def"><a name="L139"></a><tt class="py-lineno">139</tt> <a class="py-toggle" href="#" id="main-toggle" onclick="return toggle('main');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="api-module.html#main">main</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="main-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="main-expanded"><a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">        <tt class="py-name">run_wsgi_app</tt><tt class="py-op">(</tt><tt id="link-43" class="py-name"><a title="api.application
+frontend.application" class="py-name" href="#" onclick="return doclink('link-43', 'application', 'link-41');">application</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-keyword">if</tt> <tt class="py-name">__name__</tt> <tt class="py-op">==</tt> <tt class="py-string">'__main__'</tt><tt class="py-op">:</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">        <tt id="link-44" class="py-name" targets="Function api.main()=api-module.html#main,Function frontend.main()=frontend-module.html#main"><a title="api.main
+frontend.main" class="py-name" href="#" onclick="return doclink('link-44', 'main', 'link-44');">main</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/cooper-redhen">RedHen</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sat Jul 17 18:49:52 2010</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

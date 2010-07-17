@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>frontend</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/cooper-redhen">RedHen</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Module&nbsp;frontend
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="frontend-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="frontend-module.html">Module frontend</a></h1>
+<pre class="py-src">
+&#239;&#187;&#191;import cgi
+import datetime
+import logging
+import backend
+
+from google.appengine.ext import blobstore, db, webapp
+from google.appengine.api import users, quota, memcache
+from google.appengine.ext.webapp import template, blobstore_handlers
+from google.appengine.ext.webapp.util import run_wsgi_app
+
+class MainHandler(webapp.RequestHandler):
+    def get(self):
+        file = open('jcamp-test.jdx')
+        if 0:
+            for s in backend.Spectrum.all(): s.delete()
+            for m in backend.Matcher.all(): m.delete()
+            memcache.flush_all()
+            import os
+            fileNames = []
+            for count, entry in enumerate(os.listdir('short_library')):
+                #if count > 10: break
+                fileNames.append(entry)
+                if entry[-4:]=='.jdx':
+                    backend.add(open(os.path.join('short_library', entry)))
+            self.response.out.write('<pre>' + '\n'.join( [s for s in fileNames] ) + '</pre>')
+            
+        self.response.out.write(template.render('index.html', {}))
+
+    def post(self):
+        file = self.request.POST.get('file').file
+        response = backend.search(file)
+        search_results = '\n'.join( [r.chemical_name+' - '+str(100/(r.error+1)**0.1)[:5]+'%' for r in response] )
+        self.response.out.write(template.render('index.html', {'search_results':search_results}))
+
+class Search(db.Model):
+    """Store a user's search for a certain spectrum."""
+    
+    spectrum_in = blobstore.BlobReferenceProperty()
+    """The Spectrum that was searched for
+    @type: L{google.appengine.ext.blobstore.BlobReferenceProperty}"""
+    
+    spectrum_out = db.ListProperty(db.Key)
+    """The Spectra that were returned
+    @type: C{list}"""
+    
+    spectrum_error = db.ListProperty(float)
+    """The error value associated with each returned spectrum
+    @type: C{list}"""
+    
+    user = db.UserProperty(auto_current_user_add=True)
+    """The user that did the search
+    @type: L{google.appengine.ext.blobstore.UserProperty}"""
+    
+    datetime = db.DateTimeProperty(auto_now=True)
+    """The date and time the search occurred
+    @type: L{google.appengine.ext.blobstore.DateTimeProperty}"""
+
+
+application = webapp.WSGIApplication([
+        ('/', MainHandler)
+], debug=True)
+
+def main():
+        run_wsgi_app(application)
+
+if __name__ == '__main__':
+        main()
+<script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/cooper-redhen">RedHen</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sat Jul 17 18:49:52 2010</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>frontend.Search</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/cooper-redhen">RedHen</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="frontend-module.html">Module&nbsp;frontend</a> ::
+        Class&nbsp;Search
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="frontend.Search-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class Search</h1><p class="nomargin-top"><span class="codelink"><a href="frontend-pysrc.html#Search">source&nbsp;code</a></span></p>
+<center>
+<center>  <map id="uml_class_diagram_for_frontend_2" name="uml_class_diagram_for_frontend_2">
+<area shape="rect" href="frontend.Search-class.html#spectrum_in" title="The Spectrum that was searched for" alt="" coords="17,28,420,47"/>
+<area shape="rect" href="frontend.Search-class.html#spectrum_out" title="The Spectra that were returned" alt="" coords="17,47,420,65"/>
+<area shape="rect" href="frontend.Search-class.html#spectrum_error" title="The error value associated with each returned spectrum" alt="" coords="17,65,420,84"/>
+<area shape="rect" href="frontend.Search-class.html#user" title="The user that did the search" alt="" coords="17,84,420,103"/>
+<area shape="rect" href="frontend.Search-class.html#datetime" title="The date and time the search occurred" alt="" coords="17,103,420,121"/>
+<area shape="rect" href="frontend.Search-class.html" title="Store a user&#39;s search for a certain spectrum." alt="" coords="16,11,421,131"/>
+</map>
+  <img src="uml_class_diagram_for_frontend_2.gif" alt='' usemap="#uml_class_diagram_for_frontend_2" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
+<hr />
+<p>Store a user's search for a certain spectrum.</p>
+
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code 
+      class="link">google.appengine.ext.blobstore.BlobReferenceProperty</code></span>
+    </td><td class="summary">
+        <a name="spectrum_in"></a><span class="summary-name">spectrum_in</span> = <code title="blobstore.BlobReferenceProperty()">blobstore.BlobReferenceProperty()</code><br />
+      The Spectrum that was searched for
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code></span>
+    </td><td class="summary">
+        <a name="spectrum_out"></a><span class="summary-name">spectrum_out</span> = <code title="db.ListProperty(db.Key)">db.ListProperty(db.Key)</code><br />
+      The Spectra that were returned
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code></span>
+    </td><td class="summary">
+        <a name="spectrum_error"></a><span class="summary-name">spectrum_error</span> = <code title="db.ListProperty(float)">db.ListProperty(float)</code><br />
+      The error value associated with each returned spectrum
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">google.appengine.ext.blobstore.UserProperty</code></span>
+    </td><td class="summary">
+        <a name="user"></a><span class="summary-name">user</span> = <code title="db.UserProperty(auto_current_user_add= True)">db.UserProperty(auto_current_user_add= True)</code><br />
+      The user that did the search
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code 
+      class="link">google.appengine.ext.blobstore.DateTimeProperty</code></span>
+    </td><td class="summary">
+        <a name="datetime"></a><span class="summary-name">datetime</span> = <code title="db.DateTimeProperty(auto_now= True)">db.DateTimeProperty(auto_now= True)</code><br />
+      The date and time the search occurred
+    </td>
+  </tr>
+</table>
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Project homepage -->
+      <th class="navbar" align="right" width="100%">
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr><th class="navbar" align="center"
+            ><a class="navbar" target="_top" href="http://code.google.com/p/cooper-redhen">RedHen</a></th>
+          </tr></table></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    <a href="epydoc-log.html">Generated by Epydoc
+    3.0.1 on Sat Jul 17 18:49:52 2010</a>
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

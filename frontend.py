@@ -33,11 +33,28 @@ class MainHandler(webapp.RequestHandler):
         self.response.out.write(template.render('index.html', {'search_results':search_results}))
 
 class Search(db.Model):
+    """Store a user's search for a certain spectrum."""
+    
     spectrum_in = blobstore.BlobReferenceProperty()
+    """The Spectrum that was searched for
+    @type: L{google.appengine.ext.blobstore.BlobReferenceProperty}"""
+    
     spectrum_out = db.ListProperty(db.Key)
+    """The Spectra that were returned
+    @type: C{list}"""
+    
     spectrum_error = db.ListProperty(float)
+    """The error value associated with each returned spectrum
+    @type: C{list}"""
+    
     user = db.UserProperty(auto_current_user_add=True)
+    """The user that did the search
+    @type: L{google.appengine.ext.blobstore.UserProperty}"""
+    
     datetime = db.DateTimeProperty(auto_now=True)
+    """The date and time the search occurred
+    @type: L{google.appengine.ext.blobstore.DateTimeProperty}"""
+
 
 application = webapp.WSGIApplication([
 	('/', MainHandler)

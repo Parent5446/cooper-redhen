@@ -1,13 +1,11 @@
-'''Provide functions for identifying a spectrum for an unknown substance using
-various methods of database searching.'''
-
-## Provide functions for identifying a spectrum for an unknown substance using
-# various methods of database searching.
-# 
-# @package backend
-# @author The Cooper Union for the Advancement of the Science and the Arts
-# @license http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
-# @copyright Copyright (c) 2010, Cooper Union (Some Right Reserved)
+'''
+Provide functions for identifying a spectrum for an unknown substance using
+various methods of database searching.
+ 
+@organization: The Cooper Union for the Advancement of the Science and the Arts
+@license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
+@copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
+'''
 
 import re # re.finditer (regex searches)
 import pickle # pickle.loads, pickle.dumps (data serialization)
@@ -23,16 +21,20 @@ import logging
 
 import common
 
-## Search for a spectrum.
-# 
-# Parse the given file and create a Spectrum object for it. Use the Matcher
-# object to find candidates for similar spectra in the database and compare
-# all candidates to the original spectrum using linear comparison algorithms.
-#
-# @param file_obj File descriptor for the spectrum
-# @return List of Spectrum objects
 def search(file_obj):
-    """Search for a spectrum based on a given file descriptor."""
+    """
+    Search for a spectrum based on a given file descriptor.
+    
+    Parse the given file and create a Spectrum object for it. Use the Matcher
+    object to find candidates for similar spectra in the database and compare
+    all candidates to the original spectrum using linear comparison algorithms.
+    
+    @param file_obj: File descriptor containing spectrum information
+    @type  file_obj: C{file} or L{google.appengine.ext.blobstore.BlobReader}
+    
+    @return: List of candidates similar to the input spectrum
+    @rtype: C{list} of L{backend.Spectrum}
+    """
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
     spectrum.parse_file(file_obj)
@@ -48,15 +50,17 @@ def search(file_obj):
     # Let frontend do the rest
     return candidates
 
-## Add a new spectrum to the database.
-# 
-# Parse the given file and create a Spectrum object for it. If the Matcher
-# object does not yet exist, create it. Then store the spectrum in the database
-# and add any necessary sorting data to the Matcher object.
-# 
-# @param file_obj File descriptor for the spectrum
 def add(file_obj):
-    """Add a new spectrum to the database from a given file descriptor."""
+    """
+    Add a new spectrum to the database from a given file descriptor.
+    
+    Parse the given file and create a Spectrum object for it. If the Matcher
+    object does not yet exist, create it. Then store the spectrum in the database
+    and add any necessary sorting data to the Matcher object.
+    
+    @param file_obj: File descriptor containing spectrum information
+    @type  file_obj: C{file} or L{google.appengine.ext.blobstore.BlobReader}
+    """
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
     spectrum.parse_file(file_obj)
@@ -74,32 +78,36 @@ def add(file_obj):
     matcher.put()
     memcache.set(spectrum.type + '_matcher', matcher)
 
-## Store a spectrum and its related data.
-# 
-# Store a spectrum's chemical name, type, and graph data. Also provide functions
-# to make a new Spectrum from a JCAMP file.
+
 class Spectrum(db.Model):
-    """Store a spectrum, its related data, and any algorithms necessary
-    to compare the spectrum to the DataStore."""
+    """
+    Store a spectrum, its related data, and any algorithms necessary
+    to compare the spectrum to the DataStore.
+    """
     
-    ## The chemical name associated with the spectrum.
     chemical_name = db.StringProperty()
+    """The chemical name associated with the spectrum
+    @type: C{str}"""
     
-    ## The chemical type of the substance the spectrum represents.
     chemical_type = db.StringProperty()
+    """The chemical type of the substance the spectrum represents
+    @type: C{str}"""
     
-    ## A list of integrated X,Y points for the spectrum's graph.
     data = db.ListProperty(float)
+    """A list of integrated X,Y points for the spectrum's graph
+    @type: C{list}"""
     
-    ## Parse a string of JCAMP file data and extract all needed data.
-    # 
-    # Search a JCAMP file for the chemical's name, type, and spectrum data.
-    # Then integrate the X, Y data and store alGet a specific data label from the file.l variables in the object.
-    # @warning Does not handle Windows-format line breaks.
-    # 
-    # @param file_obj File descriptor for the JCAMP file.
     def parse_file(self, file_obj):
-        """Parse a string of JCAMP file data and extract all needed data."""
+        """
+        Parse a string of JCAMP file data and extract all needed data.
+        
+        Search a JCAMP file for the chemical's name, type, and spectrum data.
+        Then integrate the X, Y data and store alGet a specific data label from the file.l variables in the object.
+        
+        @warning: Does not handle Windows-format line breaks.
+        @param file_obj: File descriptor containing spectrum information
+        @type  file_obj: C{file} or L{google.appengine.ext.blobstore.BlobReader}
+        """
         self.contents = file_obj.read()
         self.type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
@@ -154,51 +162,61 @@ class Spectrum(db.Model):
         self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
     
-    ## Get a specific data label from the file.
-    # @param name Name of the data label to retrieve
-    # @return Value of the data label
     def get_field(self, name):
-        """Get a specific data label from the file."""
+        """
+        Get a specific data label from the file.
+        
+        @param name: Name of data label to retrieve
+        @type  name: C{str}
+        @return: Value of the data label
+        @rtype: C{str}
+        """
         index = self.contents.index(name) + len(name) # means find where the field name ends 
         return self.contents[index:self.contents.index('\n', index)] #Does not handle Windows format
 
 
-
-## Store data necessary for sorting spectra in a searchable manner.
 class Matcher(db.Model):
-    """Store spectra data necessary for searching the database, then search the database
-    for candidates that may represent a given spectrum."""
+    """
+    Store spectra data necessary for searching the database, then search the database
+    for candidates that may represent a given spectrum.
+    """
     
-    ## Number of bits in the heavyside index.
     FLAT_HEAVYSIDE_BITS = 8
+    """Number of bits in the heavyside index
+    @type: C{int}"""
     
-    ## List of flat-heavyside indices.
     flat_heavyside = common.DictProperty()
+    """@ivar: List of flat-heavyside indices
+    @type: L{common.DictProperty}"""
     
-    ## List of ordered-heavyside indices.
     ordered_heavyside = common.DictProperty()
+    """@ivar: List of ordered-heavyside indices
+    @type: L{common.DictProperty}"""
     
-    ## List of x-values for peaks and their associated spectra.
     peak_list = common.GenericListProperty()
+    """@ivar: List of x-values for peaks and their associated spectra
+    @type: L{common.GenericListProperty}"""
     
-    ## List of high-low table indices.
     high_low = common.DictProperty()
+    """@ivar: List of high-low table indices
+    @type: L{common.DictProperty}"""
     
-    ## List of chemical types.
     chem_types = common.DictProperty()
+    """@ivar: List of chemical types
+    @type: L{common.DictProperty}"""
     
-    ## Add a new spectrum to the Matcher.
-    # 
-    # Add new spectrum data to the various Matcher data structures. Find the
-    # heavyside index, peaks, and other indices and add them to the data
-    # structures.
-    # 
-    # @param spectrum Spectrum object
     def add(self, spectrum):
-        """Add new spectrum data to the various Matcher data structures. Find the heavyside
-        index, peaks, and other indices and add them to the data structures."""
-        # Get the spectrum's key, peaks, and other heuristic data:
+        """
+        Add a new spectrum to the Matcher.
         
+        Add new spectrum data to the various Matcher data structures. Find the
+        heavyside index, peaks, and other indices and add them to the data
+        structures.
+        
+        @param spectrum: The spectrum to add
+        @type  spectrum: L{backend.Spectrum}
+        """
+        # Get the spectrum's key, peaks, and other heuristic data:
         #Flat heavyside: hash table of heavyside keys
         stack = [(0,0,0,len(spectrum.data))] #List of (key, whichBit, leftEdge, width)
         while len(stack) > 0: #keep going while there is stuff on the stack
@@ -221,19 +239,20 @@ class Matcher(db.Model):
         peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
         for peak in peaks:
             bisect.insort(self.peak_list, (peak, spectrum.key()))
-    
-    ## Find spectra similar to the given one.
-    # 
-    # Find spectra that may represent the given Spectrum object by sorting
-    # the database using different heuristics, having them vote, and returning only
-    # the spectra deemed similar to the given spectrum.
-    # 
-    # @param spectrum Spectrum object
-    # @return List of similar Spectrum objects
+
     def get(self, spectrum):
-        """Find spectra that may represent the given Spectrum object by sorting
+        """
+        Find spectra similar to the given one.
+        
+        Find spectra that may represent the given Spectrum object by sorting
         the database using different heuristics, having them vote, and returning only
-        the spectra deemed similar to the given spectrum."""
+        the spectra deemed similar to the given spectrum.
+        
+        @param spectrum: The spectrum to search for
+        @type  spectrum: L{backend.Spectrum}
+        @return: List of similar spectra
+        @rtype: C{list} of L{backend.Spectrum}
+        """
         
         # Get flat heayside key.
         flatHeavysideKey, leftEdge, width = 0, 0, len(spectrum.data) # Initialize variables
@@ -270,18 +289,31 @@ class Matcher(db.Model):
         keys = sorted(keys.iteritems(), key=operator.itemgetter(1))
         return Spectrum.get([k[0] for k in keys])
     
-    ## Calculate the difference or error between two spectra using Bove's algorithm.
-    # @param a Spectrum object to compare
-    # @param b Other Spectrum object to compare
-    # @return Integer representing the error
-    @staticmethod # Make a static method for faster execution
     def bove(a, b):
+        """
+        Calculate the difference or error between two spectra using Bove's
+        algorithm.
+        
+        @param a: Spectrum to compare
+        @type  a: L{backend.Spectrum}
+        @param b: Other Spectrum to compare
+        @type  b: L{backend.Spectrum}
+        @return: The difference or error between the spectra
+        @rtype: C{int}
+        """
         return max([abs(a.data[i]-b.data[i]) for i in xrange(len(a.data))]) # Do Bove's algorithm
     
-    ## Calculate the difference or error between two spectra using least squares.
-    # @param a Spectrum object to compare
-    # @param b Other Spectrum object to compare
-    # @return Integer representing the error
     @staticmethod # Make a static method for faster execution
     def least_squares(a, b):
+        """
+        Calculate the difference or error between two spectra using Bove's
+        algorithm.
+        
+        @param a: Spectrum to compare
+        @type  a: L{backend.Spectrum}
+        @param b: Other Spectrum to compare
+        @type  b: L{backend.Spectrum}
+        @return: The difference or error between the spectra
+        @rtype: C{int}
+        """
         return sum([(a.data[i]-a.b[i])**2 for i in xrange(len(a.data))]) # Compare to spectra with least squares

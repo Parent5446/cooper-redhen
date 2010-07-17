@@ -8,10 +8,17 @@ if not os.environ.get("APPLICATION_ID", False):
     import urllib
     import os.path
     
-    def main_client(dir, recursive=False):
-        if not os.path.exists(dir) or not os.path.isdir(dir):
+    def main_client(dirname, recursive=False):
+        """
+        Extract all files from a directory and transfer them to the server.
+        
+        @param dirname: Name of the directory
+        @type  dirname: C{str}
+        @raise Exception: If the given file name is not a directory
+        """
+        if not os.path.exists(dirname) or not os.path.isdir(dirname):
             raise Exception("Not a directory.")
-        files = os.listdir(dir)
+        files = os.listdir(dirname)
         for file_name in files:
             if os.path.isdir(file_name):
                 if recursive:
@@ -22,6 +29,13 @@ if not os.environ.get("APPLICATION_ID", False):
                 transfer(file_obj)
     
     def transfer(file_obj):
+        """
+        Submit a POST request to the server with the spectrum information.
+        
+        @param file_obj: File to load spectrum from
+        @type  file_obj: C{type}
+        @raise Exception: If the server gave a response code other than 200
+        """
         # Generate a SpectrumTransfer object
         spectrum = SpectrumTransfer()
         spectrum.parse_file(file_obj)
@@ -40,7 +54,6 @@ if not os.environ.get("APPLICATION_ID", False):
         response = conn.getresponse()
         if int(response.status) != 200:
             raise Exception("Upload error: %s" % response.read())
-        return True
 
 if os.environ.get("APPLICATION_ID", False):
     import sys
@@ -51,7 +64,20 @@ if os.environ.get("APPLICATION_ID", False):
     import backend
     
     class Uploader(webapp.RequestHandler):
+        """
+        Handle upload requests submitted to the server from the client-side
+        version of this script.
+        """
+        
         def post(self):
+            """
+            Store the uploaded spectrum in the database.
+            
+            First check if the user is authorized, then attempt to add the
+            spectrum to the database.
+            
+            @todo: Support multiple uploads
+            """
             # Check if user is admin. If not, error code 401.
             if not is_current_user_admin():
                 self.error(401)
@@ -83,28 +109,35 @@ if os.environ.get("APPLICATION_ID", False):
                 memcache.set(spectrum.type + '_matcher', matcher)
                 return True
 
-class SpectrumTransfer():
-    """Store a spectrum, its related data, and any algorithms necessary
-    to compare the spectrum to the DataStore."""
+class SpectrumTransfer:
+    """
+    A copy of L{backend.Spectrum} except without the Google App Engine
+    dependencies.
+    """
     
-    ## The chemical name associated with the spectrum.
     chemical_name = ""
+    """The chemical name associated with the spectrum
+    @type: C{str}"""
     
-    ## The chemical type of the substance the spectrum represents.
     chemical_type = ""
+    """The chemical type of the substance the spectrum represents
+    @type: C{str}"""
     
-    ## A list of integrated X,Y points for the spectrum's graph.
     data = []
+    """A list of integrated X,Y points for the spectrum's graph
+    @type: C{list}"""
     
-    ## Parse a string of JCAMP file data and extract all needed data.
-    # 
-    # Search a JCAMP file for the chemical's name, type, and spectrum data.
-    # Then integrate the X, Y data and store alGet a specific data label from the file.l variables in the object.
-    # @warning Does not handle Windows-format line breaks.
-    # 
-    # @param file_obj File descriptor for the JCAMP file.
     def parse_file(self, file_obj):
-        """Parse a string of JCAMP file data and extract all needed data."""
+        """
+        Parse a string of JCAMP file data and extract all needed data.
+        
+        Search a JCAMP file for the chemical's name, type, and spectrum data.
+        Then integrate the X, Y data and store alGet a specific data label from the file.l variables in the object.
+        
+        @warning: Does not handle Windows-format line breaks.
+        @param file_obj: File descriptor containing spectrum information
+        @type  file_obj: C{file}
+        """
         self.contents = file_obj.read()
         self.type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
@@ -159,11 +192,15 @@ class SpectrumTransfer():
         self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
     
-    ## Get a specific data label from the file.
-    # @param name Name of the data label to retrieve
-    # @return Value of the data label
     def get_field(self, name):
-        """Get a specific data label from the file."""
+        """
+        Get a specific data label from the file.
+        
+        @param name: Name of data label to retrieve
+        @type  name: C{str}
+        @return: Value of the data label
+        @rtype: C{str}
+        """
         index = self.contents.index(name) + len(name) # means find where the field name ends 
         return self.contents[index:self.contents.index('\n', index)] #Does not handle Windows format
 
