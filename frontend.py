@@ -4,11 +4,9 @@ import logging
 import backend
 
 from google.appengine.ext import blobstore, db, webapp
-from google.appengine.api import users, quota
+from google.appengine.api import users, quota, memcache
 from google.appengine.ext.webapp import template, blobstore_handlers
 from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.api import memcache
-from google.appengine.ext.webapp import template
 
 class MainHandler(webapp.RequestHandler):
     def get(self):
@@ -33,6 +31,13 @@ class MainHandler(webapp.RequestHandler):
         response = backend.search(file)
         search_results = '\n'.join( [r.chemical_name+' - '+str(100/(r.error+1)**0.1)[:5]+'%' for r in response] )
         self.response.out.write(template.render('index.html', {'search_results':search_results}))
+
+class Search(db.Model):
+    spectrum_in = blobstore.BlobReferenceProperty()
+    spectrum_out = db.ListProperty(db.Key)
+    spectrum_error = db.ListProperty(float)
+    user = db.UserProperty(auto_current_user_add=True)
+    datetime = db.DateTimeProperty(auto_now=True)
 
 application = webapp.WSGIApplication([
 	('/', MainHandler)

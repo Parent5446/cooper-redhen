@@ -56,6 +56,8 @@ class ApiHandler(webapp.RequestHandler, blobstore_handlers.BlobstoreUploadHandle
     # @param debug_mode Whether to print debugging information or not
     def handle_exception(exception, debug_mode):
         '''Handle any exceptions raised by the handler.'''
+        # TODO: Convert errors into a JSON response so the front end can handle
+        #       them easily.
         if isinstance(exception, ServerError):
             # Server error: let Google handle this the usual way.
             super(ApiHandler, self).handle_exception(exception, True)
@@ -72,7 +74,9 @@ class ApiHandler(webapp.RequestHandler, blobstore_handlers.BlobstoreUploadHandle
     ## Process an API request.
     #
     # Take a given action and args and process an API request. If the action
-    # is 'search', search the database for any spectrum files uploaded.
+    # is 'search', search the database for any spectrum files uploaded or get
+    # any history items if they are provided as the 'target'. If the action is
+    # 'history', get the history of searches for the current user.
     #
     # @param action What to do
     # @param args List of arguments for the action
@@ -80,14 +84,41 @@ class ApiHandler(webapp.RequestHandler, blobstore_handlers.BlobstoreUploadHandle
         '''Process an API request.'''
         response = []
         if action == "search":
-            # Send each file upload to the back end for searching.
-            for upload in self.get_uploads('spectrum'):
-                file_obj = blobstore.BlobReader(upload.key())
-                result = backend.search(file_obj)
-                # Delete the file afterward so it does not become orphaned.
-                upload.delete()
-                # Extract relevant information and add to the response.
-                info = result.chemical_name, result.error
+            # Search the database for something
+            if isinstance(args.get("target", ""), str):
+                # User wants to find an already completed search.
+                # First validate the target. It should be a list.
+                if not isinstance(args["target"], list):
+                    raise common.InputError(args["target"], "Invalid search target.")
+                # Get the targeted searches and extract relevant information.
+                # TODO: Make script entirely re-do the search if the 'force'
+                #       argument is set to True.
+                searches = frontend.Search(args["target"])
+                info = [(searches.spectrum_out[i].chemical_name, searches.error[i])
+                        for i in len(searches.spectrum_out)]
+                response.append(info)
+            else:
+                # User wants to commit a new search with a file upload.
+                # Send each file upload to the back end for searching.
+                for upload in self.get_uploads('spectrum'):
+                    file_obj = blobstore.BlobReader(upload.key())
+                    result = backend.search(file_obj)
+                    # Extract relevant information and add to the response.
+                    info = [(result.chemical_name, result.error) for i in result]
+                    response.append(info)
+                    # Add to search history
+                    # FIXME: Find way to limit the number of stored searches
+                    search = frontend.Search()
+                    search.spectrum_in = upload
+                    search.spectrum_out = [spectrum.key() for spectrum in result]
+                    search.error = [spectrum.error for spectrum in result]
+                    search.put()
+        elif action == "history":
+            # Get a list of previous searches for the current user.
+            curr_user = users.get_current_user()
+            history = frontend.Search.gql("WHERE user = :user", user=curr_user)
+            for item in history:
+                info = [item.key, item.datetime, list(item.spectrum_out)]
                 response.append(info)
         else:
             # Invalid action. Raise an error.
