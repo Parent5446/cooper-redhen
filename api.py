@@ -34,16 +34,12 @@ class ApiHandler(webapp.RequestHandler, blobstore_handlers.BlobstoreUploadHandle
         Load the JSON object in the request and hand it off to self.process_request.
         Then put the response back in JSON format and give back to the user.
         """
-        request = json.loads(self.request.body)
-        # The script needs a dictionary with an action key to continue.
-        if not isinstance(request, dict):
-            raise common.InputError(request, "JSON object must be an indexed array.")
+        request = self.request.arguments()
         # Pop action and send the rest to the process_request function.
         action = request.pop("action", False)
         result = self.process_request(action, request)
         # Put back into JSON and send to user.
-        response = json.dumps(result)
-        self.response.out.write(response)
+        self.response.out.write(json.dumps(result))
     
     def handle_exception(exception, debug_mode):
         """
@@ -67,8 +63,7 @@ class ApiHandler(webapp.RequestHandler, blobstore_handlers.BlobstoreUploadHandle
             # Input error: in normal cases, Google would send a 500 error code
             # for all exception, but we want a 400 for an invalid request.
             self.error(400)
-            response = "Invalid user input.\nInput: %s\nReason: %s"
-            self.response.out.write(response % exception.expr, expression.msg)
+            self.response.out.write(json.dumps([exception.expr, exception.msg]))
         else:
             # Send all else to Google.
             super(ApiHandler, self).handle_exception(exception, True)
