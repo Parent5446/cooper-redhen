@@ -17,7 +17,7 @@ from google.appengine.api import memcache # import memory cache
 
 import common
 
-def search(file_obj):
+def search(spectrum_data):
     """
     Search for a spectrum based on a given file descriptor.
     
@@ -31,9 +31,11 @@ def search(file_obj):
     @return: List of candidates similar to the input spectrum
     @rtype: C{list} of L{backend.Spectrum}
     """
+    if not isinstance(spectrum_data, str):
+        raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
-    spectrum.parse_file(file_obj)
+    spectrum.parse_string(spectrum_data)
     # Check cache for the Matcher. If not, get from database.
     matcher = memcache.get(spectrum.type + '_matcher')
     if matcher is None:
@@ -48,10 +50,22 @@ def search(file_obj):
     return candidates
 
 def compare(file1, file2, algorithm="bove"):
-    spectrum1 = Spectrum()
-    spectrum1.parse_file(file1)
-    spectrum2 = Spectrum()
-    spectrum2.parse_file(file2)
+    if not isinstance(file1, str):
+        raise common.InputError(file1, "Invalid spectrum data.")
+    if not isinstance(file2, str):
+        raise common.InputError(file2, "Invalid spectrum data.")
+    # Prepare the targets. (Limit to only 2 for now.)
+    if file1[0:3] == "db:":
+        spectrum1 = Spectrum(file1[3:])
+    else:                        
+        spectrum1 = Spectrum()
+        spectrum1.parse_string(file1)
+    if file2[0:3] == "db:":
+        spectrum2 = Spectrum(file2[3:])
+    else:                        
+        spectrum1 = Spectrum()
+        spectrum1.parse_string(file2)
+    # Start comparing
     if algorithm == "bove":
         return Matcher.bove(spectrum1, spectrum2)
     elif algorithm == "leastsquares":
@@ -72,7 +86,7 @@ def browse(target, limit=10, offset=0):
     else:
         raise common.InputError(target, "Invalid database to search.")
 
-def add(file_obj):
+def add(spectrum_data):
     """
     Add a new spectrum to the database from a given file descriptor.
     
@@ -80,12 +94,14 @@ def add(file_obj):
     object does not yet exist, create it. Then store the spectrum in the database
     and add any necessary sorting data to the Matcher object.
     
-    @param file_obj: File descriptor containing spectrum information
-    @type  file_obj: C{file} or L{google.appengine.ext.blobstore.BlobReader}
+    @param spectrum_data: String containing spectrum information
+    @type  spectrum_data: C{str}
     """
+    if not isinstance(spectrum_data, str):
+        raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
-    spectrum.parse_file(file_obj)
+    spectrum.parse_string(spectrum_data)
     # Check cache for the Matcher. If not, get from database. If it's not there,
     # make a new one.
     matcher = memcache.get(spectrum.type + '_matcher')
@@ -127,7 +143,7 @@ class Spectrum(db.Model):
     """Notes on the spectrum if in a private database
     @type: C{str}"""
     
-    def parse_file(self, contents):
+    def parse_string(self, contents):
         """
         Parse a string of JCAMP file data and extract all needed data.
         
@@ -135,8 +151,8 @@ class Spectrum(db.Model):
         Then integrate the X, Y data and store alGet a specific data label from the file.l variables in the object.
         
         @warning: Does not handle Windows-format line breaks.
-        @param file_obj: File descriptor containing spectrum information
-        @type  file_obj: C{file} or L{google.appengine.ext.blobstore.BlobReader}
+        @param contents: String containing spectrum information
+        @type  contents: C{str}
         """
         self.contents = contents
         self.type = 'Infrared' # Later this will be variable
