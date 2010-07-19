@@ -2,8 +2,29 @@
 Take a POST request with JSON data and process it. If it contains a spectrum
 file, send it to the back end to search the database.
 
-The nature of this API depends on the type of request sent to it, and where
-the request is sent to. It behaves as follows:
+Usage:
+- All requests to the API must be POST.
+- Pass the API one or more POST variables all with the name "request". Any
+  POST variable that is not named "request" will be ignored.
+- All requests must be serialized dictionaries with the request information,
+  and must follow the format below.
+
+Requests:
+{ action: <action>
+  target: [<target>, <target>, ...]
+  limit: <limit>
+  offset: <offset> }
+
+- action (required): Can be "search", "compare", or "browse"
+- target (required):
+    - When action is "search" or "compare": Can be either the text from a JCAMP
+      file or "db:key", where key is the database key for a Spectrum object.
+    - When action is "browse": Can be either "public" for browsing the public
+      library or "private" for browsing your own private library.
+- limit (optional, used only when action is "browse"): How many spectra to get
+  when browsing (maximum is 50).
+- offset (optional, used only when action is "browse"): Where to start listing
+  spectra from (used for pagination).
 
 @organization: The Cooper Union for the Advancement of the Science and the Arts
 @license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
@@ -21,9 +42,45 @@ import backend
 class ApiHandler(webapp.RequestHandler):
     """Handle any API requests and return a JSON response."""
     
+    def get(self):
+        """
+        Handle a GET request to the API. Print instructions on how to use
+        the API.
+        """
+        system.response.out.write("""
+RedHen API v0.1
+
+Usage:
+- All requests to the API must be POST.
+- Pass the API one or more POST variables all with the name "request". Any
+  POST variable that is not named "request" will be ignored.
+- All requests must be serialized dictionaries with the request information,
+  and must follow the format below.
+
+Requests:
+{ action: <action>
+  target: [<target>, <target>, ...]
+  limit: <limit>
+  offset: <offset> }
+
+- action (required): Can be "search", "compare", or "browse"
+- target (required):
+    - When action is "search" or "compare": Can be either the text from a JCAMP
+      file or "db:key", where key is the database key for a Spectrum object.
+    - When action is "browse": Can be either "public" for browsing the public
+      library or "private" for browsing your own private library.
+- limit (optional, used only when action is "browse"): How many spectra to get
+  when browsing (maximum is 50).
+- offset (optional, used only when action is "browse"): Where to start listing
+  spectra from (used for pagination).
+        """)
+    
     def post(self):
         """
         Handle a POST request to the API.
+        
+        Take a list of actions from a POST request, and do the appropriate
+        action. See the documentation for this module for more information.
         """
         requests = [pickle.loads(req) for req in self.request.get_all("request")]
         output = []

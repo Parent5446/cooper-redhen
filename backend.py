@@ -25,8 +25,8 @@ def search(spectrum_data):
     object to find candidates for similar spectra in the database and compare
     all candidates to the original spectrum using linear comparison algorithms.
     
-    @param file_obj: File descriptor containing spectrum information
-    @type  file_obj: C{file} or L{google.appengine.ext.blobstore.BlobReader}
+    @param spectrum_data: String containing spectrum information
+    @type  spectrum_data: C{str}
     
     @return: List of candidates similar to the input spectrum
     @rtype: C{list} of L{backend.Spectrum}
@@ -49,22 +49,33 @@ def search(spectrum_data):
     # Let frontend do the rest
     return candidates
 
-def compare(file1, file2, algorithm="bove"):
-    if not isinstance(file1, str):
-        raise common.InputError(file1, "Invalid spectrum data.")
-    if not isinstance(file2, str):
-        raise common.InputError(file2, "Invalid spectrum data.")
-    # Prepare the targets. (Limit to only 2 for now.)
-    if file1[0:3] == "db:":
-        spectrum1 = Spectrum(file1[3:])
+def compare(data1, data2, algorithm="bove"):
+    """
+    Compare two spectra using the given algorithm.
+    
+    @param data1: String containing spectrum information
+    @type  data1: C{str}
+    @param data2: String containing spectrum information
+    @type  data2: C{str}
+    @return: Calculated error between the two spectra
+    @rtype: C{int}
+    """
+    # First check for invalid spectrum data (if they are not strings).
+    if not isinstance(data1, str):
+        raise common.InputError(data1, "Invalid spectrum data.")
+    if not isinstance(data2, str):
+        raise common.InputError(data2, "Invalid spectrum data.")
+    # Load spectrum either as a database key or a file.
+    if data1[0:3] == "db:":
+        spectrum1 = Spectrum(data1[3:])
     else:                        
         spectrum1 = Spectrum()
-        spectrum1.parse_string(file1)
-    if file2[0:3] == "db:":
-        spectrum2 = Spectrum(file2[3:])
+        spectrum1.parse_string(data1)
+    if data2[0:3] == "db:":
+        spectrum2 = Spectrum(data2[3:])
     else:                        
         spectrum1 = Spectrum()
-        spectrum1.parse_string(file2)
+        spectrum1.parse_string(data2)
     # Start comparing
     if algorithm == "bove":
         return Matcher.bove(spectrum1, spectrum2)
@@ -74,6 +85,18 @@ def compare(file1, file2, algorithm="bove"):
         raise common.InputError(algo, "Invalid algorithm selection.")
 
 def browse(target, limit=10, offset=0):
+    """
+    Get a list of spectrum for browsing.
+    
+    @param target: Where to list spectrum from ("public" or "private")
+    @type  target: C{str}
+    @param limit: Number of spectra to list
+    @type  limit: C{int}
+    @param offset: Where to start listing from (for pagination)
+    @type  offset: C{int}
+    @return: List of spectra
+    @rtype: C{list} of L{backend.Spectrum}
+    """
     if limit > 50:
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
     if target == "public":
@@ -157,37 +180,36 @@ class Spectrum(db.Model):
         self.contents = contents
         self.type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
-        deltaX = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
-        xFactor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
-        yFactor = float(self.get_field('##YFACTOR=')) # some very small number, but if not use this instead
-        self.xy = []
+        delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
+        x_factor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
+        y_factor = float(self.get_field('##YFACTOR=')) # some very small number, but if not use this instead
+        xy = []
         # Process the XY data from JCAMP's (X++(Y..Y)) format.
         raw_xy = self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]
         for match in re.finditer(r'(\D)([\d.-]+)', raw_xy):
             if match.group(1) == '\n':
                 # Number is the first on the line and is an x-value
-                x = float(match.group(2)) * xFactor
+                x = float(match.group(2)) * x_factor
             else:
                 # Number is a relative y-value.
-                self.xy.append((x, float(match.group(2))*yFactor))
-                x += deltaX
+                xy.append((x, float(match.group(2)) * y_factor))
+                x += delta_x
         # Keep the data in ascending order. It will be descending in the file
         # if our delta X is negative.
-        if deltaX < 0:
-            self.xy.reverse()
-        # Integrate self.xy numerically over a fixed range.
+        if delta_x < 0:
+            xy.reverse()
+        # Integrate xy numerically over a fixed range.
         range = (700.0, 3900.0)
         # Initialize the data and find the interval of integration.
         self.data = [0.0 for i in xrange(1000)]
         interval = (range[1] - range[0]) / len(self.data)
-        # Find index in self.xy where integrals start
-        start = bisect.bisect_left(self.xy, (range[0], 0))
+        # Find index in xy where integrals start
+        start = bisect.bisect_left(xy, (range[0], 0))
         # oldX = start of range, oldY = linear interpolation of corresponding y
-        xy = self.xy
-        oldX, oldY = range[0], (self.xy[start - 1][1] +
+        oldX, oldY = range[0], (xy[start - 1][1] +
              (xy[start][1] - xy[start - 1][1]) * (range[0] - xy[start][0]) /
              (xy[start - 1][0] - xy[start][0]))
-        for x, y in self.xy[start:]: #Iterate over self.xy from start
+        for x, y in xy[start:]: #Iterate over xy from start
             newIndex = int((x - range[0]) / interval)
             oldIndex = int((oldX - range[0]) / interval)
             if newIndex != oldIndex:
@@ -230,15 +252,15 @@ class Spectrum(db.Model):
         @rtype: C{list} or C{float}
         """
         if one:
-            return max(self.xy, key=operator.itemgetter(1))[0] 
-        xy = sorted(self.xy, key = operator.itemgetter(1), reverse=True)
+            return max(self.data, key=operator.itemgetter(1))[0] 
+        xy = sorted(self.data, key = operator.itemgetter(1), reverse=True)
         peaks = []
         peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
         return peaks
     
     def calculate_heavyside(self):
         """
-        Calculate the heavyside inde for a spectrum.
+        Calculate the heavyside index for a spectrum.
         
         @return: The heavyside index
         @rtype: C{int}
