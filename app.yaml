@@ -7,8 +7,8 @@ derived_file_type:
 - python_precompiled
 
 handlers:
-- url: /static
-  static_dir: static_files
+- url: /html
+  static_dir: html
 
 - url: .*
   script: frontend.py
