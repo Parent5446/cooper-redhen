@@ -60,12 +60,14 @@
 <h1 class="epydoc">Class Spectrum</h1><p class="nomargin-top"><span class="codelink"><a href="backend-pysrc.html#Spectrum">source&nbsp;code</a></span></p>
 <center>
 <center>  <map id="uml_class_diagram_for_backend__2" name="uml_class_diagram_for_backend__2">
-<area shape="rect" href="backend.Spectrum-class.html#chemical_name" title="The chemical name associated with the spectrum" alt="" coords="17,28,153,47"/>
-<area shape="rect" href="backend.Spectrum-class.html#chemical_type" title="The chemical type of the substance the spectrum represents" alt="" coords="17,47,153,65"/>
-<area shape="rect" href="backend.Spectrum-class.html#data" title="A list of integrated X,Y points for the spectrum&#39;s graph" alt="" coords="17,65,153,84"/>
-<area shape="rect" href="backend.Spectrum-class.html#parse_file" title="Parse a string of JCAMP file data and extract all needed data." alt="" coords="17,87,153,105"/>
-<area shape="rect" href="backend.Spectrum-class.html#get_field" title="Get a specific data label from the file." alt="" coords="17,105,153,124"/>
-<area shape="rect" href="backend.Spectrum-class.html" title="Store a spectrum, its related data, and any algorithms necessary to compare the spectrum to the DataStore." alt="" coords="16,11,155,125"/>
+<area shape="rect" href="backend.Spectrum-class.html#chemical_name" title="The chemical name associated with the spectrum" alt="" coords="17,28,215,47"/>
+<area shape="rect" href="backend.Spectrum-class.html#chemical_type" title="The chemical type of the substance the spectrum represents" alt="" coords="17,47,215,65"/>
+<area shape="rect" href="backend.Spectrum-class.html#data" title="A list of integrated X,Y points for the spectrum&#39;s graph" alt="" coords="17,65,215,84"/>
+<area shape="rect" href="backend.Spectrum-class.html#parse_file" title="Parse a string of JCAMP file data and extract all needed data." alt="" coords="17,87,215,105"/>
+<area shape="rect" href="backend.Spectrum-class.html#get_field" title="Get a specific data label from the file." alt="" coords="17,105,215,124"/>
+<area shape="rect" href="backend.Spectrum-class.html#calculate_peaks" title="Calculate the peaks for a spectrum." alt="" coords="17,124,215,143"/>
+<area shape="rect" href="backend.Spectrum-class.html#calculate_heavyside" title="Calculate the heavyside inde for a spectrum." alt="" coords="17,143,215,161"/>
+<area shape="rect" href="backend.Spectrum-class.html" title="Store a spectrum, its related data, and any algorithms necessary to compare the spectrum to the DataStore." alt="" coords="16,11,216,163"/>
 </map>
   <img src="uml_class_diagram_for_backend__2.gif" alt='' usemap="#uml_class_diagram_for_backend__2" ismap="ismap" class="graph-without-title" />
 </center>
@@ -120,6 +122,41 @@
       Get a specific data label from the file.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#Spectrum.get_field">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code> or <code>float</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="backend.Spectrum-class.html#calculate_peaks" class="summary-sig-name">calculate_peaks</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">one</span>=<span class="summary-sig-default">False</span>)</span><br />
+      Calculate the peaks for a spectrum.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="backend-pysrc.html#Spectrum.calculate_peaks">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>int</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="backend.Spectrum-class.html#calculate_heavyside" class="summary-sig-name">calculate_heavyside</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Calculate the heavyside inde for a spectrum.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="backend-pysrc.html#Spectrum.calculate_heavyside">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -245,6 +282,53 @@
   </dl>
 </td></tr></table>
 </div>
+<a name="calculate_peaks"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">calculate_peaks</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">one</span>=<span class="sig-default">False</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="backend-pysrc.html#Spectrum.calculate_peaks">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Calculate the peaks for a spectrum.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>one</code></strong> (<code>bool</code>) - Whether to get all the peaks or just the first one</li>
+    </ul></dd>
+    <dt>Returns: <code>list</code> or <code>float</code></dt>
+        <dd>Either a list of peaks or one peak, depending on the parameter</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="calculate_heavyside"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">calculate_heavyside</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="backend-pysrc.html#Spectrum.calculate_heavyside">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Calculate the heavyside inde for a spectrum.</p>
+  <dl class="fields">
+    <dt>Returns: <code>int</code></dt>
+        <dd>The heavyside index</dd>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -275,7 +359,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jul 17 18:49:52 2010</a>
+    3.0.1 on Sun Jul 18 21:25:21 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

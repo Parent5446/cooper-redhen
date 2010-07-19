@@ -60,10 +60,11 @@
 <h1 class="epydoc">Class ApiHandler</h1><p class="nomargin-top"><span class="codelink"><a href="api-pysrc.html#ApiHandler">source&nbsp;code</a></span></p>
 <center>
 <center>  <map id="uml_class_diagram_for_api_apih" name="uml_class_diagram_for_api_apih">
-<area shape="rect" href="api.ApiHandler-class.html#post" title="Handle a POST request to the API." alt="" coords="17,36,271,55"/>
-<area shape="rect" href="api.ApiHandler-class.html#handle_exception" title="Handle any exceptions raised by the handler." alt="" coords="17,55,271,73"/>
-<area shape="rect" href="api.ApiHandler-class.html#process_request" title="Process an API request." alt="" coords="17,73,271,92"/>
-<area shape="rect" href="api.ApiHandler-class.html" title="Handle any API requests and return a JSON response." alt="" coords="16,11,272,93"/>
+<area shape="rect" href="api.ApiHandler-class.html#get" title="api.ApiHandler.get" alt="" coords="17,36,297,55"/>
+<area shape="rect" href="api.ApiHandler-class.html#post" title="Handle a POST request to the API." alt="" coords="17,55,297,73"/>
+<area shape="rect" href="api.ApiHandler-class.html#handle_request" title="api.ApiHandler.handle_request" alt="" coords="17,73,297,92"/>
+<area shape="rect" href="api.ApiHandler-class.html#handle_exception" title="Handle any exceptions raised by the handler." alt="" coords="17,92,297,111"/>
+<area shape="rect" href="api.ApiHandler-class.html" title="Handle any API requests and return a JSON response." alt="" coords="16,11,299,112"/>
 </map>
   <img src="uml_class_diagram_for_api_apih.gif" alt='' usemap="#uml_class_diagram_for_api_apih" ismap="ismap" class="graph-without-title" />
 </center>
@@ -94,6 +95,23 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a name="get"></a><span class="summary-sig-name">get</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">resource</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="api-pysrc.html#ApiHandler.get">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="api.ApiHandler-class.html#post" class="summary-sig-name">post</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Handle a POST request to the API.</td>
           <td align="right" valign="top">
@@ -111,11 +129,10 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="api.ApiHandler-class.html#handle_exception" class="summary-sig-name">handle_exception</a>(<span class="summary-sig-arg">exception</span>,
-        <span class="summary-sig-arg">debug_mode</span>)</span><br />
-      Handle any exceptions raised by the handler.</td>
+          <td><span class="summary-sig"><a name="handle_request"></a><span class="summary-sig-name">handle_request</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">upload</span>=<span class="summary-sig-default">False</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="api-pysrc.html#ApiHandler.handle_exception">source&nbsp;code</a></span>
+            <span class="codelink"><a href="api-pysrc.html#ApiHandler.handle_request">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -125,15 +142,16 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>list</code></span>
+      <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="api.ApiHandler-class.html#process_request" class="summary-sig-name">process_request</a>(<span class="summary-sig-arg">action</span>,
-        <span class="summary-sig-arg">args</span>)</span><br />
-      Process an API request.</td>
+          <td><span class="summary-sig"><a href="api.ApiHandler-class.html#handle_exception" class="summary-sig-name">handle_exception</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">exception</span>,
+        <span class="summary-sig-arg">debug_mode</span>)</span><br />
+      Handle any exceptions raised by the handler.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="api-pysrc.html#ApiHandler.process_request">source&nbsp;code</a></span>
+            <span class="codelink"><a href="api-pysrc.html#ApiHandler.handle_exception">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -189,7 +207,8 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_exception</span>(<span class="sig-arg">exception</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">handle_exception</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">exception</span>,
         <span class="sig-arg">debug_mode</span>)</span>
   </h3>
   </td><td align="right" valign="top"
@@ -207,37 +226,6 @@
         <li><strong class="pname"><code>exception</code></strong> (<code>Exception</code> or one of its children) - The Exception that was raised</li>
         <li><strong class="pname"><code>debug_mode</code></strong> (<code>bool</code>) - Whether to print deubgging information or not</li>
     </ul></dd>
-  </dl>
-</td></tr></table>
-</div>
-<a name="process_request"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">process_request</span>(<span class="sig-arg">action</span>,
-        <span class="sig-arg">args</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="api-pysrc.html#ApiHandler.process_request">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Process an API request.</p>
-  <p>Take a given action and args and process an API request. If the action
-  is 'search', search the database for any spectrum files uploaded or get 
-  any history items if they are provided as the 'target'. If the action is 
-  'history', get the history of searches for the current user.</p>
-  <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>action</code></strong> (<code>str</code>) - What to do</li>
-        <li><strong class="pname"><code>args</code></strong> (<code>dict</code>) - List of arguments for the action</li>
-    </ul></dd>
-    <dt>Returns: <code>list</code></dt>
-        <dd>Response to the request</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -271,7 +259,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jul 17 18:49:52 2010</a>
+    3.0.1 on Sun Jul 18 21:25:20 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

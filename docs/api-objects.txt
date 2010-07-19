@@ -1,6 +1,6 @@
 api	api-module.html
-api.application	api-module.html#application
 api.main	api-module.html#main
+api.application	api-module.html#application
 backend	backend-module.html
 backend.search	backend-module.html#search
 backend.add	backend-module.html#add
@@ -15,7 +15,11 @@ uploader.main_client	uploader-module.html#main_client
 api.ApiHandler	api.ApiHandler-class.html
 api.ApiHandler.post	api.ApiHandler-class.html#post
 api.ApiHandler.handle_exception	api.ApiHandler-class.html#handle_exception
-api.ApiHandler.process_request	api.ApiHandler-class.html#process_request
+api.ApiHandler.handle_request	api.ApiHandler-class.html#handle_request
+api.ApiHandler.get	api.ApiHandler-class.html#get
+api.UploadHandler	api.UploadHandler-class.html
+api.UploadHandler.post	api.UploadHandler-class.html#post
+api.UploadHandler.get	api.UploadHandler-class.html#get
 backend.Matcher	backend.Matcher-class.html
 backend.Matcher.flat_heavyside	backend.Matcher-class.html#flat_heavyside
 backend.Matcher.bove	backend.Matcher-class.html#bove
@@ -28,11 +32,13 @@ backend.Matcher.ordered_heavyside	backend.Matcher-class.html#ordered_heavyside
 backend.Matcher.peak_list	backend.Matcher-class.html#peak_list
 backend.Matcher.high_low	backend.Matcher-class.html#high_low
 backend.Spectrum	backend.Spectrum-class.html
-backend.Spectrum.parse_file	backend.Spectrum-class.html#parse_file
-backend.Spectrum.get_field	backend.Spectrum-class.html#get_field
 backend.Spectrum.chemical_type	backend.Spectrum-class.html#chemical_type
-backend.Spectrum.data	backend.Spectrum-class.html#data
+backend.Spectrum.calculate_heavyside	backend.Spectrum-class.html#calculate_heavyside
+backend.Spectrum.calculate_peaks	backend.Spectrum-class.html#calculate_peaks
 backend.Spectrum.chemical_name	backend.Spectrum-class.html#chemical_name
+backend.Spectrum.get_field	backend.Spectrum-class.html#get_field
+backend.Spectrum.parse_file	backend.Spectrum-class.html#parse_file
+backend.Spectrum.data	backend.Spectrum-class.html#data
 common.DictProperty	common.DictProperty-class.html
 common.DictProperty.default_value	common.DictProperty-class.html#default_value
 common.DictProperty.data_type	dict-class.html

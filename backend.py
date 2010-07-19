@@ -11,13 +11,9 @@ import re # re.finditer (regex searches)
 import pickle # pickle.loads, pickle.dumps (data serialization)
 import bisect # bisect.bisect (binary search of a list)
 import operator # operator.attrgetter, operator.itemgetter
+
 from google.appengine.ext import db # import database
 from google.appengine.api import memcache # import memory cache
-
-# Testing:
-import time
-from google.appengine.api import quota
-import logging
 
 import common
 
@@ -45,8 +41,9 @@ def search(file_obj):
     # Get the candidates for similar spectra.
     candidates = matcher.get(spectrum)
     # Do one-to-one on candidates and sort by error
-    candidates = [Matcher.bove(spectrum, candidate) for candidate in candidates]
-    list.sort(candidates, key=operator.attrgetter('error'))
+    for candidate in candidates:
+        candidate.error = Matcher.bove(spectrum, candidate)
+    candidates.sort(key=operator.attrgetter('error'))
     # Let frontend do the rest
     return candidates
 
@@ -173,7 +170,41 @@ class Spectrum(db.Model):
         """
         index = self.contents.index(name) + len(name) # means find where the field name ends 
         return self.contents[index:self.contents.index('\n', index)] #Does not handle Windows format
-
+     
+    def calculate_peaks(self, one=False):
+        """
+        Calculate the peaks for a spectrum.
+        
+        @param one: Whether to get all the peaks or just the first one
+        @type  one: C{bool}
+        @return: Either a list of peaks or one peak, depending on the parameter
+        @rtype: C{list} or C{float}
+        """
+        if one:
+            return max(self.xy, key=operator.itemgetter(1))[0] 
+        xy = sorted(self.xy, key = operator.itemgetter(1), reverse=True)
+        peaks = []
+        peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
+        return peaks
+    
+    def calculate_heavyside(self):
+        """
+        Calculate the heavyside inde for a spectrum.
+        
+        @return: The heavyside index
+        @rtype: C{int}
+        """
+        key, left_edge, width = 0, 0, len(self.data) # Initialize variables
+        for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS): # Count from zero to number of bits
+            left = sum(self.data[left_edge:left_edge + width / 2])
+            right = sum(self.data[left_edge + width / 2:left_edge + width])
+            if left_edge + width == len(self.data):
+                left_edge = 0
+                width = width / 2 #Adjust boundaries
+            else:
+                left_edge += width #for next iteration
+            key += (left < right) << (Matcher.FLAT_HEAVYSIDE_BITS - bit)
+        return key
 
 class Matcher(db.Model):
     """
@@ -216,28 +247,16 @@ class Matcher(db.Model):
         @param spectrum: The spectrum to add
         @type  spectrum: L{backend.Spectrum}
         """
-        # Get the spectrum's key, peaks, and other heuristic data:
+
         #Flat heavyside: hash table of heavyside keys
-        stack = [(0,0,0,len(spectrum.data))] #List of (key, whichBit, leftEdge, width)
-        while len(stack) > 0: #keep going while there is stuff on the stack
-            key, whichBit, leftEdge, width = stack.pop() #stack holds key, whichBit, leftEdge, width
-            if whichBit == Matcher.FLAT_HEAVYSIDE_BITS: #We're done with this key, so add it to the table
-                if key in self.flat_heavyside: self.flat_heavyside[key].add(spectrum.key()) #add it to table
-                else: self.flat_heavyside[key] = set([spectrum.key()]) #add it to table
-            else:
-                left = sum(spectrum.data[leftEdge:leftEdge+width/2]) #Sum integrals
-                right = sum(spectrum.data[leftEdge+width/2:leftEdge+width]) #on both sides
-                if leftEdge+width == len(spectrum.data): leftEdge = 0; width = width/2 #Adjust boundaries
-                else: leftEdge += width #for next iteration
-                if abs(left-right) < left*0.03: #If too close to call add twice
-                    stack.append( (key, whichBit+1, leftEdge, width) ) #Once, leave key unchanged
-                    stack.append( (key+(1<<(Matcher.FLAT_HEAVYSIDE_BITS-whichBit)), whichBit+1, leftEdge, width) ) #and once change key
-                else: stack.append( (key+((left<right)<<(Matcher.FLAT_HEAVYSIDE_BITS-whichBit)), whichBit+1, leftEdge, width) ) #if its easy to tell which side is heavier
+        key = spectrum.calculate_heavyside()
+        if key in self.flat_heavyside:
+            self.flat_heavyside[key].add(spectrum.key())
+        else:
+            self.flat_heavyside[key] = set([spectrum.key()])
         
         #peak_list - positions of highest peaks:
-        xy = sorted(spectrum.xy, key = operator.itemgetter(1), reverse = True) #sort xy data by y value
-        peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
-        for peak in peaks:
+        for peak in spectrum.calculate_peaks():
             bisect.insort(self.peak_list, (peak, spectrum.key()))
 
     def get(self, spectrum):
@@ -254,41 +273,32 @@ class Matcher(db.Model):
         @rtype: C{list} of L{backend.Spectrum}
         """
         
-        # Get flat heayside key.
-        flatHeavysideKey, leftEdge, width = 0, 0, len(spectrum.data) # Initialize variables
-        for whichBit in xrange(Matcher.FLAT_HEAVYSIDE_BITS): # Count from zero to number of bits
-            left = sum(spectrum.data[leftEdge:leftEdge + width / 2]) #Sum integrals
-            right = sum(spectrum.data[leftEdge + width / 2:leftEdge + width]) #on both sides
-            if leftEdge + width == len(spectrum.data):
-                leftEdge = 0
-                width = width / 2 #Adjust boundaries
-            else:
-                leftEdge += width #for next iteration
-            flatHeavysideKey += (left < right) << (Matcher.FLAT_HEAVYSIDE_BITS - whichBit) # Adds on to the key
-        # Get x position of highest peak.
-        peak = max(spectrum.xy, key=operator.itemgetter(1))[0] # Find x with highest y
+        # Get heavyside key and peaks.
+        flatHeavysideKey = spectrum.calculate_heavyside()
+        peak = spectrum.calculate_peaks(True)
         
         # Get the candidates in a hash table
         keys = {}
         # Give ten votes to each spectrum with the same heavyside key.
         if flatHeavysideKey in self.flat_heavyside:
             for key in self.flat_heavyside[flatHeavysideKey]:
-                keys[key] = keys.get(key) + 10
+                keys[key] = keys.get(key, 0) + 10
         
         # If a spectrum has a peak within five indices of our given spectrum's
         # peaks in either direction, give it votes depending on how close it is.
         index = bisect.bisect(self.peak_list, peak)
         for offset in xrange(-5,5):
-            if index+offset < 0 or index+offset >= len(self.peak_list):
+            if index + offset < 0 or index + offset >= len(self.peak_list):
                 # If bisect gives us an index near the beginning or end of list.
                 continue
             # Give the spectrum (5 - offest) votes
-            index = self.peak_list[index+offset][1]
-            keys[index] = keys.get(index, 0) + (5 - abs(offset))
+            peak_index = self.peak_list[index+offset][1]
+            keys[peak_index] = keys.get(peak_index, 0) + (5 - abs(offset))
         # Sort candidates by number of votes and return Spectrum objects.
         keys = sorted(keys.iteritems(), key=operator.itemgetter(1))
         return Spectrum.get([k[0] for k in keys])
     
+    @staticmethod # Make a static method for faster execution
     def bove(a, b):
         """
         Calculate the difference or error between two spectra using Bove's

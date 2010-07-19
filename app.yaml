@@ -1,5 +1,5 @@
 application: cooper-redhen
-version: 1
+version: 4
 runtime: python
 api_version: 1
 
@@ -11,7 +11,7 @@ handlers:
   static_dir: static_files
 
 - url: .*
-  script: frontend.py
+  script: api.py
 
 - url: /upload
   script: uploader.py

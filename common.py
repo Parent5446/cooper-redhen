@@ -8,6 +8,7 @@ back end.
 """
 
 import logging
+import pickle
 
 from google.appengine.ext import db
 
@@ -163,7 +164,7 @@ class Error(Exception):
     
     def log(self):
         """Create a log message when an exception is raised."""
-        logger.exception(self)
+        logging.exception(self)
 
 
 class InputError(Error):

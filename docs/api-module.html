@@ -57,28 +57,29 @@
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module api</h1><p class="nomargin-top"><span class="codelink"><a href="api-pysrc.html">source&nbsp;code</a></span></p>
-<p>Take a POST request with JSON data and process it. If it contains a 
-  spectrum file, send it to the back end to search the database.</p>
-  <p>In order for the request to be handled properly, a POST request should
-  be submitted to this script with a JSON object as the body of the 
-  request. File uploads are handled automatically by Google's Blob Store. 
-  Note that the purpose of this script is because Pyjamas will compile 
-  static HTML, Javascript, and CSS files that cannot have App Engine Python
-  in them. This script allows the user to still interact dynamically with 
-  the server through an HTTP request.</p>
+<pre class="literalblock">
 
-<hr />
-<div class="fields">      <p><strong>Organization:</strong>
-        The Cooper Union for the Advancement of the Science and the Arts
-      </p>
-      <p><strong>License:</strong>
-        http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General 
-        Public License v3.0
-      </p>
-      <p><strong>Copyright:</strong>
-        Copyright (c) 2010, Cooper Union (Some Right Reserved)
-      </p>
-</div><!-- ==================== CLASSES ==================== -->
+Take a POST request with JSON data and process it. If it contains a spectrum
+file, send it to the back end to search the database.
+
+The nature of this API depends on the type of request sent to it, and where
+the request is sent to. It behaves as follows:
+
+- /upload/*
+    - GET: Returns a file upload URL
+    - POST: Uploads a file (must be a valid upload URL)
+- /serve/*
+    - GET: Executes a request for an uploaded file.
+- /*
+    - POST: Executes a request not involving a file upload.
+
+@organization: The Cooper Union for the Advancement of the Science and the Arts
+@license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
+@copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
+
+</pre>
+
+<!-- ==================== CLASSES ==================== -->
 <a name="section-Classes"></a>
 <table class="summary" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
@@ -95,6 +96,13 @@
     </table>
   </td>
 </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="api.UploadHandler-class.html" class="summary-name">UploadHandler</a>
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
@@ -159,18 +167,22 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="api-module.html#application" class="summary-name">application</a> = <code title="webapp.WSGIApplication([('/', MainHandler)], debug= True)">webapp.WSGIApplication([('/', MainHandler)], deb<code class="variable-ellipsis">...</code></code>
+        <a href="api-module.html#application" class="summary-name">application</a> = <code title="webapp.WSGIApplication([('/', ApiHandler), ('/upload', UploadHandler),\
+ ('/serve/([^/]+)?', ApiHandler)], debug= True)">webapp.WSGIApplication([('/', ApiHandler), ('/up<code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 </table>
 <p class="indent-wrapped-lines"><b>Imports:</b>
-  <span title="json">json</span>,
+  <span title="urllib">urllib</span>,
   <span title="google.appengine.ext.blobstore">blobstore</span>,
   <span title="google.appengine.ext.webapp">webapp</span>,
   <span title="google.appengine.ext.webapp.blobstore_handlers">blobstore_handlers</span>,
   <span title="google.appengine.ext.webapp.util.run_wsgi_app">run_wsgi_app</span>,
+  <span title="google.appengine.api.memcache">memcache</span>,
+  <span title="django.utils.simplejson">simplejson</span>,
+  <a href="common-module.html" title="common">common</a>,
   <a href="backend-module.html" title="backend">backend</a>,
-  <a href="common-module.html" title="common">common</a>
+  <a href="frontend-module.html" title="frontend">frontend</a>
 </p><br />
 <!-- ==================== VARIABLES DETAILS ==================== -->
 <a name="section-VariablesDetails"></a>
@@ -202,7 +214,8 @@
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-webapp.WSGIApplication([('/', MainHandler)], debug= True)
+webapp.WSGIApplication([('/', ApiHandler), ('/upload', UploadHandler),<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+ ('/serve/([^/]+)?', ApiHandler)], debug= True)
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -238,7 +251,7 @@ webapp.WSGIApplication([('/', MainHandler)], debug= True)
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jul 17 18:49:51 2010</a>
+    3.0.1 on Sun Jul 18 21:25:20 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
