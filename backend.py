@@ -171,7 +171,8 @@ class Spectrum(db.Model):
         Parse a string of JCAMP file data and extract all needed data.
         
         Search a JCAMP file for the chemical's name, type, and spectrum data.
-        Then integrate the X, Y data and store alGet a specific data label from the file.l variables in the object.
+        Then integrate the X, Y data and store alGet a specific data label from
+        the file.l variables in the object.
         
         @warning: Does not handle Windows-format line breaks.
         @param contents: String containing spectrum information
@@ -209,6 +210,7 @@ class Spectrum(db.Model):
         oldX, oldY = range[0], (xy[start - 1][1] +
              (xy[start][1] - xy[start - 1][1]) * (range[0] - xy[start][0]) /
              (xy[start - 1][0] - xy[start][0]))
+        data = []
         for x, y in xy[start:]: #Iterate over xy from start
             newIndex = int((x - range[0]) / interval)
             oldIndex = int((oldX - range[0]) / interval)
@@ -217,14 +219,15 @@ class Spectrum(db.Model):
                 boundary = newIndex * interval,\
                            ((y - oldY) * (newIndex * interval - oldX) /
                            (x - oldX) + oldY) #Linear interpolation
-                self.data[oldIndex] += (boundary[1] + oldY) * (boundary[0] - oldX) / 2 #Add area
+                data[oldIndex] += (boundary[1] + oldY) * (boundary[0] - oldX) / 2
                 if newIndex < len(self.data): # if data isn't filled 
-                    self.data[newIndex] += (boundary[1] + y) * (x - boundary[0]) / 2 #Add area
+                    data[newIndex] += (boundary[1] + y) * (x - boundary[0]) / 2
             else:
-                self.data[newIndex] += (y + oldY) * (x - oldX) / 2 #Add area
+                data[newIndex] += (y + oldY) * (x - oldX) / 2 #Add area
             if x > range[1]:
                 break #If finished, break
             oldX, oldY = x, y #Otherwise keep going
+        self.data = data
         self.chemical_type = 'Unknown' # We will find this later
         # FIXME: Assumes chemical name is in TITLE label.
         self.chemical_name = self.get_field('##TITLE=')
@@ -238,9 +241,13 @@ class Spectrum(db.Model):
         @type  name: C{str}
         @return: Value of the data label
         @rtype: C{str}
+        
+        @warning: Does not support Windows-style line breaks.
         """
-        index = self.contents.index(name) + len(name) # means find where the field name ends 
-        return self.contents[index:self.contents.index('\n', index)] #Does not handle Windows format
+        # Find where the field ends.
+        # FIXME: Does not support Windows format.
+        index = self.contents.index(name) + len(name)
+        return self.contents[index:self.contents.index('\n', index)]
      
     def calculate_peaks(self, one=False):
         """
@@ -255,7 +262,9 @@ class Spectrum(db.Model):
             return max(self.data, key=operator.itemgetter(1))[0] 
         xy = sorted(self.data, key = operator.itemgetter(1), reverse=True)
         peaks = []
-        peaks = [x for x, y in xy if y >= xy[0][1]*0.95 and not [peak for peak in peaks if abs(peak - x) < 1]]
+        peaks = [x for x, y in xy
+                   if y >= xy[0][1]*0.95
+                   and not [peak for peak in peaks if abs(peak - x) < 1]]
         return peaks
     
     def calculate_heavyside(self):
@@ -266,7 +275,7 @@ class Spectrum(db.Model):
         @rtype: C{int}
         """
         key, left_edge, width = 0, 0, len(self.data) # Initialize variables
-        for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS): # Count from zero to number of bits
+        for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS):
             left = sum(self.data[left_edge:left_edge + width / 2])
             right = sum(self.data[left_edge + width / 2:left_edge + width])
             if left_edge + width == len(self.data):
@@ -279,8 +288,8 @@ class Spectrum(db.Model):
 
 class Matcher(db.Model):
     """
-    Store spectra data necessary for searching the database, then search the database
-    for candidates that may represent a given spectrum.
+    Store spectra data necessary for searching the database, then search the
+    database for candidates that may represent a given spectrum.
     """
     
     FLAT_HEAVYSIDE_BITS = 8
@@ -335,8 +344,8 @@ class Matcher(db.Model):
         Find spectra similar to the given one.
         
         Find spectra that may represent the given Spectrum object by sorting
-        the database using different heuristics, having them vote, and returning only
-        the spectra deemed similar to the given spectrum.
+        the database using different heuristics, having them vote, and 
+        returning only the spectra deemed similar to the given spectrum.
         
         @param spectrum: The spectrum to search for
         @type  spectrum: L{backend.Spectrum}
@@ -356,11 +365,11 @@ class Matcher(db.Model):
                 keys[key] = keys.get(key, 0) + 10
         
         # If a spectrum has a peak within five indices of our given spectrum's
-        # peaks in either direction, give it votes depending on how close it is.
+        # peaks in either direction, give it votes depending on how close it is
         index = bisect.bisect(self.peak_list, peak)
         for offset in xrange(-5,5):
             if index + offset < 0 or index + offset >= len(self.peak_list):
-                # If bisect gives us an index near the beginning or end of list.
+                # If bisect gives us an index near the beginning or end of list
                 continue
             # Give the spectrum (5 - offest) votes
             peak_index = self.peak_list[index+offset][1]
@@ -382,7 +391,7 @@ class Matcher(db.Model):
         @return: The difference or error between the spectra
         @rtype: C{int}
         """
-        return max([abs(a.data[i]-b.data[i]) for i in xrange(len(a.data))]) # Do Bove's algorithm
+        return max([abs(a.data[i]-b.data[i]) for i in xrange(len(a.data))])
     
     @staticmethod # Make a static method for faster execution
     def least_squares(a, b):
@@ -397,4 +406,4 @@ class Matcher(db.Model):
         @return: The difference or error between the spectra
         @rtype: C{int}
         """
-        return sum([(a.data[i]-a.b[i])**2 for i in xrange(len(a.data))]) # Compare to spectra with least squares
+        return sum([(a.data[i]-a.b[i])**2 for i in xrange(len(a.data))])
