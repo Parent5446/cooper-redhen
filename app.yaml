@@ -11,7 +11,7 @@ handlers:
   static_dir: static_files
 
 - url: .*
-  script: api.py
+  script: frontend.py
 
 - url: /upload
   script: uploader.py
