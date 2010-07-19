@@ -5,100 +5,58 @@ file, send it to the back end to search the database.
 The nature of this API depends on the type of request sent to it, and where
 the request is sent to. It behaves as follows:
 
-- /upload/*
-    - GET: Returns a file upload URL
-    - POST: Uploads a file (must be a valid upload URL)
-- /serve/*
-    - GET: Executes a request for an uploaded file.
-- /*
-    - POST: Executes a request not involving a file upload.
-
 @organization: The Cooper Union for the Advancement of the Science and the Arts
 @license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
 @copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
 """
 
-import urllib
+import pickle
 
-from google.appengine.ext import blobstore, webapp
-from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.api import memcache # import memory cache
-from django.utils import simplejson
 
 import common
 import backend
-import frontend
 
-class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
-    def get(self):
-        self.response.out.write(blobstore.create_upload_url('/upload'))
-
-    def post(self):
-        upload_files = self.get_uploads('spectrum')
-        blob_info = upload_files[0]
-        self.redirect('/serve/%s' % blob_info.key())
-
-class ApiHandler(blobstore_handlers.BlobstoreDownloadHandler):
+class ApiHandler(webapp.RequestHandler):
     """Handle any API requests and return a JSON response."""
-    
-    def get(self, resource):
-        resource = str(urllib.unquote(resource))
-        response = self.handle_request(blobstore.BlobInfo.get(resource))
-        self.response.out.write(simplejson.dumps(response))
     
     def post(self):
         """
         Handle a POST request to the API.
-        
-        Load the JSON object in the request and hand it off to self.process_request.
-        Then put the response back in JSON format and give back to the user.
         """
-        response = self.handle_request()
-        self.response.out.write(simplejson.dumps(response))
-        
-    def handle_request(self, upload=False):
-        action = self.request.get("action")
-        response = []
-        if upload is not False:
-            # Search the database for something
-            targets = self.request.get_all("target")
-            if targets:
-                # User wants to find an already completed search.
-                # Get the targeted searches and extract relevant information.
-                # TODO: Make script entirely re-do the search if the 'force'
-                #       argument is set to True.
-                searches = frontend.Search(targets)
-                info = [(searches.spectrum_out[i].chemical_name, searches.error[i])
-                        for i in len(searches.spectrum_out)]
-                response.append(info)
+        requests = [pickle.loads(req) for req in self.request.get_all("request")]
+        output = []
+        for request in requests:
+            response = []
+            actions = request.get("action", False)
+            if action == "analyze":
+                # Search the database for something.
+                targets = request.get("target", [])
+                for target in targets:
+                    # User wants to commit a new search with a file upload.
+                    # Send file upload to the back end for searching.
+                    result = backend.search(target)
+                    # Extract relevant information and add to the response.
+                    info = [(i.chemical_name, i.error) for i in result]
+                    response.append(info)
+            elif action == "compare":
+                targets = request.get("target", None)
+                if targets is None:
+                    raise common.InputError(targets, "No search targets given.")
+                algorithm = request.get("algorithm", "bove")
+                response.append(backend.compare(targets[0], targets[1], algorithm))
+            elif action == "browse":
+                target = request.get("target", "public")
+                limit = request.get("limit", 10)
+                offset = request.get("offset", 0)
+                response.append(backend.browse(target, limit, offset))
             else:
-                # User wants to commit a new search with a file upload.
-                # Send file upload to the back end for searching.
-                file_obj = blobstore.BlobReader(upload.key())
-                result = backend.search(file_obj)
-                # Extract relevant information and add to the response.
-                info = [(i.chemical_name, i.error) for i in result]
-                response.append(info)
-                # Add to search history
-                # FIXME: Find way to limit the number of stored searches
-                search = frontend.Search()
-                search.spectrum_in = upload
-                search.spectrum_out = [spectrum.key() for spectrum in result]
-                search.error = [spectrum.error for spectrum in result]
-                search.put()
-        elif action == "history":
-            # Get a list of previous searches for the current user.
-            curr_user = users.get_current_user()
-            history = frontend.Search.gql("WHERE user = :user", user=curr_user)
-            for item in history:
-                info = [item.key, item.datetime, list(item.spectrum_out)]
-                response.append(info)
-        else:
-            # Invalid action. Raise an error.
-            raise common.InputError(action, "Invalid API action.")
-        # Put back into JSON and send to user.
-        return response
+                # Invalid action. Raise an error.
+                raise common.InputError(action, "Invalid API action.")
+            # Put back into JSON and send to user.
+            output.append(response)
+        self.response.out.write(pickle.dumps(output))
     
     def handle_exception(self, exception, debug_mode):
         """
@@ -128,13 +86,11 @@ class ApiHandler(blobstore_handlers.BlobstoreDownloadHandler):
             super(ApiHandler, self).handle_exception(exception, True)
 
 application = webapp.WSGIApplication([
-    ('/', ApiHandler),
-    ('/upload', UploadHandler),
-	('/serve/([^/]+)?', ApiHandler)
+    ('/', ApiHandler)
 ], debug=True)
 
 def main():
-	run_wsgi_app(application)
+    run_wsgi_app(application)
 
 if __name__ == '__main__':
-	main()
+    main()

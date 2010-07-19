@@ -47,6 +47,31 @@ def search(file_obj):
     # Let frontend do the rest
     return candidates
 
+def compare(file1, file2, algorithm="bove"):
+    spectrum1 = Spectrum()
+    spectrum1.parse_file(file1)
+    spectrum2 = Spectrum()
+    spectrum2.parse_file(file2)
+    if algorithm == "bove":
+        return Matcher.bove(spectrum1, spectrum2)
+    elif algorithm == "leastsquares":
+        return Matcher.leastsquares(spectrum1, spectrum2)
+    else:
+        raise common.InputError(algo, "Invalid algorithm selection.")
+
+def browse(target, limit=10, offset=0):
+    if limit > 50:
+        raise common.InputError(limit, "Number of spectra to retrieve is too big.")
+    if target == "public":
+        return Spectrum.all().fetch(limit, offset)
+    elif target == "private":
+        user = get_current_user()
+        if user is None:
+            raise common.InputError(user, "You are not logged in.")
+        return Spectrum.gql("owner = :user", user).fetch(limit, offset)
+    else:
+        raise common.InputError(target, "Invalid database to search.")
+
 def add(file_obj):
     """
     Add a new spectrum to the database from a given file descriptor.
@@ -94,7 +119,15 @@ class Spectrum(db.Model):
     """A list of integrated X,Y points for the spectrum's graph
     @type: C{list}"""
     
-    def parse_file(self, file_obj):
+    owner = db.UserProperty()
+    """The owner of the Spectrum if in a private database
+    @type: L{google.appengine.ext.db.UserProperty}"""
+    
+    notes = db.StringProperty()
+    """Notes on the spectrum if in a private database
+    @type: C{str}"""
+    
+    def parse_file(self, contents):
         """
         Parse a string of JCAMP file data and extract all needed data.
         
@@ -105,7 +138,7 @@ class Spectrum(db.Model):
         @param file_obj: File descriptor containing spectrum information
         @type  file_obj: C{file} or L{google.appengine.ext.blobstore.BlobReader}
         """
-        self.contents = file_obj.read()
+        self.contents = contents
         self.type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
         deltaX = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
