@@ -8,7 +8,7 @@ derived_file_type:
 
 handlers:
 - url: /api
-  script: api.py
+  script: frontend.py
 
 - url: .*
   static_dir: /html/output/
