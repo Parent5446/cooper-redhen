@@ -1,5 +1,4 @@
 from pyjamas.ui.RootPanel import RootPanel
-from pyjamas.ui.VerticalPanel import VerticalPanel
 from pyjamas.ui.ListBox import ListBox
 from pyjamas.ui.FileUpload import FileUpload
 from pyjamas import Window
@@ -10,16 +9,12 @@ from pyjamas.ui.Grid import Grid
 from pyjamas.ui.AbsolutePanel import AbsolutePanel
 
 if __name__ == '__main__':
-    panel = AbsolutePanel(StyleName='center-panel')
+    panel = AbsolutePanel(StyleName='center-panel') #Contents can overlap
     grid = Grid(2, 2)
 
     browse_list = ListBox(StyleName='listbox')
     map(browse_list.addItem, ['my computer', 'my projects', 'main library'])
-    def browse_list_changed():
-        if browse_list.getSelectedItemText()[0]=='my computer':
-            file_upload.setVisible(True)
-        else: file_upload.setVisible(False)
-    browse_list.addChangeListener(browse_list_changed)
+    browse_list.addChangeListener(lambda: file_upload.setVisible(browse_list.getSelectedItemText()[0]=='my computer'))
     def browse(event):
         RootPanel().add(HTML('Browse '+browse_list.getSelectedItemText()[0]))
     
