@@ -31,7 +31,7 @@ def search(spectrum_data):
     @return: List of candidates similar to the input spectrum
     @rtype: C{list} of L{backend.Spectrum}
     '''
-    if not isinstance(spectrum_data, str):
+    if not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
@@ -61,9 +61,9 @@ def compare(data1, data2, algorithm="bove"):
     @rtype: C{int}
     '''
     # First check for invalid spectrum data (if they are not strings).
-    if not isinstance(data1, str):
+    if not isinstance(data1, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(data1, "Invalid spectrum data.")
-    if not isinstance(data2, str):
+    if not isinstance(data2, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(data2, "Invalid spectrum data.")
     # Load spectrum either as a database key or a file.
     if data1[0:3] == "db:":
@@ -120,7 +120,7 @@ def add(spectrum_data):
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
     '''
-    if not isinstance(spectrum_data, str):
+    if not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
@@ -154,7 +154,7 @@ class Spectrum(db.Model):
     '''The chemical type of the substance the spectrum represents
     @type: C{str}'''
     
-    data = db.ListProperty(float)
+    data = common.GenericListProperty()
     '''A list of integrated X,Y points for the spectrum's graph
     @type: C{list}'''
     
@@ -176,7 +176,7 @@ class Spectrum(db.Model):
         
         @warning: Does not handle Windows-format line breaks.
         @param contents: String containing spectrum information
-        @type  contents: C{str}
+        @type  contents: C{unicode} or C{str}
         '''
         self.contents = contents
         self.type = 'Infrared' # Later this will be variable
@@ -202,15 +202,14 @@ class Spectrum(db.Model):
         # Integrate xy numerically over a fixed range.
         range = (700.0, 3900.0)
         # Initialize the data and find the interval of integration.
-        self.data = [0.0 for i in xrange(1000)]
-        interval = (range[1] - range[0]) / len(self.data)
+        data = [0.0 for i in xrange(1000)]
+        interval = (range[1] - range[0]) / len(data)
         # Find index in xy where integrals start
         start = bisect.bisect_left(xy, (range[0], 0))
         # oldX = start of range, oldY = linear interpolation of corresponding y
         oldX, oldY = range[0], (xy[start - 1][1] +
              (xy[start][1] - xy[start - 1][1]) * (range[0] - xy[start][0]) /
              (xy[start - 1][0] - xy[start][0]))
-        data = []
         for x, y in xy[start:]: #Iterate over xy from start
             newIndex = int((x - range[0]) / interval)
             oldIndex = int((oldX - range[0]) / interval)
@@ -220,14 +219,14 @@ class Spectrum(db.Model):
                            ((y - oldY) * (newIndex * interval - oldX) /
                            (x - oldX) + oldY) #Linear interpolation
                 data[oldIndex] += (boundary[1] + oldY) * (boundary[0] - oldX) / 2
-                if newIndex < len(self.data): # if data isn't filled 
+                if newIndex < len(data): # if data isn't filled 
                     data[newIndex] += (boundary[1] + y) * (x - boundary[0]) / 2
             else:
-                data[newIndex] += (y + oldY) * (x - oldX) / 2 #Add area
+                data[newIndex] += (y + oldY) * (x - oldX) / 2
             if x > range[1]:
                 break #If finished, break
             oldX, oldY = x, y #Otherwise keep going
-        self.data = data
+        self.data = [(int(range[0]) + i, data[i]) for i in xrange(len(data))]
         self.chemical_type = 'Unknown' # We will find this later
         # FIXME: Assumes chemical name is in TITLE label.
         self.chemical_name = self.get_field('##TITLE=')
@@ -259,8 +258,8 @@ class Spectrum(db.Model):
         @rtype: C{list} or C{float}
         '''
         if one:
-            return max(self.data, key=operator.itemgetter(1))[0] 
-        xy = sorted(self.data, key = operator.itemgetter(1), reverse=True)
+            return max(self.data, key=operator.itemgetter(1))[0]
+        xy = sorted(self.data, key=operator.itemgetter(1), reverse=True)
         peaks = []
         peaks = [x for x, y in xy
                    if y >= xy[0][1]*0.95

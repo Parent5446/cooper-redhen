@@ -10,6 +10,9 @@ handlers:
 - url: /api
   script: frontend.py
 
+- url: /serve
+  script: frontend.py
+
 - url: /upload
   script: uploader.py
   login: admin

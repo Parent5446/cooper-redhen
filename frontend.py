@@ -32,6 +32,7 @@ Requests:
 """
 
 import pickle
+import urllib
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -47,7 +48,7 @@ class ApiHandler(webapp.RequestHandler):
         Handle a GET request to the API. Print instructions on how to use
         the API.
         """
-        system.response.out.write("""
+        self.response.out.write("""
 RedHen API v0.1
 
 Usage:
@@ -82,38 +83,33 @@ Requests:
         Take a list of actions from a POST request, and do the appropriate
         action. See the documentation for this module for more information.
         """
-        requests = [pickle.loads(req) for req in self.request.get_all("request")]
-        output = []
-        for request in requests:
-            response = []
-            actions = request.get("action", False)
-            if action == "analyze":
-                # Search the database for something.
-                targets = request.get("target", [])
-                for target in targets:
-                    # User wants to commit a new search with a file upload.
-                    # Send file upload to the back end for searching.
-                    result = backend.search(target)
-                    # Extract relevant information and add to the response.
-                    info = [(i.chemical_name, i.error) for i in result]
-                    response.append(info)
-            elif action == "compare":
-                targets = request.get("target", None)
-                if targets is None:
-                    raise common.InputError(targets, "No search targets given.")
-                algorithm = request.get("algorithm", "bove")
-                response.append(backend.compare(targets[0], targets[1], algorithm))
-            elif action == "browse":
-                target = request.get("target", "public")
-                limit = request.get("limit", 10)
-                offset = request.get("offset", 0)
-                response.append(backend.browse(target, limit, offset))
-            else:
-                # Invalid action. Raise an error.
-                raise common.InputError(action, "Invalid API action.")
-            # Put back into JSON and send to user.
-            output.append(response)
-        self.response.out.write(pickle.dumps(output))
+        action = self.request.get("action")
+        targets = self.request.get_all("target")
+        response = []
+        if action == "analyze":
+            # Search the database for something.
+            for target in targets:
+                # User wants to commit a new search with a file upload.
+                # Send file upload to the back end for searching.
+                result = backend.search(target)
+                # Extract relevant information and add to the response.
+                info = [(i.chemical_name, i.error) for i in result]
+                response.append(info)
+        elif action == "compare":
+            if targets is None:
+                raise common.InputError(targets, "No search targets given.")
+            algorithm = self.request.get("algorithm", "bove")
+            response.append(backend.compare(targets[0], targets[1], algorithm))
+        elif action == "browse":
+            target = self.request.get("target", "public")
+            limit = self.request.get("limit", 10)
+            offset = self.request.get("offset", 0)
+            response.append(backend.browse(target, limit, offset))
+        else:
+            # Invalid action. Raise an error.
+            raise common.InputError(action, "Invalid API action.")
+        # Put back into JSON and send to user.
+        self.redirect("/serve?%s" % urllib.quote_plus(pickle.dumps(response)))
     
     def handle_exception(self, exception, debug_mode):
         """
@@ -137,13 +133,19 @@ Requests:
             # Input error: in normal cases, Google would send a 500 error code
             # for all exception, but we want a 400 for an invalid request.
             self.error(400)
-            self.response.out.write(simplejson.dumps([exception.expr, exception.msg]))
+            self.response.out.write(pickle.dumps([exception.expr, exception.msg]))
         else:
             # Send all else to Google.
             super(ApiHandler, self).handle_exception(exception, True)
 
+class ServeHandler(webapp.RequestHandler):
+    def get(self):
+        args = self.request.query_string
+        self.response.out.write(urllib.unquote_plus(args))
+
 application = webapp.WSGIApplication([
-    ('/', ApiHandler)
+    ('/api', ApiHandler),
+    ('/serve', ServeHandler)
 ], debug=True)
 
 def main():
