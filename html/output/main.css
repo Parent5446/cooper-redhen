@@ -1,5 +1,23 @@
-.compare-panel
+.center-panel
 {
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
+    width: 250px;
+}
+.listbox
+{
+    width: 120px;
+}
+.button
+{
+    width: 120px;
+}
+.file-upload
+{
+    -moz-opacity:0;
+	filter:alpha(opacity: 0);
+	opacity: 0;
+}
+.asdf
+{
+    
 }

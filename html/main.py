@@ -4,34 +4,37 @@ from pyjamas.ui.ListBox import ListBox
 from pyjamas.ui.FileUpload import FileUpload
 from pyjamas import Window
 from pyjamas import DOM
-
-def browse(event):
-    if event.getSelectedItemText()[0] == "my computer":
-        # Get the invisible file uploader and click it.
-        file_upload = DOM.getElementById("file_upload")
-        DOM.buttonClick(file_upload)
-    else:
-        Window.alert(event.getSelectedItemText()[0])
-    
-def compare(event):
-    Window.alert(event.getSelectedItemText()[0])
+from pyjamas.ui.HTML import HTML
+from pyjamas.ui.Button import Button
+from pyjamas.ui.Grid import Grid
+from pyjamas.ui.AbsolutePanel import AbsolutePanel
 
 if __name__ == '__main__':
-    panel = VerticalPanel(StyleName='compare-panel')
- 
-    browse_list = ListBox()
-    map(browse_list.addItem, ['spectra', 'my computer', 'my projects', 'main library'])
-    browseList.addChangeListener(browse)
+    panel = AbsolutePanel(StyleName='center-panel')
+    grid = Grid(2, 2)
+
+    browse_list = ListBox(StyleName='listbox')
+    map(browse_list.addItem, ['my computer', 'my projects', 'main library'])
+    def browse_list_changed():
+        if browse_list.getSelectedItemText()[0]=='my computer':
+            file_upload.setVisible(True)
+        else: file_upload.setVisible(False)
+    browse_list.addChangeListener(browse_list_changed)
+    def browse(event):
+        RootPanel().add(HTML('Browse '+browse_list.getSelectedItemText()[0]))
     
-    compare_list = ListBox()
-    map(compare_list.addItem, ['spectra', 'main library', 'my projects', 'each other'])
-    compareList.addChangeListener(compare)
+    compare_list = ListBox(StyleName='listbox')
+    map(compare_list.addItem, ['main library', 'my projects', 'each other'])
+    def compare(event):
+        RootPanel().add(HTML('Compare '+compare_list.getSelectedItemText()[0]))
     
-    file_upload = FileUpload()
-    file_upload.setID("file_upload")
-    file_upload.setVisible(False)
+    grid.setWidget(0, 0, Button('<b>Browse</b>', browse, StyleName='button'))
+    grid.setWidget(1, 0, Button('<b>Compare</b>', compare, StyleName='button'))
+    grid.setWidget(0, 1, browse_list)
+    grid.setWidget(1, 1, compare_list)
+    panel.add(grid)
     
-    panel.add(browse_list)
-    panel.add(compare_list)
-    panel.add(file_upload)
+    file_upload = FileUpload(StyleName='file-upload')
+    panel.add(file_upload, '-100px', '5px')
+    
     RootPanel().add(panel)
