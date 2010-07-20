@@ -18,7 +18,7 @@ from google.appengine.api import memcache # import memory cache
 import common
 
 def search(spectrum_data):
-    """
+    '''
     Search for a spectrum based on a given file descriptor.
     
     Parse the given file and create a Spectrum object for it. Use the Matcher
@@ -30,7 +30,7 @@ def search(spectrum_data):
     
     @return: List of candidates similar to the input spectrum
     @rtype: C{list} of L{backend.Spectrum}
-    """
+    '''
     if not isinstance(spectrum_data, str):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
@@ -50,7 +50,7 @@ def search(spectrum_data):
     return candidates
 
 def compare(data1, data2, algorithm="bove"):
-    """
+    '''
     Compare two spectra using the given algorithm.
     
     @param data1: String containing spectrum information
@@ -59,7 +59,7 @@ def compare(data1, data2, algorithm="bove"):
     @type  data2: C{str}
     @return: Calculated error between the two spectra
     @rtype: C{int}
-    """
+    '''
     # First check for invalid spectrum data (if they are not strings).
     if not isinstance(data1, str):
         raise common.InputError(data1, "Invalid spectrum data.")
@@ -85,7 +85,7 @@ def compare(data1, data2, algorithm="bove"):
         raise common.InputError(algo, "Invalid algorithm selection.")
 
 def browse(target, limit=10, offset=0):
-    """
+    '''
     Get a list of spectrum for browsing.
     
     @param target: Where to list spectrum from ("public" or "private")
@@ -96,7 +96,7 @@ def browse(target, limit=10, offset=0):
     @type  offset: C{int}
     @return: List of spectra
     @rtype: C{list} of L{backend.Spectrum}
-    """
+    '''
     if limit > 50:
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
     if target == "public":
@@ -110,7 +110,7 @@ def browse(target, limit=10, offset=0):
         raise common.InputError(target, "Invalid database to search.")
 
 def add(spectrum_data):
-    """
+    '''
     Add a new spectrum to the database from a given file descriptor.
     
     Parse the given file and create a Spectrum object for it. If the Matcher
@@ -119,7 +119,7 @@ def add(spectrum_data):
     
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
-    """
+    '''
     if not isinstance(spectrum_data, str):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
@@ -141,33 +141,33 @@ def add(spectrum_data):
 
 
 class Spectrum(db.Model):
-    """
+    '''
     Store a spectrum, its related data, and any algorithms necessary
     to compare the spectrum to the DataStore.
-    """
+    '''
     
     chemical_name = db.StringProperty()
-    """The chemical name associated with the spectrum
-    @type: C{str}"""
+    '''The chemical name associated with the spectrum
+    @type: C{str}'''
     
     chemical_type = db.StringProperty()
-    """The chemical type of the substance the spectrum represents
-    @type: C{str}"""
+    '''The chemical type of the substance the spectrum represents
+    @type: C{str}'''
     
     data = db.ListProperty(float)
-    """A list of integrated X,Y points for the spectrum's graph
-    @type: C{list}"""
+    '''A list of integrated X,Y points for the spectrum's graph
+    @type: C{list}'''
     
     owner = db.UserProperty()
-    """The owner of the Spectrum if in a private database
-    @type: L{google.appengine.ext.db.UserProperty}"""
+    '''The owner of the Spectrum if in a private database
+    @type: L{google.appengine.ext.db.UserProperty}'''
     
     notes = db.StringProperty()
-    """Notes on the spectrum if in a private database
-    @type: C{str}"""
+    '''Notes on the spectrum if in a private database
+    @type: C{str}'''
     
     def parse_string(self, contents):
-        """
+        '''
         Parse a string of JCAMP file data and extract all needed data.
         
         Search a JCAMP file for the chemical's name, type, and spectrum data.
@@ -177,7 +177,7 @@ class Spectrum(db.Model):
         @warning: Does not handle Windows-format line breaks.
         @param contents: String containing spectrum information
         @type  contents: C{str}
-        """
+        '''
         self.contents = contents
         self.type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
@@ -234,7 +234,7 @@ class Spectrum(db.Model):
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):
-        """
+        '''
         Get a specific data label from the file.
         
         @param name: Name of data label to retrieve
@@ -243,21 +243,21 @@ class Spectrum(db.Model):
         @rtype: C{str}
         
         @warning: Does not support Windows-style line breaks.
-        """
+        '''
         # Find where the field ends.
         # FIXME: Does not support Windows format.
         index = self.contents.index(name) + len(name)
         return self.contents[index:self.contents.index('\n', index)]
      
     def calculate_peaks(self, one=False):
-        """
+        '''
         Calculate the peaks for a spectrum.
         
         @param one: Whether to get all the peaks or just the first one
         @type  one: C{bool}
         @return: Either a list of peaks or one peak, depending on the parameter
         @rtype: C{list} or C{float}
-        """
+        '''
         if one:
             return max(self.data, key=operator.itemgetter(1))[0] 
         xy = sorted(self.data, key = operator.itemgetter(1), reverse=True)
@@ -268,12 +268,12 @@ class Spectrum(db.Model):
         return peaks
     
     def calculate_heavyside(self):
-        """
+        '''
         Calculate the heavyside index for a spectrum.
         
         @return: The heavyside index
         @rtype: C{int}
-        """
+        '''
         key, left_edge, width = 0, 0, len(self.data) # Initialize variables
         for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS):
             left = sum(self.data[left_edge:left_edge + width / 2])
@@ -287,37 +287,37 @@ class Spectrum(db.Model):
         return key
 
 class Matcher(db.Model):
-    """
+    '''
     Store spectra data necessary for searching the database, then search the
     database for candidates that may represent a given spectrum.
-    """
+    '''
     
     FLAT_HEAVYSIDE_BITS = 8
-    """Number of bits in the heavyside index
-    @type: C{int}"""
+    '''Number of bits in the heavyside index
+    @type: C{int}'''
     
     flat_heavyside = common.DictProperty()
-    """@ivar: List of flat-heavyside indices
-    @type: L{common.DictProperty}"""
+    '''@ivar: List of flat-heavyside indices
+    @type: L{common.DictProperty}'''
     
     ordered_heavyside = common.DictProperty()
-    """@ivar: List of ordered-heavyside indices
-    @type: L{common.DictProperty}"""
+    '''@ivar: List of ordered-heavyside indices
+    @type: L{common.DictProperty}'''
     
     peak_list = common.GenericListProperty()
-    """@ivar: List of x-values for peaks and their associated spectra
-    @type: L{common.GenericListProperty}"""
+    '''@ivar: List of x-values for peaks and their associated spectra
+    @type: L{common.GenericListProperty}'''
     
     high_low = common.DictProperty()
-    """@ivar: List of high-low table indices
-    @type: L{common.DictProperty}"""
+    '''@ivar: List of high-low table indices
+    @type: L{common.DictProperty}'''
     
     chem_types = common.DictProperty()
-    """@ivar: List of chemical types
-    @type: L{common.DictProperty}"""
+    '''@ivar: List of chemical types
+    @type: L{common.DictProperty}'''
     
     def add(self, spectrum):
-        """
+        '''
         Add a new spectrum to the Matcher.
         
         Add new spectrum data to the various Matcher data structures. Find the
@@ -326,7 +326,7 @@ class Matcher(db.Model):
         
         @param spectrum: The spectrum to add
         @type  spectrum: L{backend.Spectrum}
-        """
+        '''
 
         #Flat heavyside: hash table of heavyside keys
         key = spectrum.calculate_heavyside()
@@ -340,7 +340,7 @@ class Matcher(db.Model):
             bisect.insort(self.peak_list, (peak, spectrum.key()))
 
     def get(self, spectrum):
-        """
+        '''
         Find spectra similar to the given one.
         
         Find spectra that may represent the given Spectrum object by sorting
@@ -351,7 +351,7 @@ class Matcher(db.Model):
         @type  spectrum: L{backend.Spectrum}
         @return: List of similar spectra
         @rtype: C{list} of L{backend.Spectrum}
-        """
+        '''
         
         # Get heavyside key and peaks.
         flatHeavysideKey = spectrum.calculate_heavyside()
@@ -380,7 +380,7 @@ class Matcher(db.Model):
     
     @staticmethod # Make a static method for faster execution
     def bove(a, b):
-        """
+        '''
         Calculate the difference or error between two spectra using Bove's
         algorithm.
         
@@ -390,12 +390,12 @@ class Matcher(db.Model):
         @type  b: L{backend.Spectrum}
         @return: The difference or error between the spectra
         @rtype: C{int}
-        """
+        '''
         return max([abs(a.data[i]-b.data[i]) for i in xrange(len(a.data))])
     
     @staticmethod # Make a static method for faster execution
     def least_squares(a, b):
-        """
+        '''
         Calculate the difference or error between two spectra using Bove's
         algorithm.
         
@@ -405,5 +405,5 @@ class Matcher(db.Model):
         @type  b: L{backend.Spectrum}
         @return: The difference or error between the spectra
         @rtype: C{int}
-        """
+        '''
         return sum([(a.data[i]-a.b[i])**2 for i in xrange(len(a.data))])
