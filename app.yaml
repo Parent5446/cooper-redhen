@@ -10,10 +10,10 @@ handlers:
 - url: /api
   script: frontend.py
 
-- url: .*
-  static_dir: /html/output/
-
 - url: /upload
   script: uploader.py
   login: admin
   secure: optional
+
+- url: .*
+  static_dir: /html/output/
