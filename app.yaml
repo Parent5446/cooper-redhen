@@ -7,11 +7,11 @@ derived_file_type:
 - python_precompiled
 
 handlers:
-- url: /html
-  static_dir: html
+- url: /api
+  script: api.py
 
 - url: .*
-  script: frontend.py
+  static_dir: /html/output/main.html
 
 - url: /upload
   script: uploader.py
