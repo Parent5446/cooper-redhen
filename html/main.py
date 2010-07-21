@@ -11,7 +11,7 @@ from BasicControls import BasicControls
 if __name__ == '__main__':
     page = DockPanel(StyleName='centered-panel')
     page.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)
-    page.add(Image('banner.png'), DockPanel.NORTH)
+    page.add(Image('../public/banner.png'), DockPanel.NORTH)
     page.add(BasicControls(StyleName='frontpage-controls'), DockPanel.CENTER)
     RootPanel().add(page)
     

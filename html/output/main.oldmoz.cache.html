@@ -50278,7 +50278,7 @@ $pyjs.loaded_modules['main'] = function (__mod_name__) {
 	main.__track_lines__[11] = "main.py, line 11:\n    if __name__ == \'__main__\':";
 	main.__track_lines__[12] = "main.py, line 12:\n    page = DockPanel(StyleName=\'centered-panel\')";
 	main.__track_lines__[13] = "main.py, line 13:\n    page.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)";
-	main.__track_lines__[14] = "main.py, line 14:\n    page.add(Image(\'banner.png\'), DockPanel.NORTH)";
+	main.__track_lines__[14] = "main.py, line 14:\n    page.add(Image(\'../public/banner.png\'), DockPanel.NORTH)";
 	main.__track_lines__[15] = "main.py, line 15:\n    page.add(BasicControls(StyleName=\'frontpage-controls\'), DockPanel.CENTER)";
 	main.__track_lines__[16] = "main.py, line 16:\n    RootPanel().add(page)";
 	var $attr2,$attr1,$attr5,$attr4,$attr6,$attr3;
@@ -50386,7 +50386,7 @@ try{var $pyjs_dbg_3_res=main['page']['setHorizontalAlignment'](((($attr1=main['H
 		$pyjs.track.lineno=14;
 		(function(){var $pyjs_dbg_5_retry = 0;
 try{var $pyjs_dbg_5_res=main['page']['add']((function(){var $pyjs_dbg_4_retry = 0;
-try{var $pyjs_dbg_4_res=main['Image'](String('banner.png'));}catch($pyjs_dbg_4_err){
+try{var $pyjs_dbg_4_res=main['Image'](String('../public/banner.png'));}catch($pyjs_dbg_4_err){
     if ($pyjs_dbg_4_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -50404,7 +50404,7 @@ try{var $pyjs_dbg_4_res=main['Image'](String('banner.png'));}catch($pyjs_dbg_4_e
     }
     switch ($pyjs_dbg_4_retry) {
         case 1:
-            $pyjs_dbg_4_res=main['Image'](String('banner.png'));
+            $pyjs_dbg_4_res=main['Image'](String('../public/banner.png'));
             break;
         case 2:
             break;
@@ -50432,7 +50432,7 @@ try{var $pyjs_dbg_4_res=main['Image'](String('banner.png'));}catch($pyjs_dbg_4_e
     switch ($pyjs_dbg_5_retry) {
         case 1:
             $pyjs_dbg_5_res=main['page']['add']((function(){var $pyjs_dbg_4_retry = 0;
-try{var $pyjs_dbg_4_res=main['Image'](String('banner.png'));}catch($pyjs_dbg_4_err){
+try{var $pyjs_dbg_4_res=main['Image'](String('../public/banner.png'));}catch($pyjs_dbg_4_err){
     if ($pyjs_dbg_4_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -50450,7 +50450,7 @@ try{var $pyjs_dbg_4_res=main['Image'](String('banner.png'));}catch($pyjs_dbg_4_e
     }
     switch ($pyjs_dbg_4_retry) {
         case 1:
-            $pyjs_dbg_4_res=main['Image'](String('banner.png'));
+            $pyjs_dbg_4_res=main['Image'](String('../public/banner.png'));
             break;
         case 2:
             break;
@@ -58089,60 +58089,63 @@ $pyjs.loaded_modules['BasicControls'] = function (__mod_name__) {
 	BasicControls.__track_lines__[21] = "BasicControls.py, line 21:\n    class BasicControls(Composite):";
 	BasicControls.__track_lines__[22] = "BasicControls.py, line 22:\n    def __init__(self, StyleName=None):";
 	BasicControls.__track_lines__[23] = "BasicControls.py, line 23:\n    Composite.__init__(self) #Superclass constructor";
-	BasicControls.__track_lines__[24] = "BasicControls.py, line 24:\n    size = (\'250px\', \'4em\')";
-	BasicControls.__track_lines__[25] = "BasicControls.py, line 25:\n    panel = AbsolutePanel(Size=size, StyleName=StyleName) #Panel which contains the controls";
-	BasicControls.__track_lines__[26] = "BasicControls.py, line 26:\n    file_upload = FileUpload(StyleName=\'file-upload\') #File upload control (not visible)";
-	BasicControls.__track_lines__[27] = "BasicControls.py, line 27:\n    uploaded_files = {} #Table of uploaded files";
-	BasicControls.__track_lines__[30] = "BasicControls.py, line 30:\n    browse_list = ListBox(StyleName=\'listbox\')";
-	BasicControls.__track_lines__[31] = "BasicControls.py, line 31:\n    map(browse_list.addItem, [\'my computer\', \'my projects\', \'main library\'])";
-	BasicControls.__track_lines__[32] = "BasicControls.py, line 32:\n    browse_list.addChangeListener(lambda: file_upload.setVisible(browse_list.getSelectedItemText()[0]==\'my computer\'))";
-	BasicControls.__track_lines__[33] = "BasicControls.py, line 33:\n    def browse(event):";
-	BasicControls.__track_lines__[34] = "BasicControls.py, line 34:\n    dialog = VerticalPanel(StyleName=\'browse-dialog\', Size=size)";
-	BasicControls.__track_lines__[35] = "BasicControls.py, line 35:\n    dialog.setSpacing(4)";
-	BasicControls.__track_lines__[36] = "BasicControls.py, line 36:\n    dialog.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)";
-	BasicControls.__track_lines__[37] = "BasicControls.py, line 37:\n    dialog.add(HTML(\'Enter a chemical name from \'+browse_list.getSelectedItemText()[0]+\':\'))";
-	BasicControls.__track_lines__[38] = "BasicControls.py, line 38:\n    input = TextBox()";
-	BasicControls.__track_lines__[39] = "BasicControls.py, line 39:\n    options = ListBox()";
-	BasicControls.__track_lines__[40] = "BasicControls.py, line 40:\n    options.setVisibleItemCount(4)";
-	BasicControls.__track_lines__[41] = "BasicControls.py, line 41:\n    dialog.add(input)";
-	BasicControls.__track_lines__[42] = "BasicControls.py, line 42:\n    dialog.add(options)";
-	BasicControls.__track_lines__[43] = "BasicControls.py, line 43:\n    options.setVisible(False)";
-	BasicControls.__track_lines__[44] = "BasicControls.py, line 44:\n    def keyPressed(self, sender, keycode, modifiers):";
-	BasicControls.__track_lines__[45] = "BasicControls.py, line 45:\n    text = input.getText()";
-	BasicControls.__track_lines__[46] = "BasicControls.py, line 46:\n    if len(text) == 5:";
-	BasicControls.__track_lines__[47] = "BasicControls.py, line 47:\n    map(options.addItem, [\'methanol\', \'ethanol\', \'propanol\', \'butanol\', \'pentanol\'])";
-	BasicControls.__track_lines__[48] = "BasicControls.py, line 48:\n    options.setVisible(True)";
-	BasicControls.__track_lines__[50] = "BasicControls.py, line 50:\n    options.addItem(text)";
-	BasicControls.__track_lines__[51] = "BasicControls.py, line 51:\n    box = DialogBox()";
-	BasicControls.__track_lines__[52] = "BasicControls.py, line 52:\n    def done():";
-	BasicControls.__track_lines__[53] = "BasicControls.py, line 53:\n    selected = options.getSelectedItemText()";
-	BasicControls.__track_lines__[54] = "BasicControls.py, line 54:\n    if selected: Window.alert( options.getSelectedItemText()[0] )";
-	BasicControls.__track_lines__[55] = "BasicControls.py, line 55:\n    box.hide()";
-	BasicControls.__track_lines__[56] = "BasicControls.py, line 56:\n    dialog.onClick = done";
-	BasicControls.__track_lines__[57] = "BasicControls.py, line 57:\n    listener = object()";
-	BasicControls.__track_lines__[58] = "BasicControls.py, line 58:\n    listener.onKeyPress = lambda: None";
-	BasicControls.__track_lines__[59] = "BasicControls.py, line 59:\n    listener.onKeyUp = keyPressed";
-	BasicControls.__track_lines__[60] = "BasicControls.py, line 60:\n    listener.onKeyDown = lambda: None";
-	BasicControls.__track_lines__[61] = "BasicControls.py, line 61:\n    input.addKeyboardListener(listener)";
-	BasicControls.__track_lines__[62] = "BasicControls.py, line 62:\n    dialog.add(Button(\"Done\", dialog)) #Passes button clicks to dialog";
-	BasicControls.__track_lines__[63] = "BasicControls.py, line 63:\n    dialog.setWidth(\"100%\")";
-	BasicControls.__track_lines__[64] = "BasicControls.py, line 64:\n    box.setWidget(dialog)";
-	BasicControls.__track_lines__[65] = "BasicControls.py, line 65:\n    box.setPopupPosition(panel.getAbsoluteLeft(), panel.getAbsoluteTop()-10)";
-	BasicControls.__track_lines__[66] = "BasicControls.py, line 66:\n    box.show()";
-	BasicControls.__track_lines__[69] = "BasicControls.py, line 69:\n    compare_list = ListBox(StyleName=\'listbox\')";
-	BasicControls.__track_lines__[70] = "BasicControls.py, line 70:\n    map(compare_list.addItem, [\'to main library\', \'to my projects\', \'to each other\'])";
-	BasicControls.__track_lines__[71] = "BasicControls.py, line 71:\n    def compare(event):";
-	BasicControls.__track_lines__[72] = "BasicControls.py, line 72:\n    file = file_upload.getFilename()";
-	BasicControls.__track_lines__[73] = "BasicControls.py, line 73:\n    if file not in uploaded_files: panel.add(HTML(\'<i>\'+file+\'</i>\'))";
-	BasicControls.__track_lines__[74] = "BasicControls.py, line 74:\n    uploaded_files[file] = True";
-	BasicControls.__track_lines__[77] = "BasicControls.py, line 77:\n    grid = Grid(2, 2)";
-	BasicControls.__track_lines__[78] = "BasicControls.py, line 78:\n    grid.setWidget(0, 0, Button(\'<b>Browse</b>\', browse, StyleName=\'button\'))";
-	BasicControls.__track_lines__[79] = "BasicControls.py, line 79:\n    grid.setWidget(1, 0, Button(\'<b>Compare</b>\', compare, StyleName=\'button\'))";
-	BasicControls.__track_lines__[80] = "BasicControls.py, line 80:\n    grid.setWidget(0, 1, browse_list)";
-	BasicControls.__track_lines__[81] = "BasicControls.py, line 81:\n    grid.setWidget(1, 1, compare_list)";
-	BasicControls.__track_lines__[82] = "BasicControls.py, line 82:\n    panel.add(grid)";
-	BasicControls.__track_lines__[83] = "BasicControls.py, line 83:\n    panel.add(file_upload, \'-100px\', \'5px\') #This is a kludge (transparent file upload layered over a visible button)";
-	BasicControls.__track_lines__[84] = "BasicControls.py, line 84:\n    self.initWidget(panel) #This panel becomes the center of the widget, and we\'re done";
+	BasicControls.__track_lines__[24] = "BasicControls.py, line 24:\n    panel = VerticalPanel() #Master panel for the widget";
+	BasicControls.__track_lines__[25] = "BasicControls.py, line 25:\n    panel.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)";
+	BasicControls.__track_lines__[26] = "BasicControls.py, line 26:\n    size = (\'250px\', \'4em\') #Size of controls";
+	BasicControls.__track_lines__[27] = "BasicControls.py, line 27:\n    absolute = AbsolutePanel(Size=size, StyleName=StyleName) #Panel which contains the controls";
+	BasicControls.__track_lines__[28] = "BasicControls.py, line 28:\n    file_upload = FileUpload(StyleName=\'file-upload\') #File upload control (not visible)";
+	BasicControls.__track_lines__[29] = "BasicControls.py, line 29:\n    uploaded_files = {} #Table of uploaded files";
+	BasicControls.__track_lines__[32] = "BasicControls.py, line 32:\n    browse_list = ListBox(StyleName=\'listbox\')";
+	BasicControls.__track_lines__[33] = "BasicControls.py, line 33:\n    map(browse_list.addItem, [\'my computer\', \'my projects\', \'main library\'])";
+	BasicControls.__track_lines__[34] = "BasicControls.py, line 34:\n    browse_list.addChangeListener(lambda: file_upload.setVisible(browse_list.getSelectedItemText()[0]==\'my computer\'))";
+	BasicControls.__track_lines__[35] = "BasicControls.py, line 35:\n    def browse(event):";
+	BasicControls.__track_lines__[36] = "BasicControls.py, line 36:\n    dialog = VerticalPanel(StyleName=\'browse-dialog\', Size=size)";
+	BasicControls.__track_lines__[37] = "BasicControls.py, line 37:\n    dialog.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)";
+	BasicControls.__track_lines__[38] = "BasicControls.py, line 38:\n    dialog.add(HTML(\'Enter a chemical name from \'+browse_list.getSelectedItemText()[0]+\':\'))";
+	BasicControls.__track_lines__[39] = "BasicControls.py, line 39:\n    input = TextBox()";
+	BasicControls.__track_lines__[40] = "BasicControls.py, line 40:\n    options = ListBox()";
+	BasicControls.__track_lines__[41] = "BasicControls.py, line 41:\n    options.setVisibleItemCount(4)";
+	BasicControls.__track_lines__[42] = "BasicControls.py, line 42:\n    dialog.add(input)";
+	BasicControls.__track_lines__[43] = "BasicControls.py, line 43:\n    dialog.add(options)";
+	BasicControls.__track_lines__[44] = "BasicControls.py, line 44:\n    options.setVisible(False)";
+	BasicControls.__track_lines__[45] = "BasicControls.py, line 45:\n    def keyPressed(self, sender, keycode, modifiers):";
+	BasicControls.__track_lines__[46] = "BasicControls.py, line 46:\n    text = input.getText()";
+	BasicControls.__track_lines__[47] = "BasicControls.py, line 47:\n    if len(text) == 5:";
+	BasicControls.__track_lines__[48] = "BasicControls.py, line 48:\n    map(options.addItem, [\'methanol\', \'ethanol\', \'propanol\', \'butanol\', \'pentanol\'])";
+	BasicControls.__track_lines__[49] = "BasicControls.py, line 49:\n    options.setVisible(True)";
+	BasicControls.__track_lines__[51] = "BasicControls.py, line 51:\n    options.addItem(text)";
+	BasicControls.__track_lines__[52] = "BasicControls.py, line 52:\n    box = DialogBox()";
+	BasicControls.__track_lines__[53] = "BasicControls.py, line 53:\n    def done():";
+	BasicControls.__track_lines__[54] = "BasicControls.py, line 54:\n    selected = options.getSelectedItemText()";
+	BasicControls.__track_lines__[55] = "BasicControls.py, line 55:\n    if selected:";
+	BasicControls.__track_lines__[56] = "BasicControls.py, line 56:\n    panel.add(HTML(\'<i>\'+browse_list.getSelectedItemText()[0]+\': \'+selected[0]+\'</i>\'))";
+	BasicControls.__track_lines__[57] = "BasicControls.py, line 57:\n    box.hide()";
+	BasicControls.__track_lines__[58] = "BasicControls.py, line 58:\n    dialog.onClick = done";
+	BasicControls.__track_lines__[59] = "BasicControls.py, line 59:\n    listener = object()";
+	BasicControls.__track_lines__[60] = "BasicControls.py, line 60:\n    listener.onKeyPress = lambda: None";
+	BasicControls.__track_lines__[61] = "BasicControls.py, line 61:\n    listener.onKeyUp = keyPressed";
+	BasicControls.__track_lines__[62] = "BasicControls.py, line 62:\n    listener.onKeyDown = lambda: None";
+	BasicControls.__track_lines__[63] = "BasicControls.py, line 63:\n    input.addKeyboardListener(listener)";
+	BasicControls.__track_lines__[64] = "BasicControls.py, line 64:\n    dialog.add(Button(\"Done\", dialog)) #Passes button clicks to dialog";
+	BasicControls.__track_lines__[65] = "BasicControls.py, line 65:\n    dialog.setWidth(\"100%\")";
+	BasicControls.__track_lines__[66] = "BasicControls.py, line 66:\n    box.setWidget(dialog)";
+	BasicControls.__track_lines__[67] = "BasicControls.py, line 67:\n    box.setPopupPosition(absolute.getAbsoluteLeft(), absolute.getAbsoluteTop()-10)";
+	BasicControls.__track_lines__[68] = "BasicControls.py, line 68:\n    box.show()";
+	BasicControls.__track_lines__[71] = "BasicControls.py, line 71:\n    compare_list = ListBox(StyleName=\'listbox\')";
+	BasicControls.__track_lines__[72] = "BasicControls.py, line 72:\n    map(compare_list.addItem, [\'to main library\', \'to my projects\', \'to each other\'])";
+	BasicControls.__track_lines__[73] = "BasicControls.py, line 73:\n    def compare(event):";
+	BasicControls.__track_lines__[74] = "BasicControls.py, line 74:\n    file = file_upload.getFilename()";
+	BasicControls.__track_lines__[75] = "BasicControls.py, line 75:\n    if file not in uploaded_files: panel.add(HTML(\'<i>my computer: \'+file+\'</i>\'))";
+	BasicControls.__track_lines__[76] = "BasicControls.py, line 76:\n    uploaded_files[file] = True";
+	BasicControls.__track_lines__[79] = "BasicControls.py, line 79:\n    grid = Grid(2, 2)";
+	BasicControls.__track_lines__[80] = "BasicControls.py, line 80:\n    grid.setWidget(0, 0, Button(\'<b>Browse</b>\', browse, StyleName=\'button\'))";
+	BasicControls.__track_lines__[81] = "BasicControls.py, line 81:\n    grid.setWidget(1, 0, Button(\'<b>Compare</b>\', compare, StyleName=\'button\'))";
+	BasicControls.__track_lines__[82] = "BasicControls.py, line 82:\n    grid.setWidget(0, 1, browse_list)";
+	BasicControls.__track_lines__[83] = "BasicControls.py, line 83:\n    grid.setWidget(1, 1, compare_list)";
+	BasicControls.__track_lines__[84] = "BasicControls.py, line 84:\n    absolute.add(grid)";
+	BasicControls.__track_lines__[85] = "BasicControls.py, line 85:\n    absolute.add(file_upload, \'-100px\', \'5px\') #This is a kludge (transparent file upload layered over a visible button)";
+	BasicControls.__track_lines__[86] = "BasicControls.py, line 86:\n    panel.add(absolute)";
+	BasicControls.__track_lines__[87] = "BasicControls.py, line 87:\n    self.initWidget(panel) #This panel becomes the center of the widget, and we\'re done";
 
 
 	$pyjs.track.module='BasicControls';
@@ -58184,7 +58187,7 @@ $pyjs.loaded_modules['BasicControls'] = function (__mod_name__) {
 		var $cls_instance = $pyjs__class_instance('BasicControls');
 		var $cls_definition = new Object();
 		var $method;
-		$cls_definition.__md5__ = '47fe83688b6569fa7d6c9b9615892054';
+		$cls_definition.__md5__ = '08b4f81e93bad94d528098f18aa13a60';
 		$pyjs.track.lineno=22;
 		$method = $pyjs__bind_method($cls_instance, '__init__', function(StyleName) {
 			if (this.__is_instance__ === true) {
@@ -58194,7 +58197,7 @@ $pyjs.loaded_modules['BasicControls'] = function (__mod_name__) {
 				StyleName = arguments[1];
 			}
 			if (typeof StyleName == 'undefined') StyleName=arguments.callee.__args__[3][1];
-			var size,file_upload,compare,$lambda1,$attr8,$attr1,$attr2,uploaded_files,browse,compare_list,$attr7,browse_list,grid,panel;
+			var $attr9,file_upload,compare,$lambda1,$attr1,$attr2,$attr4,uploaded_files,$attr10,grid,browse,absolute,browse_list,compare_list,$attr3,panel,size;
 			$pyjs.track={module:BasicControls, lineno:22};$pyjs.trackstack.push($pyjs.track);
 			$pyjs.track.module='BasicControls';
 			$pyjs.track.lineno=22;
@@ -58227,8 +58230,8 @@ try{var $pyjs_dbg_1_res=BasicControls['Composite']['__init__'](self);}catch($pyj
     }
 }return $pyjs_dbg_1_res})();
 			$pyjs.track.lineno=24;
-			size = (function(){var $pyjs_dbg_2_retry = 0;
-try{var $pyjs_dbg_2_res=pyjslib['tuple']([String('250px'), String('4em')]);}catch($pyjs_dbg_2_err){
+			panel = (function(){var $pyjs_dbg_2_retry = 0;
+try{var $pyjs_dbg_2_res=BasicControls['VerticalPanel']();}catch($pyjs_dbg_2_err){
     if ($pyjs_dbg_2_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58246,7 +58249,7 @@ try{var $pyjs_dbg_2_res=pyjslib['tuple']([String('250px'), String('4em')]);}catc
     }
     switch ($pyjs_dbg_2_retry) {
         case 1:
-            $pyjs_dbg_2_res=pyjslib['tuple']([String('250px'), String('4em')]);
+            $pyjs_dbg_2_res=BasicControls['VerticalPanel']();
             break;
         case 2:
             break;
@@ -58255,8 +58258,10 @@ try{var $pyjs_dbg_2_res=pyjslib['tuple']([String('250px'), String('4em')]);}catc
     }
 }return $pyjs_dbg_2_res})();
 			$pyjs.track.lineno=25;
-			panel = (function(){var $pyjs_dbg_3_retry = 0;
-try{var $pyjs_dbg_3_res=$pyjs_kwargs_call(null, BasicControls['AbsolutePanel'], null, null, [{Size:size, StyleName:StyleName}]);}catch($pyjs_dbg_3_err){
+			(function(){var $pyjs_dbg_3_retry = 0;
+try{var $pyjs_dbg_3_res=panel['setHorizontalAlignment'](((($attr1=BasicControls['HasAlignment']['ALIGN_CENTER']) !== null & ($attr2=BasicControls['HasAlignment']).__is_instance__) && typeof $attr1 == 'function'?
+						pyjslib['getattr']($attr2, 'ALIGN_CENTER'):
+						BasicControls['HasAlignment']['ALIGN_CENTER']));}catch($pyjs_dbg_3_err){
     if ($pyjs_dbg_3_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58274,7 +58279,9 @@ try{var $pyjs_dbg_3_res=$pyjs_kwargs_call(null, BasicControls['AbsolutePanel'], 
     }
     switch ($pyjs_dbg_3_retry) {
         case 1:
-            $pyjs_dbg_3_res=$pyjs_kwargs_call(null, BasicControls['AbsolutePanel'], null, null, [{Size:size, StyleName:StyleName}]);
+            $pyjs_dbg_3_res=panel['setHorizontalAlignment'](((($attr1=BasicControls['HasAlignment']['ALIGN_CENTER']) !== null & ($attr2=BasicControls['HasAlignment']).__is_instance__) && typeof $attr1 == 'function'?
+						pyjslib['getattr']($attr2, 'ALIGN_CENTER'):
+						BasicControls['HasAlignment']['ALIGN_CENTER']));
             break;
         case 2:
             break;
@@ -58283,8 +58290,8 @@ try{var $pyjs_dbg_3_res=$pyjs_kwargs_call(null, BasicControls['AbsolutePanel'], 
     }
 }return $pyjs_dbg_3_res})();
 			$pyjs.track.lineno=26;
-			file_upload = (function(){var $pyjs_dbg_4_retry = 0;
-try{var $pyjs_dbg_4_res=$pyjs_kwargs_call(null, BasicControls['FileUpload'], null, null, [{StyleName:String('file-upload')}]);}catch($pyjs_dbg_4_err){
+			size = (function(){var $pyjs_dbg_4_retry = 0;
+try{var $pyjs_dbg_4_res=pyjslib['tuple']([String('250px'), String('4em')]);}catch($pyjs_dbg_4_err){
     if ($pyjs_dbg_4_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58302,7 +58309,7 @@ try{var $pyjs_dbg_4_res=$pyjs_kwargs_call(null, BasicControls['FileUpload'], nul
     }
     switch ($pyjs_dbg_4_retry) {
         case 1:
-            $pyjs_dbg_4_res=$pyjs_kwargs_call(null, BasicControls['FileUpload'], null, null, [{StyleName:String('file-upload')}]);
+            $pyjs_dbg_4_res=pyjslib['tuple']([String('250px'), String('4em')]);
             break;
         case 2:
             break;
@@ -58311,8 +58318,8 @@ try{var $pyjs_dbg_4_res=$pyjs_kwargs_call(null, BasicControls['FileUpload'], nul
     }
 }return $pyjs_dbg_4_res})();
 			$pyjs.track.lineno=27;
-			uploaded_files = (function(){var $pyjs_dbg_5_retry = 0;
-try{var $pyjs_dbg_5_res=pyjslib['dict']([]);}catch($pyjs_dbg_5_err){
+			absolute = (function(){var $pyjs_dbg_5_retry = 0;
+try{var $pyjs_dbg_5_res=$pyjs_kwargs_call(null, BasicControls['AbsolutePanel'], null, null, [{Size:size, StyleName:StyleName}]);}catch($pyjs_dbg_5_err){
     if ($pyjs_dbg_5_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58323,14 +58330,14 @@ try{var $pyjs_dbg_5_res=pyjslib['dict']([]);}catch($pyjs_dbg_5_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line None :\n" + $pyjs_dbg_5_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 27 :\n" + $pyjs_dbg_5_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_5_retry) {
         case 1:
-            $pyjs_dbg_5_res=pyjslib['dict']([]);
+            $pyjs_dbg_5_res=$pyjs_kwargs_call(null, BasicControls['AbsolutePanel'], null, null, [{Size:size, StyleName:StyleName}]);
             break;
         case 2:
             break;
@@ -58338,9 +58345,9 @@ try{var $pyjs_dbg_5_res=pyjslib['dict']([]);}catch($pyjs_dbg_5_err){
             throw $pyjs_dbg_5_err;
     }
 }return $pyjs_dbg_5_res})();
-			$pyjs.track.lineno=30;
-			browse_list = (function(){var $pyjs_dbg_6_retry = 0;
-try{var $pyjs_dbg_6_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, null, [{StyleName:String('listbox')}]);}catch($pyjs_dbg_6_err){
+			$pyjs.track.lineno=28;
+			file_upload = (function(){var $pyjs_dbg_6_retry = 0;
+try{var $pyjs_dbg_6_res=$pyjs_kwargs_call(null, BasicControls['FileUpload'], null, null, [{StyleName:String('file-upload')}]);}catch($pyjs_dbg_6_err){
     if ($pyjs_dbg_6_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58351,14 +58358,14 @@ try{var $pyjs_dbg_6_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, 
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 30 :\n" + $pyjs_dbg_6_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 28 :\n" + $pyjs_dbg_6_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_6_retry) {
         case 1:
-            $pyjs_dbg_6_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, null, [{StyleName:String('listbox')}]);
+            $pyjs_dbg_6_res=$pyjs_kwargs_call(null, BasicControls['FileUpload'], null, null, [{StyleName:String('file-upload')}]);
             break;
         case 2:
             break;
@@ -58366,12 +58373,9 @@ try{var $pyjs_dbg_6_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, 
             throw $pyjs_dbg_6_err;
     }
 }return $pyjs_dbg_6_res})();
-			$pyjs.track.lineno=31;
-			(function(){var $pyjs_dbg_8_retry = 0;
-try{var $pyjs_dbg_8_res=pyjslib['map'](((($attr1=browse_list['addItem']) !== null & ($attr2=browse_list).__is_instance__) && typeof $attr1 == 'function'?
-						pyjslib['getattr']($attr2, 'addItem'):
-						browse_list['addItem']), (function(){var $pyjs_dbg_7_retry = 0;
-try{var $pyjs_dbg_7_res=pyjslib['list']([String('my computer'), String('my projects'), String('main library')]);}catch($pyjs_dbg_7_err){
+			$pyjs.track.lineno=29;
+			uploaded_files = (function(){var $pyjs_dbg_7_retry = 0;
+try{var $pyjs_dbg_7_res=pyjslib['dict']([]);}catch($pyjs_dbg_7_err){
     if ($pyjs_dbg_7_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58382,21 +58386,24 @@ try{var $pyjs_dbg_7_res=pyjslib['list']([String('my computer'), String('my proje
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 31 :\n" + $pyjs_dbg_7_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line None :\n" + $pyjs_dbg_7_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_7_retry) {
         case 1:
-            $pyjs_dbg_7_res=pyjslib['list']([String('my computer'), String('my projects'), String('main library')]);
+            $pyjs_dbg_7_res=pyjslib['dict']([]);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_7_err;
     }
-}return $pyjs_dbg_7_res})());}catch($pyjs_dbg_8_err){
+}return $pyjs_dbg_7_res})();
+			$pyjs.track.lineno=32;
+			browse_list = (function(){var $pyjs_dbg_8_retry = 0;
+try{var $pyjs_dbg_8_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, null, [{StyleName:String('listbox')}]);}catch($pyjs_dbg_8_err){
     if ($pyjs_dbg_8_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58407,42 +58414,14 @@ try{var $pyjs_dbg_7_res=pyjslib['list']([String('my computer'), String('my proje
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 31 :\n" + $pyjs_dbg_8_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 32 :\n" + $pyjs_dbg_8_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_8_retry) {
         case 1:
-            $pyjs_dbg_8_res=pyjslib['map'](((($attr1=browse_list['addItem']) !== null & ($attr2=browse_list).__is_instance__) && typeof $attr1 == 'function'?
-						pyjslib['getattr']($attr2, 'addItem'):
-						browse_list['addItem']), (function(){var $pyjs_dbg_7_retry = 0;
-try{var $pyjs_dbg_7_res=pyjslib['list']([String('my computer'), String('my projects'), String('main library')]);}catch($pyjs_dbg_7_err){
-    if ($pyjs_dbg_7_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 31 :\n" + $pyjs_dbg_7_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_7_retry) {
-        case 1:
-            $pyjs_dbg_7_res=pyjslib['list']([String('my computer'), String('my projects'), String('main library')]);
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_7_err;
-    }
-}return $pyjs_dbg_7_res})());
+            $pyjs_dbg_8_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, null, [{StyleName:String('listbox')}]);
             break;
         case 2:
             break;
@@ -58450,17 +58429,12 @@ try{var $pyjs_dbg_7_res=pyjslib['list']([String('my computer'), String('my proje
             throw $pyjs_dbg_8_err;
     }
 }return $pyjs_dbg_8_res})();
-			$pyjs.track.lineno=32;
-			var 			$lambda1 = function() {
-
-				$pyjs.track={module:'BasicControls',lineno:32};$pyjs.trackstack.push($pyjs.track);
-				$pyjs.track.module='BasicControls';
-				$pyjs.track.lineno=32;
-				$pyjs.track.lineno=32;
-				$pyjs.track.lineno=32;
-				var $pyjs__ret = (function(){var $pyjs_dbg_10_retry = 0;
-try{var $pyjs_dbg_10_res=file_upload['setVisible'](pyjslib['op_eq']((function(){var $pyjs_dbg_9_retry = 0;
-try{var $pyjs_dbg_9_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_9_err){
+			$pyjs.track.lineno=33;
+			(function(){var $pyjs_dbg_10_retry = 0;
+try{var $pyjs_dbg_10_res=pyjslib['map'](((($attr3=browse_list['addItem']) !== null & ($attr4=browse_list).__is_instance__) && typeof $attr3 == 'function'?
+						pyjslib['getattr']($attr4, 'addItem'):
+						browse_list['addItem']), (function(){var $pyjs_dbg_9_retry = 0;
+try{var $pyjs_dbg_9_res=pyjslib['list']([String('my computer'), String('my projects'), String('main library')]);}catch($pyjs_dbg_9_err){
     if ($pyjs_dbg_9_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58471,21 +58445,21 @@ try{var $pyjs_dbg_9_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_9_
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 32 :\n" + $pyjs_dbg_9_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 33 :\n" + $pyjs_dbg_9_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_9_retry) {
         case 1:
-            $pyjs_dbg_9_res=browse_list['getSelectedItemText']();
+            $pyjs_dbg_9_res=pyjslib['list']([String('my computer'), String('my projects'), String('main library')]);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_9_err;
     }
-}return $pyjs_dbg_9_res})().__getitem__(0), String('my computer')));}catch($pyjs_dbg_10_err){
+}return $pyjs_dbg_9_res})());}catch($pyjs_dbg_10_err){
     if ($pyjs_dbg_10_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58496,15 +58470,17 @@ try{var $pyjs_dbg_9_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_9_
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 32 :\n" + $pyjs_dbg_10_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 33 :\n" + $pyjs_dbg_10_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_10_retry) {
         case 1:
-            $pyjs_dbg_10_res=file_upload['setVisible'](pyjslib['op_eq']((function(){var $pyjs_dbg_9_retry = 0;
-try{var $pyjs_dbg_9_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_9_err){
+            $pyjs_dbg_10_res=pyjslib['map'](((($attr3=browse_list['addItem']) !== null & ($attr4=browse_list).__is_instance__) && typeof $attr3 == 'function'?
+						pyjslib['getattr']($attr4, 'addItem'):
+						browse_list['addItem']), (function(){var $pyjs_dbg_9_retry = 0;
+try{var $pyjs_dbg_9_res=pyjslib['list']([String('my computer'), String('my projects'), String('main library')]);}catch($pyjs_dbg_9_err){
     if ($pyjs_dbg_9_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58515,21 +58491,21 @@ try{var $pyjs_dbg_9_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_9_
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 32 :\n" + $pyjs_dbg_9_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 33 :\n" + $pyjs_dbg_9_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_9_retry) {
         case 1:
-            $pyjs_dbg_9_res=browse_list['getSelectedItemText']();
+            $pyjs_dbg_9_res=pyjslib['list']([String('my computer'), String('my projects'), String('main library')]);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_9_err;
     }
-}return $pyjs_dbg_9_res})().__getitem__(0), String('my computer')));
+}return $pyjs_dbg_9_res})());
             break;
         case 2:
             break;
@@ -58537,15 +58513,17 @@ try{var $pyjs_dbg_9_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_9_
             throw $pyjs_dbg_10_err;
     }
 }return $pyjs_dbg_10_res})();
-				$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
-				return $pyjs__ret;
-			};
-			$lambda1.__name__ = '$lambda1';
+			$pyjs.track.lineno=34;
+			var 			$lambda1 = function() {
 
-			$lambda1.__bind_type__ = 0;
-			$lambda1.__args__ = [null,null];
-			(function(){var $pyjs_dbg_11_retry = 0;
-try{var $pyjs_dbg_11_res=browse_list['addChangeListener']($lambda1);}catch($pyjs_dbg_11_err){
+				$pyjs.track={module:'BasicControls',lineno:34};$pyjs.trackstack.push($pyjs.track);
+				$pyjs.track.module='BasicControls';
+				$pyjs.track.lineno=34;
+				$pyjs.track.lineno=34;
+				$pyjs.track.lineno=34;
+				var $pyjs__ret = (function(){var $pyjs_dbg_12_retry = 0;
+try{var $pyjs_dbg_12_res=file_upload['setVisible'](pyjslib['op_eq']((function(){var $pyjs_dbg_11_retry = 0;
+try{var $pyjs_dbg_11_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_11_err){
     if ($pyjs_dbg_11_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58556,30 +58534,21 @@ try{var $pyjs_dbg_11_res=browse_list['addChangeListener']($lambda1);}catch($pyjs
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 32 :\n" + $pyjs_dbg_11_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 34 :\n" + $pyjs_dbg_11_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_11_retry) {
         case 1:
-            $pyjs_dbg_11_res=browse_list['addChangeListener']($lambda1);
+            $pyjs_dbg_11_res=browse_list['getSelectedItemText']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_11_err;
     }
-}return $pyjs_dbg_11_res})();
-			$pyjs.track.lineno=33;
-			browse = function(event) {
-				var box,listener,$lambda3,$add4,keyPressed,$attr3,$attr4,options,$add2,$add3,$add1,done,dialog,$sub2,input,$sub1,$lambda2;
-				$pyjs.track={module:'BasicControls',lineno:33};$pyjs.trackstack.push($pyjs.track);
-				$pyjs.track.module='BasicControls';
-				$pyjs.track.lineno=33;
-				$pyjs.track.lineno=34;
-				dialog = (function(){var $pyjs_dbg_12_retry = 0;
-try{var $pyjs_dbg_12_res=$pyjs_kwargs_call(null, BasicControls['VerticalPanel'], null, null, [{StyleName:String('browse-dialog'), Size:size}]);}catch($pyjs_dbg_12_err){
+}return $pyjs_dbg_11_res})().__getitem__(0), String('my computer')));}catch($pyjs_dbg_12_err){
     if ($pyjs_dbg_12_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58597,7 +58566,33 @@ try{var $pyjs_dbg_12_res=$pyjs_kwargs_call(null, BasicControls['VerticalPanel'],
     }
     switch ($pyjs_dbg_12_retry) {
         case 1:
-            $pyjs_dbg_12_res=$pyjs_kwargs_call(null, BasicControls['VerticalPanel'], null, null, [{StyleName:String('browse-dialog'), Size:size}]);
+            $pyjs_dbg_12_res=file_upload['setVisible'](pyjslib['op_eq']((function(){var $pyjs_dbg_11_retry = 0;
+try{var $pyjs_dbg_11_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_11_err){
+    if ($pyjs_dbg_11_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 34 :\n" + $pyjs_dbg_11_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_11_retry) {
+        case 1:
+            $pyjs_dbg_11_res=browse_list['getSelectedItemText']();
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_11_err;
+    }
+}return $pyjs_dbg_11_res})().__getitem__(0), String('my computer')));
             break;
         case 2:
             break;
@@ -58605,9 +58600,15 @@ try{var $pyjs_dbg_12_res=$pyjs_kwargs_call(null, BasicControls['VerticalPanel'],
             throw $pyjs_dbg_12_err;
     }
 }return $pyjs_dbg_12_res})();
-				$pyjs.track.lineno=35;
-				(function(){var $pyjs_dbg_13_retry = 0;
-try{var $pyjs_dbg_13_res=dialog['setSpacing'](4);}catch($pyjs_dbg_13_err){
+				$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
+				return $pyjs__ret;
+			};
+			$lambda1.__name__ = '$lambda1';
+
+			$lambda1.__bind_type__ = 0;
+			$lambda1.__args__ = [null,null];
+			(function(){var $pyjs_dbg_13_retry = 0;
+try{var $pyjs_dbg_13_res=browse_list['addChangeListener']($lambda1);}catch($pyjs_dbg_13_err){
     if ($pyjs_dbg_13_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58618,14 +58619,14 @@ try{var $pyjs_dbg_13_res=dialog['setSpacing'](4);}catch($pyjs_dbg_13_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 35 :\n" + $pyjs_dbg_13_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 34 :\n" + $pyjs_dbg_13_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_13_retry) {
         case 1:
-            $pyjs_dbg_13_res=dialog['setSpacing'](4);
+            $pyjs_dbg_13_res=browse_list['addChangeListener']($lambda1);
             break;
         case 2:
             break;
@@ -58633,11 +58634,15 @@ try{var $pyjs_dbg_13_res=dialog['setSpacing'](4);}catch($pyjs_dbg_13_err){
             throw $pyjs_dbg_13_err;
     }
 }return $pyjs_dbg_13_res})();
+			$pyjs.track.lineno=35;
+			browse = function(event) {
+				var box,listener,$lambda3,$add4,keyPressed,$attr5,$attr6,$add2,$add3,$add1,done,dialog,$sub2,input,$sub1,options,$lambda2;
+				$pyjs.track={module:'BasicControls',lineno:35};$pyjs.trackstack.push($pyjs.track);
+				$pyjs.track.module='BasicControls';
+				$pyjs.track.lineno=35;
 				$pyjs.track.lineno=36;
-				(function(){var $pyjs_dbg_14_retry = 0;
-try{var $pyjs_dbg_14_res=dialog['setHorizontalAlignment'](((($attr3=BasicControls['HasAlignment']['ALIGN_CENTER']) !== null & ($attr4=BasicControls['HasAlignment']).__is_instance__) && typeof $attr3 == 'function'?
-							pyjslib['getattr']($attr4, 'ALIGN_CENTER'):
-							BasicControls['HasAlignment']['ALIGN_CENTER']));}catch($pyjs_dbg_14_err){
+				dialog = (function(){var $pyjs_dbg_14_retry = 0;
+try{var $pyjs_dbg_14_res=$pyjs_kwargs_call(null, BasicControls['VerticalPanel'], null, null, [{StyleName:String('browse-dialog'), Size:size}]);}catch($pyjs_dbg_14_err){
     if ($pyjs_dbg_14_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58655,9 +58660,7 @@ try{var $pyjs_dbg_14_res=dialog['setHorizontalAlignment'](((($attr3=BasicControl
     }
     switch ($pyjs_dbg_14_retry) {
         case 1:
-            $pyjs_dbg_14_res=dialog['setHorizontalAlignment'](((($attr3=BasicControls['HasAlignment']['ALIGN_CENTER']) !== null & ($attr4=BasicControls['HasAlignment']).__is_instance__) && typeof $attr3 == 'function'?
-							pyjslib['getattr']($attr4, 'ALIGN_CENTER'):
-							BasicControls['HasAlignment']['ALIGN_CENTER']));
+            $pyjs_dbg_14_res=$pyjs_kwargs_call(null, BasicControls['VerticalPanel'], null, null, [{StyleName:String('browse-dialog'), Size:size}]);
             break;
         case 2:
             break;
@@ -58666,10 +58669,10 @@ try{var $pyjs_dbg_14_res=dialog['setHorizontalAlignment'](((($attr3=BasicControl
     }
 }return $pyjs_dbg_14_res})();
 				$pyjs.track.lineno=37;
-				(function(){var $pyjs_dbg_17_retry = 0;
-try{var $pyjs_dbg_17_res=dialog['add']((function(){var $pyjs_dbg_16_retry = 0;
-try{var $pyjs_dbg_16_res=BasicControls['HTML']((typeof ($add3=(typeof ($add1=String('Enter a chemical name from '))==typeof ($add2=(function(){var $pyjs_dbg_15_retry = 0;
-try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_15_err){
+				(function(){var $pyjs_dbg_15_retry = 0;
+try{var $pyjs_dbg_15_res=dialog['setHorizontalAlignment'](((($attr5=BasicControls['HasAlignment']['ALIGN_CENTER']) !== null & ($attr6=BasicControls['HasAlignment']).__is_instance__) && typeof $attr5 == 'function'?
+							pyjslib['getattr']($attr6, 'ALIGN_CENTER'):
+							BasicControls['HasAlignment']['ALIGN_CENTER']));}catch($pyjs_dbg_15_err){
     if ($pyjs_dbg_15_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58687,18 +58690,21 @@ try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_1
     }
     switch ($pyjs_dbg_15_retry) {
         case 1:
-            $pyjs_dbg_15_res=browse_list['getSelectedItemText']();
+            $pyjs_dbg_15_res=dialog['setHorizontalAlignment'](((($attr5=BasicControls['HasAlignment']['ALIGN_CENTER']) !== null & ($attr6=BasicControls['HasAlignment']).__is_instance__) && typeof $attr5 == 'function'?
+							pyjslib['getattr']($attr6, 'ALIGN_CENTER'):
+							BasicControls['HasAlignment']['ALIGN_CENTER']));
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_15_err;
     }
-}return $pyjs_dbg_15_res})().__getitem__(0)) && (typeof $add1=='number'||typeof $add1=='string')?
-					$add1+$add2:
-					pyjslib['op_add']($add1,$add2)))==typeof ($add4=String(':')) && (typeof $add3=='number'||typeof $add3=='string')?
-					$add3+$add4:
-					pyjslib['op_add']($add3,$add4)));}catch($pyjs_dbg_16_err){
+}return $pyjs_dbg_15_res})();
+				$pyjs.track.lineno=38;
+				(function(){var $pyjs_dbg_18_retry = 0;
+try{var $pyjs_dbg_18_res=dialog['add']((function(){var $pyjs_dbg_17_retry = 0;
+try{var $pyjs_dbg_17_res=BasicControls['HTML']((typeof ($add3=(typeof ($add1=String('Enter a chemical name from '))==typeof ($add2=(function(){var $pyjs_dbg_16_retry = 0;
+try{var $pyjs_dbg_16_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_16_err){
     if ($pyjs_dbg_16_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58709,51 +58715,25 @@ try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_1
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 37 :\n" + $pyjs_dbg_16_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 38 :\n" + $pyjs_dbg_16_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_16_retry) {
         case 1:
-            $pyjs_dbg_16_res=BasicControls['HTML']((typeof ($add3=(typeof ($add1=String('Enter a chemical name from '))==typeof ($add2=(function(){var $pyjs_dbg_15_retry = 0;
-try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_15_err){
-    if ($pyjs_dbg_15_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 37 :\n" + $pyjs_dbg_15_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_15_retry) {
-        case 1:
-            $pyjs_dbg_15_res=browse_list['getSelectedItemText']();
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_15_err;
-    }
-}return $pyjs_dbg_15_res})().__getitem__(0)) && (typeof $add1=='number'||typeof $add1=='string')?
-					$add1+$add2:
-					pyjslib['op_add']($add1,$add2)))==typeof ($add4=String(':')) && (typeof $add3=='number'||typeof $add3=='string')?
-					$add3+$add4:
-					pyjslib['op_add']($add3,$add4)));
+            $pyjs_dbg_16_res=browse_list['getSelectedItemText']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_16_err;
     }
-}return $pyjs_dbg_16_res})());}catch($pyjs_dbg_17_err){
+}return $pyjs_dbg_16_res})().__getitem__(0)) && (typeof $add1=='number'||typeof $add1=='string')?
+					$add1+$add2:
+					pyjslib['op_add']($add1,$add2)))==typeof ($add4=String(':')) && (typeof $add3=='number'||typeof $add3=='string')?
+					$add3+$add4:
+					pyjslib['op_add']($add3,$add4)));}catch($pyjs_dbg_17_err){
     if ($pyjs_dbg_17_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58764,45 +58744,15 @@ try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_1
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 37 :\n" + $pyjs_dbg_17_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 38 :\n" + $pyjs_dbg_17_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_17_retry) {
         case 1:
-            $pyjs_dbg_17_res=dialog['add']((function(){var $pyjs_dbg_16_retry = 0;
-try{var $pyjs_dbg_16_res=BasicControls['HTML']((typeof ($add3=(typeof ($add1=String('Enter a chemical name from '))==typeof ($add2=(function(){var $pyjs_dbg_15_retry = 0;
-try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_15_err){
-    if ($pyjs_dbg_15_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 37 :\n" + $pyjs_dbg_15_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_15_retry) {
-        case 1:
-            $pyjs_dbg_15_res=browse_list['getSelectedItemText']();
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_15_err;
-    }
-}return $pyjs_dbg_15_res})().__getitem__(0)) && (typeof $add1=='number'||typeof $add1=='string')?
-					$add1+$add2:
-					pyjslib['op_add']($add1,$add2)))==typeof ($add4=String(':')) && (typeof $add3=='number'||typeof $add3=='string')?
-					$add3+$add4:
-					pyjslib['op_add']($add3,$add4)));}catch($pyjs_dbg_16_err){
+            $pyjs_dbg_17_res=BasicControls['HTML']((typeof ($add3=(typeof ($add1=String('Enter a chemical name from '))==typeof ($add2=(function(){var $pyjs_dbg_16_retry = 0;
+try{var $pyjs_dbg_16_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_16_err){
     if ($pyjs_dbg_16_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58813,40 +58763,21 @@ try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_1
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 37 :\n" + $pyjs_dbg_16_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 38 :\n" + $pyjs_dbg_16_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_16_retry) {
         case 1:
-            $pyjs_dbg_16_res=BasicControls['HTML']((typeof ($add3=(typeof ($add1=String('Enter a chemical name from '))==typeof ($add2=(function(){var $pyjs_dbg_15_retry = 0;
-try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_15_err){
-    if ($pyjs_dbg_15_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 37 :\n" + $pyjs_dbg_15_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_15_retry) {
-        case 1:
-            $pyjs_dbg_15_res=browse_list['getSelectedItemText']();
+            $pyjs_dbg_16_res=browse_list['getSelectedItemText']();
             break;
         case 2:
             break;
         default:
-            throw $pyjs_dbg_15_err;
+            throw $pyjs_dbg_16_err;
     }
-}return $pyjs_dbg_15_res})().__getitem__(0)) && (typeof $add1=='number'||typeof $add1=='string')?
+}return $pyjs_dbg_16_res})().__getitem__(0)) && (typeof $add1=='number'||typeof $add1=='string')?
 					$add1+$add2:
 					pyjslib['op_add']($add1,$add2)))==typeof ($add4=String(':')) && (typeof $add3=='number'||typeof $add3=='string')?
 					$add3+$add4:
@@ -58855,19 +58786,9 @@ try{var $pyjs_dbg_15_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_1
         case 2:
             break;
         default:
-            throw $pyjs_dbg_16_err;
-    }
-}return $pyjs_dbg_16_res})());
-            break;
-        case 2:
-            break;
-        default:
             throw $pyjs_dbg_17_err;
     }
-}return $pyjs_dbg_17_res})();
-				$pyjs.track.lineno=38;
-				input = (function(){var $pyjs_dbg_18_retry = 0;
-try{var $pyjs_dbg_18_res=BasicControls['TextBox']();}catch($pyjs_dbg_18_err){
+}return $pyjs_dbg_17_res})());}catch($pyjs_dbg_18_err){
     if ($pyjs_dbg_18_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58885,7 +58806,93 @@ try{var $pyjs_dbg_18_res=BasicControls['TextBox']();}catch($pyjs_dbg_18_err){
     }
     switch ($pyjs_dbg_18_retry) {
         case 1:
-            $pyjs_dbg_18_res=BasicControls['TextBox']();
+            $pyjs_dbg_18_res=dialog['add']((function(){var $pyjs_dbg_17_retry = 0;
+try{var $pyjs_dbg_17_res=BasicControls['HTML']((typeof ($add3=(typeof ($add1=String('Enter a chemical name from '))==typeof ($add2=(function(){var $pyjs_dbg_16_retry = 0;
+try{var $pyjs_dbg_16_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_16_err){
+    if ($pyjs_dbg_16_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 38 :\n" + $pyjs_dbg_16_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_16_retry) {
+        case 1:
+            $pyjs_dbg_16_res=browse_list['getSelectedItemText']();
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_16_err;
+    }
+}return $pyjs_dbg_16_res})().__getitem__(0)) && (typeof $add1=='number'||typeof $add1=='string')?
+					$add1+$add2:
+					pyjslib['op_add']($add1,$add2)))==typeof ($add4=String(':')) && (typeof $add3=='number'||typeof $add3=='string')?
+					$add3+$add4:
+					pyjslib['op_add']($add3,$add4)));}catch($pyjs_dbg_17_err){
+    if ($pyjs_dbg_17_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 38 :\n" + $pyjs_dbg_17_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_17_retry) {
+        case 1:
+            $pyjs_dbg_17_res=BasicControls['HTML']((typeof ($add3=(typeof ($add1=String('Enter a chemical name from '))==typeof ($add2=(function(){var $pyjs_dbg_16_retry = 0;
+try{var $pyjs_dbg_16_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_16_err){
+    if ($pyjs_dbg_16_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 38 :\n" + $pyjs_dbg_16_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_16_retry) {
+        case 1:
+            $pyjs_dbg_16_res=browse_list['getSelectedItemText']();
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_16_err;
+    }
+}return $pyjs_dbg_16_res})().__getitem__(0)) && (typeof $add1=='number'||typeof $add1=='string')?
+					$add1+$add2:
+					pyjslib['op_add']($add1,$add2)))==typeof ($add4=String(':')) && (typeof $add3=='number'||typeof $add3=='string')?
+					$add3+$add4:
+					pyjslib['op_add']($add3,$add4)));
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_17_err;
+    }
+}return $pyjs_dbg_17_res})());
             break;
         case 2:
             break;
@@ -58894,8 +58901,8 @@ try{var $pyjs_dbg_18_res=BasicControls['TextBox']();}catch($pyjs_dbg_18_err){
     }
 }return $pyjs_dbg_18_res})();
 				$pyjs.track.lineno=39;
-				options = (function(){var $pyjs_dbg_19_retry = 0;
-try{var $pyjs_dbg_19_res=BasicControls['ListBox']();}catch($pyjs_dbg_19_err){
+				input = (function(){var $pyjs_dbg_19_retry = 0;
+try{var $pyjs_dbg_19_res=BasicControls['TextBox']();}catch($pyjs_dbg_19_err){
     if ($pyjs_dbg_19_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58913,7 +58920,7 @@ try{var $pyjs_dbg_19_res=BasicControls['ListBox']();}catch($pyjs_dbg_19_err){
     }
     switch ($pyjs_dbg_19_retry) {
         case 1:
-            $pyjs_dbg_19_res=BasicControls['ListBox']();
+            $pyjs_dbg_19_res=BasicControls['TextBox']();
             break;
         case 2:
             break;
@@ -58922,8 +58929,8 @@ try{var $pyjs_dbg_19_res=BasicControls['ListBox']();}catch($pyjs_dbg_19_err){
     }
 }return $pyjs_dbg_19_res})();
 				$pyjs.track.lineno=40;
-				(function(){var $pyjs_dbg_20_retry = 0;
-try{var $pyjs_dbg_20_res=options['setVisibleItemCount'](4);}catch($pyjs_dbg_20_err){
+				options = (function(){var $pyjs_dbg_20_retry = 0;
+try{var $pyjs_dbg_20_res=BasicControls['ListBox']();}catch($pyjs_dbg_20_err){
     if ($pyjs_dbg_20_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58941,7 +58948,7 @@ try{var $pyjs_dbg_20_res=options['setVisibleItemCount'](4);}catch($pyjs_dbg_20_e
     }
     switch ($pyjs_dbg_20_retry) {
         case 1:
-            $pyjs_dbg_20_res=options['setVisibleItemCount'](4);
+            $pyjs_dbg_20_res=BasicControls['ListBox']();
             break;
         case 2:
             break;
@@ -58951,7 +58958,7 @@ try{var $pyjs_dbg_20_res=options['setVisibleItemCount'](4);}catch($pyjs_dbg_20_e
 }return $pyjs_dbg_20_res})();
 				$pyjs.track.lineno=41;
 				(function(){var $pyjs_dbg_21_retry = 0;
-try{var $pyjs_dbg_21_res=dialog['add'](input);}catch($pyjs_dbg_21_err){
+try{var $pyjs_dbg_21_res=options['setVisibleItemCount'](4);}catch($pyjs_dbg_21_err){
     if ($pyjs_dbg_21_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58969,7 +58976,7 @@ try{var $pyjs_dbg_21_res=dialog['add'](input);}catch($pyjs_dbg_21_err){
     }
     switch ($pyjs_dbg_21_retry) {
         case 1:
-            $pyjs_dbg_21_res=dialog['add'](input);
+            $pyjs_dbg_21_res=options['setVisibleItemCount'](4);
             break;
         case 2:
             break;
@@ -58979,7 +58986,7 @@ try{var $pyjs_dbg_21_res=dialog['add'](input);}catch($pyjs_dbg_21_err){
 }return $pyjs_dbg_21_res})();
 				$pyjs.track.lineno=42;
 				(function(){var $pyjs_dbg_22_retry = 0;
-try{var $pyjs_dbg_22_res=dialog['add'](options);}catch($pyjs_dbg_22_err){
+try{var $pyjs_dbg_22_res=dialog['add'](input);}catch($pyjs_dbg_22_err){
     if ($pyjs_dbg_22_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -58997,7 +59004,7 @@ try{var $pyjs_dbg_22_res=dialog['add'](options);}catch($pyjs_dbg_22_err){
     }
     switch ($pyjs_dbg_22_retry) {
         case 1:
-            $pyjs_dbg_22_res=dialog['add'](options);
+            $pyjs_dbg_22_res=dialog['add'](input);
             break;
         case 2:
             break;
@@ -59007,7 +59014,7 @@ try{var $pyjs_dbg_22_res=dialog['add'](options);}catch($pyjs_dbg_22_err){
 }return $pyjs_dbg_22_res})();
 				$pyjs.track.lineno=43;
 				(function(){var $pyjs_dbg_23_retry = 0;
-try{var $pyjs_dbg_23_res=options['setVisible'](false);}catch($pyjs_dbg_23_err){
+try{var $pyjs_dbg_23_res=dialog['add'](options);}catch($pyjs_dbg_23_err){
     if ($pyjs_dbg_23_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59025,7 +59032,7 @@ try{var $pyjs_dbg_23_res=options['setVisible'](false);}catch($pyjs_dbg_23_err){
     }
     switch ($pyjs_dbg_23_retry) {
         case 1:
-            $pyjs_dbg_23_res=options['setVisible'](false);
+            $pyjs_dbg_23_res=dialog['add'](options);
             break;
         case 2:
             break;
@@ -59034,14 +59041,8 @@ try{var $pyjs_dbg_23_res=options['setVisible'](false);}catch($pyjs_dbg_23_err){
     }
 }return $pyjs_dbg_23_res})();
 				$pyjs.track.lineno=44;
-				keyPressed = function(self, sender, keycode, modifiers) {
-					var text,$attr5,$attr6;
-					$pyjs.track={module:'BasicControls',lineno:44};$pyjs.trackstack.push($pyjs.track);
-					$pyjs.track.module='BasicControls';
-					$pyjs.track.lineno=44;
-					$pyjs.track.lineno=45;
-					text = (function(){var $pyjs_dbg_24_retry = 0;
-try{var $pyjs_dbg_24_res=input['getText']();}catch($pyjs_dbg_24_err){
+				(function(){var $pyjs_dbg_24_retry = 0;
+try{var $pyjs_dbg_24_res=options['setVisible'](false);}catch($pyjs_dbg_24_err){
     if ($pyjs_dbg_24_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59052,14 +59053,14 @@ try{var $pyjs_dbg_24_res=input['getText']();}catch($pyjs_dbg_24_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 45 :\n" + $pyjs_dbg_24_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 44 :\n" + $pyjs_dbg_24_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_24_retry) {
         case 1:
-            $pyjs_dbg_24_res=input['getText']();
+            $pyjs_dbg_24_res=options['setVisible'](false);
             break;
         case 2:
             break;
@@ -59067,10 +59068,15 @@ try{var $pyjs_dbg_24_res=input['getText']();}catch($pyjs_dbg_24_err){
             throw $pyjs_dbg_24_err;
     }
 }return $pyjs_dbg_24_res})();
+				$pyjs.track.lineno=45;
+				keyPressed = function(self, sender, keycode, modifiers) {
+					var $attr8,text,$attr7;
+					$pyjs.track={module:'BasicControls',lineno:45};$pyjs.trackstack.push($pyjs.track);
+					$pyjs.track.module='BasicControls';
+					$pyjs.track.lineno=45;
 					$pyjs.track.lineno=46;
-					if ((function(){var $pyjs_dbg_26_retry = 0;
-try{var $pyjs_dbg_26_res=pyjslib['bool'](pyjslib['op_eq']((function(){var $pyjs_dbg_25_retry = 0;
-try{var $pyjs_dbg_25_res=pyjslib['len'](text);}catch($pyjs_dbg_25_err){
+					text = (function(){var $pyjs_dbg_25_retry = 0;
+try{var $pyjs_dbg_25_res=input['getText']();}catch($pyjs_dbg_25_err){
     if ($pyjs_dbg_25_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59088,14 +59094,18 @@ try{var $pyjs_dbg_25_res=pyjslib['len'](text);}catch($pyjs_dbg_25_err){
     }
     switch ($pyjs_dbg_25_retry) {
         case 1:
-            $pyjs_dbg_25_res=pyjslib['len'](text);
+            $pyjs_dbg_25_res=input['getText']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_25_err;
     }
-}return $pyjs_dbg_25_res})(), 5));}catch($pyjs_dbg_26_err){
+}return $pyjs_dbg_25_res})();
+					$pyjs.track.lineno=47;
+					if ((function(){var $pyjs_dbg_27_retry = 0;
+try{var $pyjs_dbg_27_res=pyjslib['bool'](pyjslib['op_eq']((function(){var $pyjs_dbg_26_retry = 0;
+try{var $pyjs_dbg_26_res=pyjslib['len'](text);}catch($pyjs_dbg_26_err){
     if ($pyjs_dbg_26_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59106,53 +59116,21 @@ try{var $pyjs_dbg_25_res=pyjslib['len'](text);}catch($pyjs_dbg_25_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 46 :\n" + $pyjs_dbg_26_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 47 :\n" + $pyjs_dbg_26_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_26_retry) {
         case 1:
-            $pyjs_dbg_26_res=pyjslib['bool'](pyjslib['op_eq']((function(){var $pyjs_dbg_25_retry = 0;
-try{var $pyjs_dbg_25_res=pyjslib['len'](text);}catch($pyjs_dbg_25_err){
-    if ($pyjs_dbg_25_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 46 :\n" + $pyjs_dbg_25_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_25_retry) {
-        case 1:
-            $pyjs_dbg_25_res=pyjslib['len'](text);
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_25_err;
-    }
-}return $pyjs_dbg_25_res})(), 5));
+            $pyjs_dbg_26_res=pyjslib['len'](text);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_26_err;
     }
-}return $pyjs_dbg_26_res})()) {
-						$pyjs.track.lineno=47;
-						(function(){var $pyjs_dbg_28_retry = 0;
-try{var $pyjs_dbg_28_res=pyjslib['map'](((($attr5=options['addItem']) !== null & ($attr6=options).__is_instance__) && typeof $attr5 == 'function'?
-									pyjslib['getattr']($attr6, 'addItem'):
-									options['addItem']), (function(){var $pyjs_dbg_27_retry = 0;
-try{var $pyjs_dbg_27_res=pyjslib['list']([String('methanol'), String('ethanol'), String('propanol'), String('butanol'), String('pentanol')]);}catch($pyjs_dbg_27_err){
+}return $pyjs_dbg_26_res})(), 5));}catch($pyjs_dbg_27_err){
     if ($pyjs_dbg_27_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59170,14 +59148,46 @@ try{var $pyjs_dbg_27_res=pyjslib['list']([String('methanol'), String('ethanol'),
     }
     switch ($pyjs_dbg_27_retry) {
         case 1:
-            $pyjs_dbg_27_res=pyjslib['list']([String('methanol'), String('ethanol'), String('propanol'), String('butanol'), String('pentanol')]);
+            $pyjs_dbg_27_res=pyjslib['bool'](pyjslib['op_eq']((function(){var $pyjs_dbg_26_retry = 0;
+try{var $pyjs_dbg_26_res=pyjslib['len'](text);}catch($pyjs_dbg_26_err){
+    if ($pyjs_dbg_26_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 47 :\n" + $pyjs_dbg_26_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_26_retry) {
+        case 1:
+            $pyjs_dbg_26_res=pyjslib['len'](text);
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_26_err;
+    }
+}return $pyjs_dbg_26_res})(), 5));
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_27_err;
     }
-}return $pyjs_dbg_27_res})());}catch($pyjs_dbg_28_err){
+}return $pyjs_dbg_27_res})()) {
+						$pyjs.track.lineno=48;
+						(function(){var $pyjs_dbg_29_retry = 0;
+try{var $pyjs_dbg_29_res=pyjslib['map'](((($attr7=options['addItem']) !== null & ($attr8=options).__is_instance__) && typeof $attr7 == 'function'?
+									pyjslib['getattr']($attr8, 'addItem'):
+									options['addItem']), (function(){var $pyjs_dbg_28_retry = 0;
+try{var $pyjs_dbg_28_res=pyjslib['list']([String('methanol'), String('ethanol'), String('propanol'), String('butanol'), String('pentanol')]);}catch($pyjs_dbg_28_err){
     if ($pyjs_dbg_28_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59188,52 +59198,21 @@ try{var $pyjs_dbg_27_res=pyjslib['list']([String('methanol'), String('ethanol'),
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 47 :\n" + $pyjs_dbg_28_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 48 :\n" + $pyjs_dbg_28_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_28_retry) {
         case 1:
-            $pyjs_dbg_28_res=pyjslib['map'](((($attr5=options['addItem']) !== null & ($attr6=options).__is_instance__) && typeof $attr5 == 'function'?
-									pyjslib['getattr']($attr6, 'addItem'):
-									options['addItem']), (function(){var $pyjs_dbg_27_retry = 0;
-try{var $pyjs_dbg_27_res=pyjslib['list']([String('methanol'), String('ethanol'), String('propanol'), String('butanol'), String('pentanol')]);}catch($pyjs_dbg_27_err){
-    if ($pyjs_dbg_27_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 47 :\n" + $pyjs_dbg_27_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_27_retry) {
-        case 1:
-            $pyjs_dbg_27_res=pyjslib['list']([String('methanol'), String('ethanol'), String('propanol'), String('butanol'), String('pentanol')]);
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_27_err;
-    }
-}return $pyjs_dbg_27_res})());
+            $pyjs_dbg_28_res=pyjslib['list']([String('methanol'), String('ethanol'), String('propanol'), String('butanol'), String('pentanol')]);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_28_err;
     }
-}return $pyjs_dbg_28_res})();
-						$pyjs.track.lineno=48;
-						(function(){var $pyjs_dbg_29_retry = 0;
-try{var $pyjs_dbg_29_res=options['setVisible'](true);}catch($pyjs_dbg_29_err){
+}return $pyjs_dbg_28_res})());}catch($pyjs_dbg_29_err){
     if ($pyjs_dbg_29_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59251,7 +59230,35 @@ try{var $pyjs_dbg_29_res=options['setVisible'](true);}catch($pyjs_dbg_29_err){
     }
     switch ($pyjs_dbg_29_retry) {
         case 1:
-            $pyjs_dbg_29_res=options['setVisible'](true);
+            $pyjs_dbg_29_res=pyjslib['map'](((($attr7=options['addItem']) !== null & ($attr8=options).__is_instance__) && typeof $attr7 == 'function'?
+									pyjslib['getattr']($attr8, 'addItem'):
+									options['addItem']), (function(){var $pyjs_dbg_28_retry = 0;
+try{var $pyjs_dbg_28_res=pyjslib['list']([String('methanol'), String('ethanol'), String('propanol'), String('butanol'), String('pentanol')]);}catch($pyjs_dbg_28_err){
+    if ($pyjs_dbg_28_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 48 :\n" + $pyjs_dbg_28_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_28_retry) {
+        case 1:
+            $pyjs_dbg_28_res=pyjslib['list']([String('methanol'), String('ethanol'), String('propanol'), String('butanol'), String('pentanol')]);
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_28_err;
+    }
+}return $pyjs_dbg_28_res})());
             break;
         case 2:
             break;
@@ -59259,10 +59266,9 @@ try{var $pyjs_dbg_29_res=options['setVisible'](true);}catch($pyjs_dbg_29_err){
             throw $pyjs_dbg_29_err;
     }
 }return $pyjs_dbg_29_res})();
-					}
-					else if ((function(){var $pyjs_dbg_31_retry = 0;
-try{var $pyjs_dbg_31_res=pyjslib['bool']((pyjslib['cmp']((function(){var $pyjs_dbg_30_retry = 0;
-try{var $pyjs_dbg_30_res=pyjslib['len'](text);}catch($pyjs_dbg_30_err){
+						$pyjs.track.lineno=49;
+						(function(){var $pyjs_dbg_30_retry = 0;
+try{var $pyjs_dbg_30_res=options['setVisible'](true);}catch($pyjs_dbg_30_err){
     if ($pyjs_dbg_30_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59280,14 +59286,18 @@ try{var $pyjs_dbg_30_res=pyjslib['len'](text);}catch($pyjs_dbg_30_err){
     }
     switch ($pyjs_dbg_30_retry) {
         case 1:
-            $pyjs_dbg_30_res=pyjslib['len'](text);
+            $pyjs_dbg_30_res=options['setVisible'](true);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_30_err;
     }
-}return $pyjs_dbg_30_res})(), 5) == 1));}catch($pyjs_dbg_31_err){
+}return $pyjs_dbg_30_res})();
+					}
+					else if ((function(){var $pyjs_dbg_32_retry = 0;
+try{var $pyjs_dbg_32_res=pyjslib['bool']((pyjslib['cmp']((function(){var $pyjs_dbg_31_retry = 0;
+try{var $pyjs_dbg_31_res=pyjslib['len'](text);}catch($pyjs_dbg_31_err){
     if ($pyjs_dbg_31_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59298,50 +59308,21 @@ try{var $pyjs_dbg_30_res=pyjslib['len'](text);}catch($pyjs_dbg_30_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 49 :\n" + $pyjs_dbg_31_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 50 :\n" + $pyjs_dbg_31_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_31_retry) {
         case 1:
-            $pyjs_dbg_31_res=pyjslib['bool']((pyjslib['cmp']((function(){var $pyjs_dbg_30_retry = 0;
-try{var $pyjs_dbg_30_res=pyjslib['len'](text);}catch($pyjs_dbg_30_err){
-    if ($pyjs_dbg_30_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 49 :\n" + $pyjs_dbg_30_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_30_retry) {
-        case 1:
-            $pyjs_dbg_30_res=pyjslib['len'](text);
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_30_err;
-    }
-}return $pyjs_dbg_30_res})(), 5) == 1));
+            $pyjs_dbg_31_res=pyjslib['len'](text);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_31_err;
     }
-}return $pyjs_dbg_31_res})()) {
-						$pyjs.track.lineno=50;
-						(function(){var $pyjs_dbg_32_retry = 0;
-try{var $pyjs_dbg_32_res=options['addItem'](text);}catch($pyjs_dbg_32_err){
+}return $pyjs_dbg_31_res})(), 5) == 1));}catch($pyjs_dbg_32_err){
     if ($pyjs_dbg_32_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59359,25 +59340,43 @@ try{var $pyjs_dbg_32_res=options['addItem'](text);}catch($pyjs_dbg_32_err){
     }
     switch ($pyjs_dbg_32_retry) {
         case 1:
-            $pyjs_dbg_32_res=options['addItem'](text);
+            $pyjs_dbg_32_res=pyjslib['bool']((pyjslib['cmp']((function(){var $pyjs_dbg_31_retry = 0;
+try{var $pyjs_dbg_31_res=pyjslib['len'](text);}catch($pyjs_dbg_31_err){
+    if ($pyjs_dbg_31_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 50 :\n" + $pyjs_dbg_31_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_31_retry) {
+        case 1:
+            $pyjs_dbg_31_res=pyjslib['len'](text);
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_31_err;
+    }
+}return $pyjs_dbg_31_res})(), 5) == 1));
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_32_err;
     }
-}return $pyjs_dbg_32_res})();
-					}
-					$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
-					return null;
-				};
-				keyPressed.__name__ = 'keyPressed';
-
-				keyPressed.__bind_type__ = 0;
-				keyPressed.__args__ = [null,null,['self'],['sender'],['keycode'],['modifiers']];
-				$pyjs.track.lineno=51;
-				box = (function(){var $pyjs_dbg_33_retry = 0;
-try{var $pyjs_dbg_33_res=BasicControls['DialogBox']();}catch($pyjs_dbg_33_err){
+}return $pyjs_dbg_32_res})()) {
+						$pyjs.track.lineno=51;
+						(function(){var $pyjs_dbg_33_retry = 0;
+try{var $pyjs_dbg_33_res=options['addItem'](text);}catch($pyjs_dbg_33_err){
     if ($pyjs_dbg_33_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59395,7 +59394,7 @@ try{var $pyjs_dbg_33_res=BasicControls['DialogBox']();}catch($pyjs_dbg_33_err){
     }
     switch ($pyjs_dbg_33_retry) {
         case 1:
-            $pyjs_dbg_33_res=BasicControls['DialogBox']();
+            $pyjs_dbg_33_res=options['addItem'](text);
             break;
         case 2:
             break;
@@ -59403,15 +59402,17 @@ try{var $pyjs_dbg_33_res=BasicControls['DialogBox']();}catch($pyjs_dbg_33_err){
             throw $pyjs_dbg_33_err;
     }
 }return $pyjs_dbg_33_res})();
+					}
+					$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
+					return null;
+				};
+				keyPressed.__name__ = 'keyPressed';
+
+				keyPressed.__bind_type__ = 0;
+				keyPressed.__args__ = [null,null,['self'],['sender'],['keycode'],['modifiers']];
 				$pyjs.track.lineno=52;
-				done = function() {
-					var selected;
-					$pyjs.track={module:'BasicControls',lineno:52};$pyjs.trackstack.push($pyjs.track);
-					$pyjs.track.module='BasicControls';
-					$pyjs.track.lineno=52;
-					$pyjs.track.lineno=53;
-					selected = (function(){var $pyjs_dbg_34_retry = 0;
-try{var $pyjs_dbg_34_res=options['getSelectedItemText']();}catch($pyjs_dbg_34_err){
+				box = (function(){var $pyjs_dbg_34_retry = 0;
+try{var $pyjs_dbg_34_res=BasicControls['DialogBox']();}catch($pyjs_dbg_34_err){
     if ($pyjs_dbg_34_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59422,14 +59423,14 @@ try{var $pyjs_dbg_34_res=options['getSelectedItemText']();}catch($pyjs_dbg_34_er
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 53 :\n" + $pyjs_dbg_34_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 52 :\n" + $pyjs_dbg_34_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_34_retry) {
         case 1:
-            $pyjs_dbg_34_res=options['getSelectedItemText']();
+            $pyjs_dbg_34_res=BasicControls['DialogBox']();
             break;
         case 2:
             break;
@@ -59437,9 +59438,15 @@ try{var $pyjs_dbg_34_res=options['getSelectedItemText']();}catch($pyjs_dbg_34_er
             throw $pyjs_dbg_34_err;
     }
 }return $pyjs_dbg_34_res})();
+				$pyjs.track.lineno=53;
+				done = function() {
+					var selected,$add6,$add7,$add12,$add5,$add10,$add8,$add9,$add11;
+					$pyjs.track={module:'BasicControls',lineno:53};$pyjs.trackstack.push($pyjs.track);
+					$pyjs.track.module='BasicControls';
+					$pyjs.track.lineno=53;
 					$pyjs.track.lineno=54;
-					if ((function(){var $pyjs_dbg_35_retry = 0;
-try{var $pyjs_dbg_35_res=pyjslib['bool'](selected);}catch($pyjs_dbg_35_err){
+					selected = (function(){var $pyjs_dbg_35_retry = 0;
+try{var $pyjs_dbg_35_res=options['getSelectedItemText']();}catch($pyjs_dbg_35_err){
     if ($pyjs_dbg_35_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59457,18 +59464,17 @@ try{var $pyjs_dbg_35_res=pyjslib['bool'](selected);}catch($pyjs_dbg_35_err){
     }
     switch ($pyjs_dbg_35_retry) {
         case 1:
-            $pyjs_dbg_35_res=pyjslib['bool'](selected);
+            $pyjs_dbg_35_res=options['getSelectedItemText']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_35_err;
     }
-}return $pyjs_dbg_35_res})()) {
-						$pyjs.track.lineno=54;
-						(function(){var $pyjs_dbg_37_retry = 0;
-try{var $pyjs_dbg_37_res=BasicControls['Window']['alert']((function(){var $pyjs_dbg_36_retry = 0;
-try{var $pyjs_dbg_36_res=options['getSelectedItemText']();}catch($pyjs_dbg_36_err){
+}return $pyjs_dbg_35_res})();
+					$pyjs.track.lineno=55;
+					if ((function(){var $pyjs_dbg_36_retry = 0;
+try{var $pyjs_dbg_36_res=pyjslib['bool'](selected);}catch($pyjs_dbg_36_err){
     if ($pyjs_dbg_36_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59479,21 +59485,26 @@ try{var $pyjs_dbg_36_res=options['getSelectedItemText']();}catch($pyjs_dbg_36_er
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 54 :\n" + $pyjs_dbg_36_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 55 :\n" + $pyjs_dbg_36_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_36_retry) {
         case 1:
-            $pyjs_dbg_36_res=options['getSelectedItemText']();
+            $pyjs_dbg_36_res=pyjslib['bool'](selected);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_36_err;
     }
-}return $pyjs_dbg_36_res})().__getitem__(0));}catch($pyjs_dbg_37_err){
+}return $pyjs_dbg_36_res})()) {
+						$pyjs.track.lineno=56;
+						(function(){var $pyjs_dbg_39_retry = 0;
+try{var $pyjs_dbg_39_res=panel['add']((function(){var $pyjs_dbg_38_retry = 0;
+try{var $pyjs_dbg_38_res=BasicControls['HTML']((typeof ($add11=(typeof ($add9=(typeof ($add7=(typeof ($add5=String('\x3Ci\x3E'))==typeof ($add6=(function(){var $pyjs_dbg_37_retry = 0;
+try{var $pyjs_dbg_37_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_37_err){
     if ($pyjs_dbg_37_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59504,51 +59515,29 @@ try{var $pyjs_dbg_36_res=options['getSelectedItemText']();}catch($pyjs_dbg_36_er
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 54 :\n" + $pyjs_dbg_37_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 56 :\n" + $pyjs_dbg_37_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_37_retry) {
         case 1:
-            $pyjs_dbg_37_res=BasicControls['Window']['alert']((function(){var $pyjs_dbg_36_retry = 0;
-try{var $pyjs_dbg_36_res=options['getSelectedItemText']();}catch($pyjs_dbg_36_err){
-    if ($pyjs_dbg_36_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 54 :\n" + $pyjs_dbg_36_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_36_retry) {
-        case 1:
-            $pyjs_dbg_36_res=options['getSelectedItemText']();
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_36_err;
-    }
-}return $pyjs_dbg_36_res})().__getitem__(0));
+            $pyjs_dbg_37_res=browse_list['getSelectedItemText']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_37_err;
     }
-}return $pyjs_dbg_37_res})();
-					}
-					$pyjs.track.lineno=55;
-					(function(){var $pyjs_dbg_38_retry = 0;
-try{var $pyjs_dbg_38_res=box['hide']();}catch($pyjs_dbg_38_err){
+}return $pyjs_dbg_37_res})().__getitem__(0)) && (typeof $add5=='number'||typeof $add5=='string')?
+							$add5+$add6:
+							pyjslib['op_add']($add5,$add6)))==typeof ($add8=String(': ')) && (typeof $add7=='number'||typeof $add7=='string')?
+							$add7+$add8:
+							pyjslib['op_add']($add7,$add8)))==typeof ($add10=selected.__getitem__(0)) && (typeof $add9=='number'||typeof $add9=='string')?
+							$add9+$add10:
+							pyjslib['op_add']($add9,$add10)))==typeof ($add12=String('\x3C/i\x3E')) && (typeof $add11=='number'||typeof $add11=='string')?
+							$add11+$add12:
+							pyjslib['op_add']($add11,$add12)));}catch($pyjs_dbg_38_err){
     if ($pyjs_dbg_38_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59559,33 +59548,55 @@ try{var $pyjs_dbg_38_res=box['hide']();}catch($pyjs_dbg_38_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 55 :\n" + $pyjs_dbg_38_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 56 :\n" + $pyjs_dbg_38_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_38_retry) {
         case 1:
-            $pyjs_dbg_38_res=box['hide']();
+            $pyjs_dbg_38_res=BasicControls['HTML']((typeof ($add11=(typeof ($add9=(typeof ($add7=(typeof ($add5=String('\x3Ci\x3E'))==typeof ($add6=(function(){var $pyjs_dbg_37_retry = 0;
+try{var $pyjs_dbg_37_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_37_err){
+    if ($pyjs_dbg_37_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 56 :\n" + $pyjs_dbg_37_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_37_retry) {
+        case 1:
+            $pyjs_dbg_37_res=browse_list['getSelectedItemText']();
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_37_err;
+    }
+}return $pyjs_dbg_37_res})().__getitem__(0)) && (typeof $add5=='number'||typeof $add5=='string')?
+							$add5+$add6:
+							pyjslib['op_add']($add5,$add6)))==typeof ($add8=String(': ')) && (typeof $add7=='number'||typeof $add7=='string')?
+							$add7+$add8:
+							pyjslib['op_add']($add7,$add8)))==typeof ($add10=selected.__getitem__(0)) && (typeof $add9=='number'||typeof $add9=='string')?
+							$add9+$add10:
+							pyjslib['op_add']($add9,$add10)))==typeof ($add12=String('\x3C/i\x3E')) && (typeof $add11=='number'||typeof $add11=='string')?
+							$add11+$add12:
+							pyjslib['op_add']($add11,$add12)));
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_38_err;
     }
-}return $pyjs_dbg_38_res})();
-					$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
-					return null;
-				};
-				done.__name__ = 'done';
-
-				done.__bind_type__ = 0;
-				done.__args__ = [null,null];
-				$pyjs.track.lineno=56;
-				dialog.onClick = done;
-				$pyjs.track.lineno=57;
-				listener = (function(){var $pyjs_dbg_39_retry = 0;
-try{var $pyjs_dbg_39_res=pyjslib['object']();}catch($pyjs_dbg_39_err){
+}return $pyjs_dbg_38_res})());}catch($pyjs_dbg_39_err){
     if ($pyjs_dbg_39_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59596,14 +59607,108 @@ try{var $pyjs_dbg_39_res=pyjslib['object']();}catch($pyjs_dbg_39_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 57 :\n" + $pyjs_dbg_39_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 56 :\n" + $pyjs_dbg_39_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_39_retry) {
         case 1:
-            $pyjs_dbg_39_res=pyjslib['object']();
+            $pyjs_dbg_39_res=panel['add']((function(){var $pyjs_dbg_38_retry = 0;
+try{var $pyjs_dbg_38_res=BasicControls['HTML']((typeof ($add11=(typeof ($add9=(typeof ($add7=(typeof ($add5=String('\x3Ci\x3E'))==typeof ($add6=(function(){var $pyjs_dbg_37_retry = 0;
+try{var $pyjs_dbg_37_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_37_err){
+    if ($pyjs_dbg_37_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 56 :\n" + $pyjs_dbg_37_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_37_retry) {
+        case 1:
+            $pyjs_dbg_37_res=browse_list['getSelectedItemText']();
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_37_err;
+    }
+}return $pyjs_dbg_37_res})().__getitem__(0)) && (typeof $add5=='number'||typeof $add5=='string')?
+							$add5+$add6:
+							pyjslib['op_add']($add5,$add6)))==typeof ($add8=String(': ')) && (typeof $add7=='number'||typeof $add7=='string')?
+							$add7+$add8:
+							pyjslib['op_add']($add7,$add8)))==typeof ($add10=selected.__getitem__(0)) && (typeof $add9=='number'||typeof $add9=='string')?
+							$add9+$add10:
+							pyjslib['op_add']($add9,$add10)))==typeof ($add12=String('\x3C/i\x3E')) && (typeof $add11=='number'||typeof $add11=='string')?
+							$add11+$add12:
+							pyjslib['op_add']($add11,$add12)));}catch($pyjs_dbg_38_err){
+    if ($pyjs_dbg_38_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 56 :\n" + $pyjs_dbg_38_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_38_retry) {
+        case 1:
+            $pyjs_dbg_38_res=BasicControls['HTML']((typeof ($add11=(typeof ($add9=(typeof ($add7=(typeof ($add5=String('\x3Ci\x3E'))==typeof ($add6=(function(){var $pyjs_dbg_37_retry = 0;
+try{var $pyjs_dbg_37_res=browse_list['getSelectedItemText']();}catch($pyjs_dbg_37_err){
+    if ($pyjs_dbg_37_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 56 :\n" + $pyjs_dbg_37_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_37_retry) {
+        case 1:
+            $pyjs_dbg_37_res=browse_list['getSelectedItemText']();
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_37_err;
+    }
+}return $pyjs_dbg_37_res})().__getitem__(0)) && (typeof $add5=='number'||typeof $add5=='string')?
+							$add5+$add6:
+							pyjslib['op_add']($add5,$add6)))==typeof ($add8=String(': ')) && (typeof $add7=='number'||typeof $add7=='string')?
+							$add7+$add8:
+							pyjslib['op_add']($add7,$add8)))==typeof ($add10=selected.__getitem__(0)) && (typeof $add9=='number'||typeof $add9=='string')?
+							$add9+$add10:
+							pyjslib['op_add']($add9,$add10)))==typeof ($add12=String('\x3C/i\x3E')) && (typeof $add11=='number'||typeof $add11=='string')?
+							$add11+$add12:
+							pyjslib['op_add']($add11,$add12)));
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_38_err;
+    }
+}return $pyjs_dbg_38_res})());
             break;
         case 2:
             break;
@@ -59611,45 +59716,10 @@ try{var $pyjs_dbg_39_res=pyjslib['object']();}catch($pyjs_dbg_39_err){
             throw $pyjs_dbg_39_err;
     }
 }return $pyjs_dbg_39_res})();
-				$pyjs.track.lineno=58;
-				var 				$lambda2 = function() {
-
-					$pyjs.track={module:'BasicControls',lineno:58};$pyjs.trackstack.push($pyjs.track);
-					$pyjs.track.module='BasicControls';
-					$pyjs.track.lineno=58;
-					$pyjs.track.lineno=58;
-					$pyjs.track.lineno=58;
-					var $pyjs__ret = null;
-					$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
-					return $pyjs__ret;
-				};
-				$lambda2.__name__ = '$lambda2';
-
-				$lambda2.__bind_type__ = 0;
-				$lambda2.__args__ = [null,null];
-				listener.onKeyPress = $lambda2;
-				$pyjs.track.lineno=59;
-				listener.onKeyUp = keyPressed;
-				$pyjs.track.lineno=60;
-				var 				$lambda3 = function() {
-
-					$pyjs.track={module:'BasicControls',lineno:60};$pyjs.trackstack.push($pyjs.track);
-					$pyjs.track.module='BasicControls';
-					$pyjs.track.lineno=60;
-					$pyjs.track.lineno=60;
-					$pyjs.track.lineno=60;
-					var $pyjs__ret = null;
-					$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
-					return $pyjs__ret;
-				};
-				$lambda3.__name__ = '$lambda3';
-
-				$lambda3.__bind_type__ = 0;
-				$lambda3.__args__ = [null,null];
-				listener.onKeyDown = $lambda3;
-				$pyjs.track.lineno=61;
-				(function(){var $pyjs_dbg_40_retry = 0;
-try{var $pyjs_dbg_40_res=input['addKeyboardListener'](listener);}catch($pyjs_dbg_40_err){
+					}
+					$pyjs.track.lineno=57;
+					(function(){var $pyjs_dbg_40_retry = 0;
+try{var $pyjs_dbg_40_res=box['hide']();}catch($pyjs_dbg_40_err){
     if ($pyjs_dbg_40_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59660,14 +59730,14 @@ try{var $pyjs_dbg_40_res=input['addKeyboardListener'](listener);}catch($pyjs_dbg
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 61 :\n" + $pyjs_dbg_40_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 57 :\n" + $pyjs_dbg_40_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_40_retry) {
         case 1:
-            $pyjs_dbg_40_res=input['addKeyboardListener'](listener);
+            $pyjs_dbg_40_res=box['hide']();
             break;
         case 2:
             break;
@@ -59675,10 +59745,18 @@ try{var $pyjs_dbg_40_res=input['addKeyboardListener'](listener);}catch($pyjs_dbg
             throw $pyjs_dbg_40_err;
     }
 }return $pyjs_dbg_40_res})();
-				$pyjs.track.lineno=62;
-				(function(){var $pyjs_dbg_42_retry = 0;
-try{var $pyjs_dbg_42_res=dialog['add']((function(){var $pyjs_dbg_41_retry = 0;
-try{var $pyjs_dbg_41_res=BasicControls['Button'](String('Done'), dialog);}catch($pyjs_dbg_41_err){
+					$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
+					return null;
+				};
+				done.__name__ = 'done';
+
+				done.__bind_type__ = 0;
+				done.__args__ = [null,null];
+				$pyjs.track.lineno=58;
+				dialog.onClick = done;
+				$pyjs.track.lineno=59;
+				listener = (function(){var $pyjs_dbg_41_retry = 0;
+try{var $pyjs_dbg_41_res=pyjslib['object']();}catch($pyjs_dbg_41_err){
     if ($pyjs_dbg_41_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59689,21 +59767,60 @@ try{var $pyjs_dbg_41_res=BasicControls['Button'](String('Done'), dialog);}catch(
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 62 :\n" + $pyjs_dbg_41_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 59 :\n" + $pyjs_dbg_41_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_41_retry) {
         case 1:
-            $pyjs_dbg_41_res=BasicControls['Button'](String('Done'), dialog);
+            $pyjs_dbg_41_res=pyjslib['object']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_41_err;
     }
-}return $pyjs_dbg_41_res})());}catch($pyjs_dbg_42_err){
+}return $pyjs_dbg_41_res})();
+				$pyjs.track.lineno=60;
+				var 				$lambda2 = function() {
+
+					$pyjs.track={module:'BasicControls',lineno:60};$pyjs.trackstack.push($pyjs.track);
+					$pyjs.track.module='BasicControls';
+					$pyjs.track.lineno=60;
+					$pyjs.track.lineno=60;
+					$pyjs.track.lineno=60;
+					var $pyjs__ret = null;
+					$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
+					return $pyjs__ret;
+				};
+				$lambda2.__name__ = '$lambda2';
+
+				$lambda2.__bind_type__ = 0;
+				$lambda2.__args__ = [null,null];
+				listener.onKeyPress = $lambda2;
+				$pyjs.track.lineno=61;
+				listener.onKeyUp = keyPressed;
+				$pyjs.track.lineno=62;
+				var 				$lambda3 = function() {
+
+					$pyjs.track={module:'BasicControls',lineno:62};$pyjs.trackstack.push($pyjs.track);
+					$pyjs.track.module='BasicControls';
+					$pyjs.track.lineno=62;
+					$pyjs.track.lineno=62;
+					$pyjs.track.lineno=62;
+					var $pyjs__ret = null;
+					$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
+					return $pyjs__ret;
+				};
+				$lambda3.__name__ = '$lambda3';
+
+				$lambda3.__bind_type__ = 0;
+				$lambda3.__args__ = [null,null];
+				listener.onKeyDown = $lambda3;
+				$pyjs.track.lineno=63;
+				(function(){var $pyjs_dbg_42_retry = 0;
+try{var $pyjs_dbg_42_res=input['addKeyboardListener'](listener);}catch($pyjs_dbg_42_err){
     if ($pyjs_dbg_42_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59714,40 +59831,14 @@ try{var $pyjs_dbg_41_res=BasicControls['Button'](String('Done'), dialog);}catch(
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 62 :\n" + $pyjs_dbg_42_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 63 :\n" + $pyjs_dbg_42_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_42_retry) {
         case 1:
-            $pyjs_dbg_42_res=dialog['add']((function(){var $pyjs_dbg_41_retry = 0;
-try{var $pyjs_dbg_41_res=BasicControls['Button'](String('Done'), dialog);}catch($pyjs_dbg_41_err){
-    if ($pyjs_dbg_41_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 62 :\n" + $pyjs_dbg_41_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_41_retry) {
-        case 1:
-            $pyjs_dbg_41_res=BasicControls['Button'](String('Done'), dialog);
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_41_err;
-    }
-}return $pyjs_dbg_41_res})());
+            $pyjs_dbg_42_res=input['addKeyboardListener'](listener);
             break;
         case 2:
             break;
@@ -59755,9 +59846,10 @@ try{var $pyjs_dbg_41_res=BasicControls['Button'](String('Done'), dialog);}catch(
             throw $pyjs_dbg_42_err;
     }
 }return $pyjs_dbg_42_res})();
-				$pyjs.track.lineno=63;
-				(function(){var $pyjs_dbg_43_retry = 0;
-try{var $pyjs_dbg_43_res=dialog['setWidth'](String('100%'));}catch($pyjs_dbg_43_err){
+				$pyjs.track.lineno=64;
+				(function(){var $pyjs_dbg_44_retry = 0;
+try{var $pyjs_dbg_44_res=dialog['add']((function(){var $pyjs_dbg_43_retry = 0;
+try{var $pyjs_dbg_43_res=BasicControls['Button'](String('Done'), dialog);}catch($pyjs_dbg_43_err){
     if ($pyjs_dbg_43_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59768,24 +59860,21 @@ try{var $pyjs_dbg_43_res=dialog['setWidth'](String('100%'));}catch($pyjs_dbg_43_
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 63 :\n" + $pyjs_dbg_43_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 64 :\n" + $pyjs_dbg_43_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_43_retry) {
         case 1:
-            $pyjs_dbg_43_res=dialog['setWidth'](String('100%'));
+            $pyjs_dbg_43_res=BasicControls['Button'](String('Done'), dialog);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_43_err;
     }
-}return $pyjs_dbg_43_res})();
-				$pyjs.track.lineno=64;
-				(function(){var $pyjs_dbg_44_retry = 0;
-try{var $pyjs_dbg_44_res=box['setWidget'](dialog);}catch($pyjs_dbg_44_err){
+}return $pyjs_dbg_43_res})());}catch($pyjs_dbg_44_err){
     if ($pyjs_dbg_44_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59803,7 +59892,33 @@ try{var $pyjs_dbg_44_res=box['setWidget'](dialog);}catch($pyjs_dbg_44_err){
     }
     switch ($pyjs_dbg_44_retry) {
         case 1:
-            $pyjs_dbg_44_res=box['setWidget'](dialog);
+            $pyjs_dbg_44_res=dialog['add']((function(){var $pyjs_dbg_43_retry = 0;
+try{var $pyjs_dbg_43_res=BasicControls['Button'](String('Done'), dialog);}catch($pyjs_dbg_43_err){
+    if ($pyjs_dbg_43_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 64 :\n" + $pyjs_dbg_43_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_43_retry) {
+        case 1:
+            $pyjs_dbg_43_res=BasicControls['Button'](String('Done'), dialog);
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_43_err;
+    }
+}return $pyjs_dbg_43_res})());
             break;
         case 2:
             break;
@@ -59812,9 +59927,8 @@ try{var $pyjs_dbg_44_res=box['setWidget'](dialog);}catch($pyjs_dbg_44_err){
     }
 }return $pyjs_dbg_44_res})();
 				$pyjs.track.lineno=65;
-				(function(){var $pyjs_dbg_47_retry = 0;
-try{var $pyjs_dbg_47_res=box['setPopupPosition']((function(){var $pyjs_dbg_45_retry = 0;
-try{var $pyjs_dbg_45_res=panel['getAbsoluteLeft']();}catch($pyjs_dbg_45_err){
+				(function(){var $pyjs_dbg_45_retry = 0;
+try{var $pyjs_dbg_45_res=dialog['setWidth'](String('100%'));}catch($pyjs_dbg_45_err){
     if ($pyjs_dbg_45_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59832,15 +59946,17 @@ try{var $pyjs_dbg_45_res=panel['getAbsoluteLeft']();}catch($pyjs_dbg_45_err){
     }
     switch ($pyjs_dbg_45_retry) {
         case 1:
-            $pyjs_dbg_45_res=panel['getAbsoluteLeft']();
+            $pyjs_dbg_45_res=dialog['setWidth'](String('100%'));
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_45_err;
     }
-}return $pyjs_dbg_45_res})(), (typeof ($sub1=(function(){var $pyjs_dbg_46_retry = 0;
-try{var $pyjs_dbg_46_res=panel['getAbsoluteTop']();}catch($pyjs_dbg_46_err){
+}return $pyjs_dbg_45_res})();
+				$pyjs.track.lineno=66;
+				(function(){var $pyjs_dbg_46_retry = 0;
+try{var $pyjs_dbg_46_res=box['setWidget'](dialog);}catch($pyjs_dbg_46_err){
     if ($pyjs_dbg_46_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59851,23 +59967,25 @@ try{var $pyjs_dbg_46_res=panel['getAbsoluteTop']();}catch($pyjs_dbg_46_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 65 :\n" + $pyjs_dbg_46_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 66 :\n" + $pyjs_dbg_46_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_46_retry) {
         case 1:
-            $pyjs_dbg_46_res=panel['getAbsoluteTop']();
+            $pyjs_dbg_46_res=box['setWidget'](dialog);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_46_err;
     }
-}return $pyjs_dbg_46_res})())==typeof ($sub2=10) && (typeof $sub1=='number'||typeof $sub1=='string')?
-					$sub1-$sub2:
-					pyjslib['op_sub']($sub1,$sub2)));}catch($pyjs_dbg_47_err){
+}return $pyjs_dbg_46_res})();
+				$pyjs.track.lineno=67;
+				(function(){var $pyjs_dbg_49_retry = 0;
+try{var $pyjs_dbg_49_res=box['setPopupPosition']((function(){var $pyjs_dbg_47_retry = 0;
+try{var $pyjs_dbg_47_res=absolute['getAbsoluteLeft']();}catch($pyjs_dbg_47_err){
     if ($pyjs_dbg_47_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59878,78 +59996,22 @@ try{var $pyjs_dbg_46_res=panel['getAbsoluteTop']();}catch($pyjs_dbg_46_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 65 :\n" + $pyjs_dbg_47_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 67 :\n" + $pyjs_dbg_47_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_47_retry) {
         case 1:
-            $pyjs_dbg_47_res=box['setPopupPosition']((function(){var $pyjs_dbg_45_retry = 0;
-try{var $pyjs_dbg_45_res=panel['getAbsoluteLeft']();}catch($pyjs_dbg_45_err){
-    if ($pyjs_dbg_45_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 65 :\n" + $pyjs_dbg_45_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_45_retry) {
-        case 1:
-            $pyjs_dbg_45_res=panel['getAbsoluteLeft']();
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_45_err;
-    }
-}return $pyjs_dbg_45_res})(), (typeof ($sub1=(function(){var $pyjs_dbg_46_retry = 0;
-try{var $pyjs_dbg_46_res=panel['getAbsoluteTop']();}catch($pyjs_dbg_46_err){
-    if ($pyjs_dbg_46_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 65 :\n" + $pyjs_dbg_46_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_46_retry) {
-        case 1:
-            $pyjs_dbg_46_res=panel['getAbsoluteTop']();
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_46_err;
-    }
-}return $pyjs_dbg_46_res})())==typeof ($sub2=10) && (typeof $sub1=='number'||typeof $sub1=='string')?
-					$sub1-$sub2:
-					pyjslib['op_sub']($sub1,$sub2)));
+            $pyjs_dbg_47_res=absolute['getAbsoluteLeft']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_47_err;
     }
-}return $pyjs_dbg_47_res})();
-				$pyjs.track.lineno=66;
-				(function(){var $pyjs_dbg_48_retry = 0;
-try{var $pyjs_dbg_48_res=box['show']();}catch($pyjs_dbg_48_err){
+}return $pyjs_dbg_47_res})(), (typeof ($sub1=(function(){var $pyjs_dbg_48_retry = 0;
+try{var $pyjs_dbg_48_res=absolute['getAbsoluteTop']();}catch($pyjs_dbg_48_err){
     if ($pyjs_dbg_48_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59960,31 +60022,23 @@ try{var $pyjs_dbg_48_res=box['show']();}catch($pyjs_dbg_48_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 66 :\n" + $pyjs_dbg_48_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 67 :\n" + $pyjs_dbg_48_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_48_retry) {
         case 1:
-            $pyjs_dbg_48_res=box['show']();
+            $pyjs_dbg_48_res=absolute['getAbsoluteTop']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_48_err;
     }
-}return $pyjs_dbg_48_res})();
-				$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
-				return null;
-			};
-			browse.__name__ = 'browse';
-
-			browse.__bind_type__ = 0;
-			browse.__args__ = [null,null,['event']];
-			$pyjs.track.lineno=69;
-			compare_list = (function(){var $pyjs_dbg_49_retry = 0;
-try{var $pyjs_dbg_49_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, null, [{StyleName:String('listbox')}]);}catch($pyjs_dbg_49_err){
+}return $pyjs_dbg_48_res})())==typeof ($sub2=10) && (typeof $sub1=='number'||typeof $sub1=='string')?
+					$sub1-$sub2:
+					pyjslib['op_sub']($sub1,$sub2)));}catch($pyjs_dbg_49_err){
     if ($pyjs_dbg_49_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -59995,14 +60049,68 @@ try{var $pyjs_dbg_49_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null,
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 69 :\n" + $pyjs_dbg_49_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 67 :\n" + $pyjs_dbg_49_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_49_retry) {
         case 1:
-            $pyjs_dbg_49_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, null, [{StyleName:String('listbox')}]);
+            $pyjs_dbg_49_res=box['setPopupPosition']((function(){var $pyjs_dbg_47_retry = 0;
+try{var $pyjs_dbg_47_res=absolute['getAbsoluteLeft']();}catch($pyjs_dbg_47_err){
+    if ($pyjs_dbg_47_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 67 :\n" + $pyjs_dbg_47_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_47_retry) {
+        case 1:
+            $pyjs_dbg_47_res=absolute['getAbsoluteLeft']();
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_47_err;
+    }
+}return $pyjs_dbg_47_res})(), (typeof ($sub1=(function(){var $pyjs_dbg_48_retry = 0;
+try{var $pyjs_dbg_48_res=absolute['getAbsoluteTop']();}catch($pyjs_dbg_48_err){
+    if ($pyjs_dbg_48_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 67 :\n" + $pyjs_dbg_48_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_48_retry) {
+        case 1:
+            $pyjs_dbg_48_res=absolute['getAbsoluteTop']();
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_48_err;
+    }
+}return $pyjs_dbg_48_res})())==typeof ($sub2=10) && (typeof $sub1=='number'||typeof $sub1=='string')?
+					$sub1-$sub2:
+					pyjslib['op_sub']($sub1,$sub2)));
             break;
         case 2:
             break;
@@ -60010,12 +60118,9 @@ try{var $pyjs_dbg_49_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null,
             throw $pyjs_dbg_49_err;
     }
 }return $pyjs_dbg_49_res})();
-			$pyjs.track.lineno=70;
-			(function(){var $pyjs_dbg_51_retry = 0;
-try{var $pyjs_dbg_51_res=pyjslib['map'](((($attr7=compare_list['addItem']) !== null & ($attr8=compare_list).__is_instance__) && typeof $attr7 == 'function'?
-						pyjslib['getattr']($attr8, 'addItem'):
-						compare_list['addItem']), (function(){var $pyjs_dbg_50_retry = 0;
-try{var $pyjs_dbg_50_res=pyjslib['list']([String('to main library'), String('to my projects'), String('to each other')]);}catch($pyjs_dbg_50_err){
+				$pyjs.track.lineno=68;
+				(function(){var $pyjs_dbg_50_retry = 0;
+try{var $pyjs_dbg_50_res=box['show']();}catch($pyjs_dbg_50_err){
     if ($pyjs_dbg_50_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60026,21 +60131,31 @@ try{var $pyjs_dbg_50_res=pyjslib['list']([String('to main library'), String('to 
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 70 :\n" + $pyjs_dbg_50_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 68 :\n" + $pyjs_dbg_50_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_50_retry) {
         case 1:
-            $pyjs_dbg_50_res=pyjslib['list']([String('to main library'), String('to my projects'), String('to each other')]);
+            $pyjs_dbg_50_res=box['show']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_50_err;
     }
-}return $pyjs_dbg_50_res})());}catch($pyjs_dbg_51_err){
+}return $pyjs_dbg_50_res})();
+				$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
+				return null;
+			};
+			browse.__name__ = 'browse';
+
+			browse.__bind_type__ = 0;
+			browse.__args__ = [null,null,['event']];
+			$pyjs.track.lineno=71;
+			compare_list = (function(){var $pyjs_dbg_51_retry = 0;
+try{var $pyjs_dbg_51_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, null, [{StyleName:String('listbox')}]);}catch($pyjs_dbg_51_err){
     if ($pyjs_dbg_51_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60051,42 +60166,14 @@ try{var $pyjs_dbg_50_res=pyjslib['list']([String('to main library'), String('to 
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 70 :\n" + $pyjs_dbg_51_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 71 :\n" + $pyjs_dbg_51_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_51_retry) {
         case 1:
-            $pyjs_dbg_51_res=pyjslib['map'](((($attr7=compare_list['addItem']) !== null & ($attr8=compare_list).__is_instance__) && typeof $attr7 == 'function'?
-						pyjslib['getattr']($attr8, 'addItem'):
-						compare_list['addItem']), (function(){var $pyjs_dbg_50_retry = 0;
-try{var $pyjs_dbg_50_res=pyjslib['list']([String('to main library'), String('to my projects'), String('to each other')]);}catch($pyjs_dbg_50_err){
-    if ($pyjs_dbg_50_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 70 :\n" + $pyjs_dbg_50_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_50_retry) {
-        case 1:
-            $pyjs_dbg_50_res=pyjslib['list']([String('to main library'), String('to my projects'), String('to each other')]);
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_50_err;
-    }
-}return $pyjs_dbg_50_res})());
+            $pyjs_dbg_51_res=$pyjs_kwargs_call(null, BasicControls['ListBox'], null, null, [{StyleName:String('listbox')}]);
             break;
         case 2:
             break;
@@ -60094,15 +60181,12 @@ try{var $pyjs_dbg_50_res=pyjslib['list']([String('to main library'), String('to 
             throw $pyjs_dbg_51_err;
     }
 }return $pyjs_dbg_51_res})();
-			$pyjs.track.lineno=71;
-			compare = function(event) {
-				var $add6,$add7,file,$add5,$add8;
-				$pyjs.track={module:'BasicControls',lineno:71};$pyjs.trackstack.push($pyjs.track);
-				$pyjs.track.module='BasicControls';
-				$pyjs.track.lineno=71;
-				$pyjs.track.lineno=72;
-				file = (function(){var $pyjs_dbg_52_retry = 0;
-try{var $pyjs_dbg_52_res=file_upload['getFilename']();}catch($pyjs_dbg_52_err){
+			$pyjs.track.lineno=72;
+			(function(){var $pyjs_dbg_53_retry = 0;
+try{var $pyjs_dbg_53_res=pyjslib['map'](((($attr9=compare_list['addItem']) !== null & ($attr10=compare_list).__is_instance__) && typeof $attr9 == 'function'?
+						pyjslib['getattr']($attr10, 'addItem'):
+						compare_list['addItem']), (function(){var $pyjs_dbg_52_retry = 0;
+try{var $pyjs_dbg_52_res=pyjslib['list']([String('to main library'), String('to my projects'), String('to each other')]);}catch($pyjs_dbg_52_err){
     if ($pyjs_dbg_52_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60120,17 +60204,14 @@ try{var $pyjs_dbg_52_res=file_upload['getFilename']();}catch($pyjs_dbg_52_err){
     }
     switch ($pyjs_dbg_52_retry) {
         case 1:
-            $pyjs_dbg_52_res=file_upload['getFilename']();
+            $pyjs_dbg_52_res=pyjslib['list']([String('to main library'), String('to my projects'), String('to each other')]);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_52_err;
     }
-}return $pyjs_dbg_52_res})();
-				$pyjs.track.lineno=73;
-				if ((function(){var $pyjs_dbg_53_retry = 0;
-try{var $pyjs_dbg_53_res=pyjslib['bool'](!uploaded_files.__contains__(file));}catch($pyjs_dbg_53_err){
+}return $pyjs_dbg_52_res})());}catch($pyjs_dbg_53_err){
     if ($pyjs_dbg_53_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60141,29 +60222,58 @@ try{var $pyjs_dbg_53_res=pyjslib['bool'](!uploaded_files.__contains__(file));}ca
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 73 :\n" + $pyjs_dbg_53_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 72 :\n" + $pyjs_dbg_53_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_53_retry) {
         case 1:
-            $pyjs_dbg_53_res=pyjslib['bool'](!uploaded_files.__contains__(file));
+            $pyjs_dbg_53_res=pyjslib['map'](((($attr9=compare_list['addItem']) !== null & ($attr10=compare_list).__is_instance__) && typeof $attr9 == 'function'?
+						pyjslib['getattr']($attr10, 'addItem'):
+						compare_list['addItem']), (function(){var $pyjs_dbg_52_retry = 0;
+try{var $pyjs_dbg_52_res=pyjslib['list']([String('to main library'), String('to my projects'), String('to each other')]);}catch($pyjs_dbg_52_err){
+    if ($pyjs_dbg_52_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 72 :\n" + $pyjs_dbg_52_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_52_retry) {
+        case 1:
+            $pyjs_dbg_52_res=pyjslib['list']([String('to main library'), String('to my projects'), String('to each other')]);
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_52_err;
+    }
+}return $pyjs_dbg_52_res})());
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_53_err;
     }
-}return $pyjs_dbg_53_res})()) {
-					$pyjs.track.lineno=73;
-					(function(){var $pyjs_dbg_55_retry = 0;
-try{var $pyjs_dbg_55_res=panel['add']((function(){var $pyjs_dbg_54_retry = 0;
-try{var $pyjs_dbg_54_res=BasicControls['HTML']((typeof ($add7=(typeof ($add5=String('\x3Ci\x3E'))==typeof ($add6=file) && (typeof $add5=='number'||typeof $add5=='string')?
-						$add5+$add6:
-						pyjslib['op_add']($add5,$add6)))==typeof ($add8=String('\x3C/i\x3E')) && (typeof $add7=='number'||typeof $add7=='string')?
-						$add7+$add8:
-						pyjslib['op_add']($add7,$add8)));}catch($pyjs_dbg_54_err){
+}return $pyjs_dbg_53_res})();
+			$pyjs.track.lineno=73;
+			compare = function(event) {
+				var $add14,$add15,$add16,file,$add13;
+				$pyjs.track={module:'BasicControls',lineno:73};$pyjs.trackstack.push($pyjs.track);
+				$pyjs.track.module='BasicControls';
+				$pyjs.track.lineno=73;
+				$pyjs.track.lineno=74;
+				file = (function(){var $pyjs_dbg_54_retry = 0;
+try{var $pyjs_dbg_54_res=file_upload['getFilename']();}catch($pyjs_dbg_54_err){
     if ($pyjs_dbg_54_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60174,25 +60284,24 @@ try{var $pyjs_dbg_54_res=BasicControls['HTML']((typeof ($add7=(typeof ($add5=Str
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 73 :\n" + $pyjs_dbg_54_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 74 :\n" + $pyjs_dbg_54_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_54_retry) {
         case 1:
-            $pyjs_dbg_54_res=BasicControls['HTML']((typeof ($add7=(typeof ($add5=String('\x3Ci\x3E'))==typeof ($add6=file) && (typeof $add5=='number'||typeof $add5=='string')?
-						$add5+$add6:
-						pyjslib['op_add']($add5,$add6)))==typeof ($add8=String('\x3C/i\x3E')) && (typeof $add7=='number'||typeof $add7=='string')?
-						$add7+$add8:
-						pyjslib['op_add']($add7,$add8)));
+            $pyjs_dbg_54_res=file_upload['getFilename']();
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_54_err;
     }
-}return $pyjs_dbg_54_res})());}catch($pyjs_dbg_55_err){
+}return $pyjs_dbg_54_res})();
+				$pyjs.track.lineno=75;
+				if ((function(){var $pyjs_dbg_55_retry = 0;
+try{var $pyjs_dbg_55_res=pyjslib['bool'](!uploaded_files.__contains__(file));}catch($pyjs_dbg_55_err){
     if ($pyjs_dbg_55_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60203,59 +60312,29 @@ try{var $pyjs_dbg_54_res=BasicControls['HTML']((typeof ($add7=(typeof ($add5=Str
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 73 :\n" + $pyjs_dbg_55_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 75 :\n" + $pyjs_dbg_55_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_55_retry) {
         case 1:
-            $pyjs_dbg_55_res=panel['add']((function(){var $pyjs_dbg_54_retry = 0;
-try{var $pyjs_dbg_54_res=BasicControls['HTML']((typeof ($add7=(typeof ($add5=String('\x3Ci\x3E'))==typeof ($add6=file) && (typeof $add5=='number'||typeof $add5=='string')?
-						$add5+$add6:
-						pyjslib['op_add']($add5,$add6)))==typeof ($add8=String('\x3C/i\x3E')) && (typeof $add7=='number'||typeof $add7=='string')?
-						$add7+$add8:
-						pyjslib['op_add']($add7,$add8)));}catch($pyjs_dbg_54_err){
-    if ($pyjs_dbg_54_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 73 :\n" + $pyjs_dbg_54_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_54_retry) {
-        case 1:
-            $pyjs_dbg_54_res=BasicControls['HTML']((typeof ($add7=(typeof ($add5=String('\x3Ci\x3E'))==typeof ($add6=file) && (typeof $add5=='number'||typeof $add5=='string')?
-						$add5+$add6:
-						pyjslib['op_add']($add5,$add6)))==typeof ($add8=String('\x3C/i\x3E')) && (typeof $add7=='number'||typeof $add7=='string')?
-						$add7+$add8:
-						pyjslib['op_add']($add7,$add8)));
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_54_err;
-    }
-}return $pyjs_dbg_54_res})());
+            $pyjs_dbg_55_res=pyjslib['bool'](!uploaded_files.__contains__(file));
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_55_err;
     }
-}return $pyjs_dbg_55_res})();
-				}
-				$pyjs.track.lineno=74;
-				(function(){var $pyjs_dbg_56_retry = 0;
-try{var $pyjs_dbg_56_res=uploaded_files.__setitem__(file, true);}catch($pyjs_dbg_56_err){
+}return $pyjs_dbg_55_res})()) {
+					$pyjs.track.lineno=75;
+					(function(){var $pyjs_dbg_57_retry = 0;
+try{var $pyjs_dbg_57_res=panel['add']((function(){var $pyjs_dbg_56_retry = 0;
+try{var $pyjs_dbg_56_res=BasicControls['HTML']((typeof ($add15=(typeof ($add13=String('\x3Ci\x3Emy computer: '))==typeof ($add14=file) && (typeof $add13=='number'||typeof $add13=='string')?
+						$add13+$add14:
+						pyjslib['op_add']($add13,$add14)))==typeof ($add16=String('\x3C/i\x3E')) && (typeof $add15=='number'||typeof $add15=='string')?
+						$add15+$add16:
+						pyjslib['op_add']($add15,$add16)));}catch($pyjs_dbg_56_err){
     if ($pyjs_dbg_56_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60266,31 +60345,25 @@ try{var $pyjs_dbg_56_res=uploaded_files.__setitem__(file, true);}catch($pyjs_dbg
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 74 :\n" + $pyjs_dbg_56_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 75 :\n" + $pyjs_dbg_56_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_56_retry) {
         case 1:
-            $pyjs_dbg_56_res=uploaded_files.__setitem__(file, true);
+            $pyjs_dbg_56_res=BasicControls['HTML']((typeof ($add15=(typeof ($add13=String('\x3Ci\x3Emy computer: '))==typeof ($add14=file) && (typeof $add13=='number'||typeof $add13=='string')?
+						$add13+$add14:
+						pyjslib['op_add']($add13,$add14)))==typeof ($add16=String('\x3C/i\x3E')) && (typeof $add15=='number'||typeof $add15=='string')?
+						$add15+$add16:
+						pyjslib['op_add']($add15,$add16)));
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_56_err;
     }
-}return $pyjs_dbg_56_res})();
-				$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
-				return null;
-			};
-			compare.__name__ = 'compare';
-
-			compare.__bind_type__ = 0;
-			compare.__args__ = [null,null,['event']];
-			$pyjs.track.lineno=77;
-			grid = (function(){var $pyjs_dbg_57_retry = 0;
-try{var $pyjs_dbg_57_res=BasicControls['Grid'](2, 2);}catch($pyjs_dbg_57_err){
+}return $pyjs_dbg_56_res})());}catch($pyjs_dbg_57_err){
     if ($pyjs_dbg_57_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60301,14 +60374,48 @@ try{var $pyjs_dbg_57_res=BasicControls['Grid'](2, 2);}catch($pyjs_dbg_57_err){
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 77 :\n" + $pyjs_dbg_57_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 75 :\n" + $pyjs_dbg_57_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_57_retry) {
         case 1:
-            $pyjs_dbg_57_res=BasicControls['Grid'](2, 2);
+            $pyjs_dbg_57_res=panel['add']((function(){var $pyjs_dbg_56_retry = 0;
+try{var $pyjs_dbg_56_res=BasicControls['HTML']((typeof ($add15=(typeof ($add13=String('\x3Ci\x3Emy computer: '))==typeof ($add14=file) && (typeof $add13=='number'||typeof $add13=='string')?
+						$add13+$add14:
+						pyjslib['op_add']($add13,$add14)))==typeof ($add16=String('\x3C/i\x3E')) && (typeof $add15=='number'||typeof $add15=='string')?
+						$add15+$add16:
+						pyjslib['op_add']($add15,$add16)));}catch($pyjs_dbg_56_err){
+    if ($pyjs_dbg_56_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 75 :\n" + $pyjs_dbg_56_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_56_retry) {
+        case 1:
+            $pyjs_dbg_56_res=BasicControls['HTML']((typeof ($add15=(typeof ($add13=String('\x3Ci\x3Emy computer: '))==typeof ($add14=file) && (typeof $add13=='number'||typeof $add13=='string')?
+						$add13+$add14:
+						pyjslib['op_add']($add13,$add14)))==typeof ($add16=String('\x3C/i\x3E')) && (typeof $add15=='number'||typeof $add15=='string')?
+						$add15+$add16:
+						pyjslib['op_add']($add15,$add16)));
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_56_err;
+    }
+}return $pyjs_dbg_56_res})());
             break;
         case 2:
             break;
@@ -60316,10 +60423,10 @@ try{var $pyjs_dbg_57_res=BasicControls['Grid'](2, 2);}catch($pyjs_dbg_57_err){
             throw $pyjs_dbg_57_err;
     }
 }return $pyjs_dbg_57_res})();
-			$pyjs.track.lineno=78;
-			(function(){var $pyjs_dbg_59_retry = 0;
-try{var $pyjs_dbg_59_res=grid['setWidget'](0, 0, (function(){var $pyjs_dbg_58_retry = 0;
-try{var $pyjs_dbg_58_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3EBrowse\x3C/b\x3E'), browse]);}catch($pyjs_dbg_58_err){
+				}
+				$pyjs.track.lineno=76;
+				(function(){var $pyjs_dbg_58_retry = 0;
+try{var $pyjs_dbg_58_res=uploaded_files.__setitem__(file, true);}catch($pyjs_dbg_58_err){
     if ($pyjs_dbg_58_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60330,21 +60437,31 @@ try{var $pyjs_dbg_58_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, 
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 78 :\n" + $pyjs_dbg_58_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 76 :\n" + $pyjs_dbg_58_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_58_retry) {
         case 1:
-            $pyjs_dbg_58_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3EBrowse\x3C/b\x3E'), browse]);
+            $pyjs_dbg_58_res=uploaded_files.__setitem__(file, true);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_58_err;
     }
-}return $pyjs_dbg_58_res})());}catch($pyjs_dbg_59_err){
+}return $pyjs_dbg_58_res})();
+				$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
+				return null;
+			};
+			compare.__name__ = 'compare';
+
+			compare.__bind_type__ = 0;
+			compare.__args__ = [null,null,['event']];
+			$pyjs.track.lineno=79;
+			grid = (function(){var $pyjs_dbg_59_retry = 0;
+try{var $pyjs_dbg_59_res=BasicControls['Grid'](2, 2);}catch($pyjs_dbg_59_err){
     if ($pyjs_dbg_59_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60355,40 +60472,14 @@ try{var $pyjs_dbg_58_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, 
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 78 :\n" + $pyjs_dbg_59_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 79 :\n" + $pyjs_dbg_59_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_59_retry) {
         case 1:
-            $pyjs_dbg_59_res=grid['setWidget'](0, 0, (function(){var $pyjs_dbg_58_retry = 0;
-try{var $pyjs_dbg_58_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3EBrowse\x3C/b\x3E'), browse]);}catch($pyjs_dbg_58_err){
-    if ($pyjs_dbg_58_err.__name__ != 'StopIteration') {
-        var save_stack = $pyjs.__last_exception_stack__;
-        sys.save_exception_stack();
-        var $pyjs_msg = "";
-
-        try {
-            $pyjs_msg = "\n" + sys.trackstackstr();
-        } catch (s) {};
-        $pyjs.__last_exception_stack__ = save_stack;
-        if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 78 :\n" + $pyjs_dbg_58_err + $pyjs_msg);
-            $pyjs.debug_msg = $pyjs_msg;
-            debugger;
-        }
-    }
-    switch ($pyjs_dbg_58_retry) {
-        case 1:
-            $pyjs_dbg_58_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3EBrowse\x3C/b\x3E'), browse]);
-            break;
-        case 2:
-            break;
-        default:
-            throw $pyjs_dbg_58_err;
-    }
-}return $pyjs_dbg_58_res})());
+            $pyjs_dbg_59_res=BasicControls['Grid'](2, 2);
             break;
         case 2:
             break;
@@ -60396,10 +60487,10 @@ try{var $pyjs_dbg_58_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, 
             throw $pyjs_dbg_59_err;
     }
 }return $pyjs_dbg_59_res})();
-			$pyjs.track.lineno=79;
+			$pyjs.track.lineno=80;
 			(function(){var $pyjs_dbg_61_retry = 0;
-try{var $pyjs_dbg_61_res=grid['setWidget'](1, 0, (function(){var $pyjs_dbg_60_retry = 0;
-try{var $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3ECompare\x3C/b\x3E'), compare]);}catch($pyjs_dbg_60_err){
+try{var $pyjs_dbg_61_res=grid['setWidget'](0, 0, (function(){var $pyjs_dbg_60_retry = 0;
+try{var $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3EBrowse\x3C/b\x3E'), browse]);}catch($pyjs_dbg_60_err){
     if ($pyjs_dbg_60_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60410,14 +60501,14 @@ try{var $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, 
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 79 :\n" + $pyjs_dbg_60_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 80 :\n" + $pyjs_dbg_60_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_60_retry) {
         case 1:
-            $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3ECompare\x3C/b\x3E'), compare]);
+            $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3EBrowse\x3C/b\x3E'), browse]);
             break;
         case 2:
             break;
@@ -60435,15 +60526,15 @@ try{var $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, 
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 79 :\n" + $pyjs_dbg_61_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 80 :\n" + $pyjs_dbg_61_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_61_retry) {
         case 1:
-            $pyjs_dbg_61_res=grid['setWidget'](1, 0, (function(){var $pyjs_dbg_60_retry = 0;
-try{var $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3ECompare\x3C/b\x3E'), compare]);}catch($pyjs_dbg_60_err){
+            $pyjs_dbg_61_res=grid['setWidget'](0, 0, (function(){var $pyjs_dbg_60_retry = 0;
+try{var $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3EBrowse\x3C/b\x3E'), browse]);}catch($pyjs_dbg_60_err){
     if ($pyjs_dbg_60_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60454,14 +60545,14 @@ try{var $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, 
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 79 :\n" + $pyjs_dbg_60_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 80 :\n" + $pyjs_dbg_60_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_60_retry) {
         case 1:
-            $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3ECompare\x3C/b\x3E'), compare]);
+            $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3EBrowse\x3C/b\x3E'), browse]);
             break;
         case 2:
             break;
@@ -60476,9 +60567,10 @@ try{var $pyjs_dbg_60_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, 
             throw $pyjs_dbg_61_err;
     }
 }return $pyjs_dbg_61_res})();
-			$pyjs.track.lineno=80;
-			(function(){var $pyjs_dbg_62_retry = 0;
-try{var $pyjs_dbg_62_res=grid['setWidget'](0, 1, browse_list);}catch($pyjs_dbg_62_err){
+			$pyjs.track.lineno=81;
+			(function(){var $pyjs_dbg_63_retry = 0;
+try{var $pyjs_dbg_63_res=grid['setWidget'](1, 0, (function(){var $pyjs_dbg_62_retry = 0;
+try{var $pyjs_dbg_62_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3ECompare\x3C/b\x3E'), compare]);}catch($pyjs_dbg_62_err){
     if ($pyjs_dbg_62_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60489,24 +60581,21 @@ try{var $pyjs_dbg_62_res=grid['setWidget'](0, 1, browse_list);}catch($pyjs_dbg_6
         } catch (s) {};
         $pyjs.__last_exception_stack__ = save_stack;
         if ($pyjs_msg !== $pyjs.debug_msg) {
-            pyjslib['debugReport']("Module BasicControls at line 80 :\n" + $pyjs_dbg_62_err + $pyjs_msg);
+            pyjslib['debugReport']("Module BasicControls at line 81 :\n" + $pyjs_dbg_62_err + $pyjs_msg);
             $pyjs.debug_msg = $pyjs_msg;
             debugger;
         }
     }
     switch ($pyjs_dbg_62_retry) {
         case 1:
-            $pyjs_dbg_62_res=grid['setWidget'](0, 1, browse_list);
+            $pyjs_dbg_62_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3ECompare\x3C/b\x3E'), compare]);
             break;
         case 2:
             break;
         default:
             throw $pyjs_dbg_62_err;
     }
-}return $pyjs_dbg_62_res})();
-			$pyjs.track.lineno=81;
-			(function(){var $pyjs_dbg_63_retry = 0;
-try{var $pyjs_dbg_63_res=grid['setWidget'](1, 1, compare_list);}catch($pyjs_dbg_63_err){
+}return $pyjs_dbg_62_res})());}catch($pyjs_dbg_63_err){
     if ($pyjs_dbg_63_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60524,7 +60613,33 @@ try{var $pyjs_dbg_63_res=grid['setWidget'](1, 1, compare_list);}catch($pyjs_dbg_
     }
     switch ($pyjs_dbg_63_retry) {
         case 1:
-            $pyjs_dbg_63_res=grid['setWidget'](1, 1, compare_list);
+            $pyjs_dbg_63_res=grid['setWidget'](1, 0, (function(){var $pyjs_dbg_62_retry = 0;
+try{var $pyjs_dbg_62_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3ECompare\x3C/b\x3E'), compare]);}catch($pyjs_dbg_62_err){
+    if ($pyjs_dbg_62_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 81 :\n" + $pyjs_dbg_62_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_62_retry) {
+        case 1:
+            $pyjs_dbg_62_res=$pyjs_kwargs_call(null, BasicControls['Button'], null, null, [{StyleName:String('button')}, String('\x3Cb\x3ECompare\x3C/b\x3E'), compare]);
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_62_err;
+    }
+}return $pyjs_dbg_62_res})());
             break;
         case 2:
             break;
@@ -60534,7 +60649,7 @@ try{var $pyjs_dbg_63_res=grid['setWidget'](1, 1, compare_list);}catch($pyjs_dbg_
 }return $pyjs_dbg_63_res})();
 			$pyjs.track.lineno=82;
 			(function(){var $pyjs_dbg_64_retry = 0;
-try{var $pyjs_dbg_64_res=panel['add'](grid);}catch($pyjs_dbg_64_err){
+try{var $pyjs_dbg_64_res=grid['setWidget'](0, 1, browse_list);}catch($pyjs_dbg_64_err){
     if ($pyjs_dbg_64_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60552,7 +60667,7 @@ try{var $pyjs_dbg_64_res=panel['add'](grid);}catch($pyjs_dbg_64_err){
     }
     switch ($pyjs_dbg_64_retry) {
         case 1:
-            $pyjs_dbg_64_res=panel['add'](grid);
+            $pyjs_dbg_64_res=grid['setWidget'](0, 1, browse_list);
             break;
         case 2:
             break;
@@ -60562,7 +60677,7 @@ try{var $pyjs_dbg_64_res=panel['add'](grid);}catch($pyjs_dbg_64_err){
 }return $pyjs_dbg_64_res})();
 			$pyjs.track.lineno=83;
 			(function(){var $pyjs_dbg_65_retry = 0;
-try{var $pyjs_dbg_65_res=panel['add'](file_upload, String('-100px'), String('5px'));}catch($pyjs_dbg_65_err){
+try{var $pyjs_dbg_65_res=grid['setWidget'](1, 1, compare_list);}catch($pyjs_dbg_65_err){
     if ($pyjs_dbg_65_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60580,7 +60695,7 @@ try{var $pyjs_dbg_65_res=panel['add'](file_upload, String('-100px'), String('5px
     }
     switch ($pyjs_dbg_65_retry) {
         case 1:
-            $pyjs_dbg_65_res=panel['add'](file_upload, String('-100px'), String('5px'));
+            $pyjs_dbg_65_res=grid['setWidget'](1, 1, compare_list);
             break;
         case 2:
             break;
@@ -60590,7 +60705,7 @@ try{var $pyjs_dbg_65_res=panel['add'](file_upload, String('-100px'), String('5px
 }return $pyjs_dbg_65_res})();
 			$pyjs.track.lineno=84;
 			(function(){var $pyjs_dbg_66_retry = 0;
-try{var $pyjs_dbg_66_res=self['initWidget'](panel);}catch($pyjs_dbg_66_err){
+try{var $pyjs_dbg_66_res=absolute['add'](grid);}catch($pyjs_dbg_66_err){
     if ($pyjs_dbg_66_err.__name__ != 'StopIteration') {
         var save_stack = $pyjs.__last_exception_stack__;
         sys.save_exception_stack();
@@ -60608,7 +60723,7 @@ try{var $pyjs_dbg_66_res=self['initWidget'](panel);}catch($pyjs_dbg_66_err){
     }
     switch ($pyjs_dbg_66_retry) {
         case 1:
-            $pyjs_dbg_66_res=self['initWidget'](panel);
+            $pyjs_dbg_66_res=absolute['add'](grid);
             break;
         case 2:
             break;
@@ -60616,6 +60731,90 @@ try{var $pyjs_dbg_66_res=self['initWidget'](panel);}catch($pyjs_dbg_66_err){
             throw $pyjs_dbg_66_err;
     }
 }return $pyjs_dbg_66_res})();
+			$pyjs.track.lineno=85;
+			(function(){var $pyjs_dbg_67_retry = 0;
+try{var $pyjs_dbg_67_res=absolute['add'](file_upload, String('-100px'), String('5px'));}catch($pyjs_dbg_67_err){
+    if ($pyjs_dbg_67_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 85 :\n" + $pyjs_dbg_67_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_67_retry) {
+        case 1:
+            $pyjs_dbg_67_res=absolute['add'](file_upload, String('-100px'), String('5px'));
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_67_err;
+    }
+}return $pyjs_dbg_67_res})();
+			$pyjs.track.lineno=86;
+			(function(){var $pyjs_dbg_68_retry = 0;
+try{var $pyjs_dbg_68_res=panel['add'](absolute);}catch($pyjs_dbg_68_err){
+    if ($pyjs_dbg_68_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 86 :\n" + $pyjs_dbg_68_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_68_retry) {
+        case 1:
+            $pyjs_dbg_68_res=panel['add'](absolute);
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_68_err;
+    }
+}return $pyjs_dbg_68_res})();
+			$pyjs.track.lineno=87;
+			(function(){var $pyjs_dbg_69_retry = 0;
+try{var $pyjs_dbg_69_res=self['initWidget'](panel);}catch($pyjs_dbg_69_err){
+    if ($pyjs_dbg_69_err.__name__ != 'StopIteration') {
+        var save_stack = $pyjs.__last_exception_stack__;
+        sys.save_exception_stack();
+        var $pyjs_msg = "";
+
+        try {
+            $pyjs_msg = "\n" + sys.trackstackstr();
+        } catch (s) {};
+        $pyjs.__last_exception_stack__ = save_stack;
+        if ($pyjs_msg !== $pyjs.debug_msg) {
+            pyjslib['debugReport']("Module BasicControls at line 87 :\n" + $pyjs_dbg_69_err + $pyjs_msg);
+            $pyjs.debug_msg = $pyjs_msg;
+            debugger;
+        }
+    }
+    switch ($pyjs_dbg_69_retry) {
+        case 1:
+            $pyjs_dbg_69_res=self['initWidget'](panel);
+            break;
+        case 2:
+            break;
+        default:
+            throw $pyjs_dbg_69_err;
+    }
+}return $pyjs_dbg_69_res})();
 			$pyjs.trackstack.pop();$pyjs.track=$pyjs.trackstack.pop();$pyjs.trackstack.push($pyjs.track);
 			return null;
 		}

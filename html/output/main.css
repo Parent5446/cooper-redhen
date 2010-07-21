@@ -16,15 +16,21 @@
 }
 .browse-dialog
 {
-    background-color:#CCF;
+    background-color:#FFF;
     -moz-border-radius:10px;
     -webkit-border-radius:10px;
     behavior:url(border-radius.htc);
+    border: solid black 1px;
+    -moz-opacity:0.95;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=95)";
+	filter:alpha(opacity=95);
+	opacity: 0.95;
 }
 .file-upload
 {
     -moz-opacity:0;
-	filter:alpha(opacity: 0);
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter:alpha(opacity=0);
 	opacity: 0;
 }
 .asdfas
