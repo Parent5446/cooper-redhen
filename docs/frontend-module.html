@@ -57,6 +57,40 @@
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module frontend</h1><p class="nomargin-top"><span class="codelink"><a href="frontend-pysrc.html">source&nbsp;code</a></span></p>
+<pre class="literalblock">
+
+Take a POST request with JSON data and process it. If it contains a spectrum
+file, send it to the back end to search the database.
+
+All request must be POST requests. Any GET requests will just print these
+instructions, and all others will be ignored. The POST variables below
+may be passed. If uploading files, make sure to set enctype to
+multipart/form-data, or they will not be processed properly.
+
+- action (required):
+    - &quot;compare&quot; - Compare two targets, either from file upload or database.
+    - &quot;analyze&quot; - Does the same as compare, except instead of taking two
+                  targets, it takes one and searches the database in an
+                  attempt to find the other (good for unknown spectra).
+    - &quot;browse&quot;  - Browse the database.
+- target (required):
+    - When action is &quot;search&quot; or &quot;compare&quot;: Can be either the text from a JCAMP
+      file or &quot;db:key&quot;, where key is the database key for a Spectrum object.
+    - When action is &quot;browse&quot;: Can be either &quot;public&quot; for browsing the public
+      library or &quot;private&quot; for browsing your own private library.
+- limit (optional, used only when action is &quot;browse&quot;): How many spectra to get
+  when browsing (maximum is 50).
+- offset (optional, used only when action is &quot;browse&quot;): Where to start listing
+  spectra from (used for pagination).
+- output (optional): Can be &quot;xml&quot;, &quot;json&quot;, &quot;python&quot;, or &quot;pickle&quot; depending on
+                     what output format you want. Default is &quot;pickle&quot;.
+
+@organization: The Cooper Union for the Advancement of the Science and the Arts
+@license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
+@copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
+
+</pre>
+
 <!-- ==================== CLASSES ==================== -->
 <a name="section-Classes"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -78,15 +112,17 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="frontend.MainHandler-class.html" class="summary-name">MainHandler</a>
+        <a href="frontend.ApiHandler-class.html" class="summary-name">ApiHandler</a><br />
+      Handle any API requests and return a JSON response.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="frontend.Search-class.html" class="summary-name">Search</a><br />
-      Store a user's search for a certain spectrum.
+        <a href="frontend.ServeHandler-class.html" class="summary-name">ServeHandler</a><br />
+      Take a URL with encoded output information from the ApiHandler, 
+      decode it, and output it to the user.
     </td>
   </tr>
 </table>
@@ -145,24 +181,20 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="frontend-module.html#application" class="summary-name">application</a> = <code title="webapp.WSGIApplication([('/', MainHandler)], debug= True)">webapp.WSGIApplication([('/', MainHandler)], deb<code class="variable-ellipsis">...</code></code>
+        <a href="frontend-module.html#application" class="summary-name">application</a> = <code title="webapp.WSGIApplication([('/api', ApiHandler), ('/serve', ServeHandler)\
+], debug= True)">webapp.WSGIApplication([('/api', ApiHandler), ('<code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 </table>
 <p class="indent-wrapped-lines"><b>Imports:</b>
-  <span title="cgi">cgi</span>,
-  <span title="datetime">datetime</span>,
-  <span title="logging">logging</span>,
-  <a href="backend-module.html" title="backend">backend</a>,
-  <span title="google.appengine.ext.blobstore">blobstore</span>,
-  <span title="google.appengine.ext.db">db</span>,
-  <span title="google.appengine.ext.webapp">webapp</span>,
+  <span title="urllib">urllib</span>,
+  <span title="pickle">pickle</span>,
   <span title="google.appengine.api.users">users</span>,
-  <span title="google.appengine.api.quota">quota</span>,
   <span title="google.appengine.api.memcache">memcache</span>,
-  <span title="google.appengine.ext.webapp.template">template</span>,
-  <span title="google.appengine.ext.webapp.blobstore_handlers">blobstore_handlers</span>,
-  <span title="google.appengine.ext.webapp.util.run_wsgi_app">run_wsgi_app</span>
+  <span title="google.appengine.ext.webapp">webapp</span>,
+  <span title="google.appengine.ext.webapp.util.run_wsgi_app">run_wsgi_app</span>,
+  <a href="common-module.html" title="common">common</a>,
+  <a href="backend-module.html" title="backend">backend</a>
 </p><br />
 <!-- ==================== VARIABLES DETAILS ==================== -->
 <a name="section-VariablesDetails"></a>
@@ -194,7 +226,8 @@
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-webapp.WSGIApplication([('/', MainHandler)], debug= True)
+webapp.WSGIApplication([('/api', ApiHandler), ('/serve', ServeHandler)<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+], debug= True)
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -230,7 +263,7 @@ webapp.WSGIApplication([('/', MainHandler)], debug= True)
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jul 18 21:25:20 2010</a>
+    3.0.1 on Tue Jul 20 20:12:39 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

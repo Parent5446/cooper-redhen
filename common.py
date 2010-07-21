@@ -109,7 +109,7 @@ class GenericListProperty(db.Property):
         if value is None:
             # Make a new list if it does not exist.
             return []
-        return pickle.loads(value)
+        return pickle.loads(str(value))
     
     def default_value(self):
         """Get the default value for the property."""

@@ -60,14 +60,16 @@
 <h1 class="epydoc">Class Spectrum</h1><p class="nomargin-top"><span class="codelink"><a href="backend-pysrc.html#Spectrum">source&nbsp;code</a></span></p>
 <center>
 <center>  <map id="uml_class_diagram_for_backend__2" name="uml_class_diagram_for_backend__2">
-<area shape="rect" href="backend.Spectrum-class.html#chemical_name" title="The chemical name associated with the spectrum" alt="" coords="17,28,215,47"/>
-<area shape="rect" href="backend.Spectrum-class.html#chemical_type" title="The chemical type of the substance the spectrum represents" alt="" coords="17,47,215,65"/>
-<area shape="rect" href="backend.Spectrum-class.html#data" title="A list of integrated X,Y points for the spectrum&#39;s graph" alt="" coords="17,65,215,84"/>
-<area shape="rect" href="backend.Spectrum-class.html#parse_file" title="Parse a string of JCAMP file data and extract all needed data." alt="" coords="17,87,215,105"/>
-<area shape="rect" href="backend.Spectrum-class.html#get_field" title="Get a specific data label from the file." alt="" coords="17,105,215,124"/>
-<area shape="rect" href="backend.Spectrum-class.html#calculate_peaks" title="Calculate the peaks for a spectrum." alt="" coords="17,124,215,143"/>
-<area shape="rect" href="backend.Spectrum-class.html#calculate_heavyside" title="Calculate the heavyside inde for a spectrum." alt="" coords="17,143,215,161"/>
-<area shape="rect" href="backend.Spectrum-class.html" title="Store a spectrum, its related data, and any algorithms necessary to compare the spectrum to the DataStore." alt="" coords="16,11,216,163"/>
+<area shape="rect" href="backend.Spectrum-class.html#chemical_name" title="The chemical name associated with the spectrum" alt="" coords="17,28,287,47"/>
+<area shape="rect" href="backend.Spectrum-class.html#chemical_type" title="The chemical type of the substance the spectrum represents" alt="" coords="17,47,287,65"/>
+<area shape="rect" href="backend.Spectrum-class.html#data" title="A list of integrated X,Y points for the spectrum&#39;s graph" alt="" coords="17,65,287,84"/>
+<area shape="rect" href="backend.Spectrum-class.html#owner" title="The owner of the Spectrum if in a private database" alt="" coords="17,84,287,103"/>
+<area shape="rect" href="backend.Spectrum-class.html#notes" title="Notes on the spectrum if in a private database" alt="" coords="17,103,287,121"/>
+<area shape="rect" href="backend.Spectrum-class.html#parse_string" title="Parse a string of JCAMP file data and extract all needed data." alt="" coords="17,124,287,143"/>
+<area shape="rect" href="backend.Spectrum-class.html#get_field" title="Get a specific data label from the file." alt="" coords="17,143,287,161"/>
+<area shape="rect" href="backend.Spectrum-class.html#calculate_peaks" title="Calculate the peaks for a spectrum." alt="" coords="17,161,287,180"/>
+<area shape="rect" href="backend.Spectrum-class.html#calculate_heavyside" title="Calculate the heavyside index for a spectrum." alt="" coords="17,180,287,199"/>
+<area shape="rect" href="backend.Spectrum-class.html" title="Store a spectrum, its related data, and any algorithms necessary to compare the spectrum to the DataStore." alt="" coords="16,11,288,200"/>
 </map>
   <img src="uml_class_diagram_for_backend__2.gif" alt='' usemap="#uml_class_diagram_for_backend__2" ismap="ismap" class="graph-without-title" />
 </center>
@@ -99,11 +101,11 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="backend.Spectrum-class.html#parse_file" class="summary-sig-name">parse_file</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">file_obj</span>)</span><br />
+          <td><span class="summary-sig"><a href="backend.Spectrum-class.html#parse_string" class="summary-sig-name">parse_string</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">contents</span>)</span><br />
       Parse a string of JCAMP file data and extract all needed data.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="backend-pysrc.html#Spectrum.parse_file">source&nbsp;code</a></span>
+            <span class="codelink"><a href="backend-pysrc.html#Spectrum.parse_string">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -154,7 +156,7 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="backend.Spectrum-class.html#calculate_heavyside" class="summary-sig-name">calculate_heavyside</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Calculate the heavyside inde for a spectrum.</td>
+      Calculate the heavyside index for a spectrum.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#Spectrum.calculate_heavyside">source&nbsp;code</a></span>
             
@@ -202,8 +204,24 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><code>list</code></span>
     </td><td class="summary">
-        <a name="data"></a><span class="summary-name">data</span> = <code title="db.ListProperty(float)">db.ListProperty(float)</code><br />
+        <a name="data"></a><span class="summary-name">data</span> = <code title="common.GenericListProperty()">common.GenericListProperty()</code><br />
       A list of integrated X,Y points for the spectrum's graph
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code class="link">google.appengine.ext.db.UserProperty</code></span>
+    </td><td class="summary">
+        <a name="owner"></a><span class="summary-name">owner</span> = <code title="db.UserProperty()">db.UserProperty()</code><br />
+      The owner of the Spectrum if in a private database
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>str</code></span>
+    </td><td class="summary">
+        <a name="notes"></a><span class="summary-name">notes</span> = <code title="db.StringProperty()">db.StringProperty()</code><br />
+      Notes on the spectrum if in a private database
     </td>
   </tr>
 </table>
@@ -225,18 +243,18 @@
   </td>
 </tr>
 </table>
-<a name="parse_file"></a>
+<a name="parse_string"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">parse_file</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">file_obj</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">parse_string</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">contents</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="backend-pysrc.html#Spectrum.parse_file">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="backend-pysrc.html#Spectrum.parse_string">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -247,8 +265,7 @@
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>file_obj</code></strong> (<code>file</code> or <code 
-          class="link">google.appengine.ext.blobstore.BlobReader</code>) - File descriptor containing spectrum information</li>
+        <li><strong class="pname"><code>contents</code></strong> (<code>unicode</code> or <code>str</code>) - String containing spectrum information</li>
     </ul></dd>
   </dl>
 <div class="fields">      <p><strong>Warning:</strong>
@@ -280,7 +297,10 @@
     <dt>Returns: <code>str</code></dt>
         <dd>Value of the data label</dd>
   </dl>
-</td></tr></table>
+<div class="fields">      <p><strong>Warning:</strong>
+        Does not support Windows-style line breaks.
+      </p>
+</div></td></tr></table>
 </div>
 <a name="calculate_peaks"></a>
 <div>
@@ -322,7 +342,7 @@
     </td>
   </tr></table>
   
-  <p>Calculate the heavyside inde for a spectrum.</p>
+  <p>Calculate the heavyside index for a spectrum.</p>
   <dl class="fields">
     <dt>Returns: <code>int</code></dt>
         <dd>The heavyside index</dd>
@@ -359,7 +379,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jul 18 21:25:21 2010</a>
+    3.0.1 on Tue Jul 20 20:12:39 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

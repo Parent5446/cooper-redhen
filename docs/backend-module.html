@@ -131,10 +131,49 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="backend-module.html#search" class="summary-sig-name">search</a>(<span class="summary-sig-arg">file_obj</span>)</span><br />
+          <td><span class="summary-sig"><a href="backend-module.html#search" class="summary-sig-name">search</a>(<span class="summary-sig-arg">spectrum_data</span>)</span><br />
       Search for a spectrum based on a given file descriptor.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#search">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>int</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="backend-module.html#compare" class="summary-sig-name">compare</a>(<span class="summary-sig-arg">data1</span>,
+        <span class="summary-sig-arg">data2</span>,
+        <span class="summary-sig-arg">algorithm</span>=<span class="summary-sig-default">&quot;bove&quot;</span>)</span><br />
+      Compare two spectra using the given algorithm.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="backend-pysrc.html#compare">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code> of <a href="backend.Spectrum-class.html" 
+      class="link">backend.Spectrum</a></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="backend-module.html#browse" class="summary-sig-name">browse</a>(<span class="summary-sig-arg">target</span>,
+        <span class="summary-sig-arg">limit</span>=<span class="summary-sig-default">10</span>,
+        <span class="summary-sig-arg">offset</span>=<span class="summary-sig-default">0</span>)</span><br />
+      Get a list of spectrum for browsing.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="backend-pysrc.html#browse">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -148,7 +187,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="backend-module.html#add" class="summary-sig-name">add</a>(<span class="summary-sig-arg">file_obj</span>)</span><br />
+          <td><span class="summary-sig"><a href="backend-module.html#add" class="summary-sig-name">add</a>(<span class="summary-sig-arg">spectrum_data</span>)</span><br />
       Add a new spectrum to the database from a given file descriptor.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#add">source&nbsp;code</a></span>
@@ -194,7 +233,7 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">search</span>(<span class="sig-arg">file_obj</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">search</span>(<span class="sig-arg">spectrum_data</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="backend-pysrc.html#search">source&nbsp;code</a></span>&nbsp;
@@ -209,12 +248,85 @@
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>file_obj</code></strong> (<code>file</code> or <code 
-          class="link">google.appengine.ext.blobstore.BlobReader</code>) - File descriptor containing spectrum information</li>
+        <li><strong class="pname"><code>spectrum_data</code></strong> (<code>str</code>) - String containing spectrum information</li>
     </ul></dd>
     <dt>Returns: <code>list</code> of <a href="backend.Spectrum-class.html" 
       class="link">backend.Spectrum</a></dt>
         <dd>List of candidates similar to the input spectrum</dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If a non-string is given as spectrum_data</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="compare"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">compare</span>(<span class="sig-arg">data1</span>,
+        <span class="sig-arg">data2</span>,
+        <span class="sig-arg">algorithm</span>=<span class="sig-default">&quot;bove&quot;</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="backend-pysrc.html#compare">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Compare two spectra using the given algorithm.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>data1</code></strong> (<code>str</code>) - String containing spectrum information</li>
+        <li><strong class="pname"><code>data2</code></strong> (<code>str</code>) - String containing spectrum information</li>
+    </ul></dd>
+    <dt>Returns: <code>int</code></dt>
+        <dd>Calculated error between the two spectra</dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If a non-string is given as spectrum_data or if an invalid 
+        algorithm is given.</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="browse"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">browse</span>(<span class="sig-arg">target</span>,
+        <span class="sig-arg">limit</span>=<span class="sig-default">10</span>,
+        <span class="sig-arg">offset</span>=<span class="sig-default">0</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="backend-pysrc.html#browse">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get a list of spectrum for browsing.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>target</code></strong> (<code>str</code>) - Where to list spectrum from (&quot;public&quot; or 
+          &quot;private&quot;)</li>
+        <li><strong class="pname"><code>limit</code></strong> (<code>int</code>) - Number of spectra to list</li>
+        <li><strong class="pname"><code>offset</code></strong> (<code>int</code>) - Where to start listing from (for pagination)</li>
+    </ul></dd>
+    <dt>Returns: <code>list</code> of <a href="backend.Spectrum-class.html" 
+      class="link">backend.Spectrum</a></dt>
+        <dd>List of spectra</dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If the user tries to retrieve too many spectra at once, the user is
+        not logged in and tries to access a private database, or if an 
+        invalid database choice is given.</li>
+    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -225,7 +337,7 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">add</span>(<span class="sig-arg">file_obj</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">add</span>(<span class="sig-arg">spectrum_data</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="backend-pysrc.html#add">source&nbsp;code</a></span>&nbsp;
@@ -240,8 +352,11 @@
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>file_obj</code></strong> (<code>file</code> or <code 
-          class="link">google.appengine.ext.blobstore.BlobReader</code>) - File descriptor containing spectrum information</li>
+        <li><strong class="pname"><code>spectrum_data</code></strong> (<code>str</code>) - String containing spectrum information</li>
+    </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If a non-string is given as spectrum_data</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -276,7 +391,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sun Jul 18 21:25:20 2010</a>
+    3.0.1 on Tue Jul 20 20:12:39 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

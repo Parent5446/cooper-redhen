@@ -27,9 +27,9 @@ def search(spectrum_data):
     
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
-    
     @return: List of candidates similar to the input spectrum
     @rtype: C{list} of L{backend.Spectrum}
+    @raise common.InputError: If a non-string is given as spectrum_data
     '''
     if not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
@@ -59,6 +59,8 @@ def compare(data1, data2, algorithm="bove"):
     @type  data2: C{str}
     @return: Calculated error between the two spectra
     @rtype: C{int}
+    @raise common.InputError: If a non-string is given as spectrum_data or if
+    an invalid algorithm is given.
     '''
     # First check for invalid spectrum data (if they are not strings).
     if not isinstance(data1, str) or isinstance(spectrum_data, unicode):
@@ -96,6 +98,9 @@ def browse(target, limit=10, offset=0):
     @type  offset: C{int}
     @return: List of spectra
     @rtype: C{list} of L{backend.Spectrum}
+    @raise common.InputError: If the user tries to retrieve too many spectra
+    at once, the user is not logged in and tries to access a private database,
+    or if an invalid database choice is given.
     '''
     if limit > 50:
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
@@ -119,6 +124,7 @@ def add(spectrum_data):
     
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
+    @raise common.InputError: If a non-string is given as spectrum_data
     '''
     if not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
@@ -275,8 +281,8 @@ class Spectrum(db.Model):
         '''
         key, left_edge, width = 0, 0, len(self.data) # Initialize variables
         for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS):
-            left = sum(self.data[left_edge:left_edge + width / 2])
-            right = sum(self.data[left_edge + width / 2:left_edge + width])
+            left = sum([i[1] for i in self.data[left_edge:left_edge + width / 2]])
+            right = sum([i[1] for i in self.data[left_edge + width / 2:left_edge + width]])
             if left_edge + width == len(self.data):
                 left_edge = 0
                 width = width / 2 #Adjust boundaries
@@ -374,7 +380,7 @@ class Matcher(db.Model):
             peak_index = self.peak_list[index+offset][1]
             keys[peak_index] = keys.get(peak_index, 0) + (5 - abs(offset))
         # Sort candidates by number of votes and return Spectrum objects.
-        keys = sorted(keys.iteritems(), key=operator.itemgetter(1))
+        keys = sorted(keys.iteritems(), key=operator.itemgetter(1), reverse=True)
         return Spectrum.get([k[0] for k in keys])
     
     @staticmethod # Make a static method for faster execution
@@ -389,8 +395,12 @@ class Matcher(db.Model):
         @type  b: L{backend.Spectrum}
         @return: The difference or error between the spectra
         @rtype: C{int}
+        @raise common.ServerError: If there are invalid spectra in the database
         '''
-        return max([abs(a.data[i]-b.data[i]) for i in xrange(len(a.data))])
+        length = min([len(a.data), len(b.data)])
+        if length == 0 or a.data is None or b.data is None:
+            raise common.ServerError("Invalid spectra in the database.")
+        return max([abs(a.data[i][1] - b.data[i][1]) for i in xrange(length)])
     
     @staticmethod # Make a static method for faster execution
     def least_squares(a, b):
@@ -404,5 +414,9 @@ class Matcher(db.Model):
         @type  b: L{backend.Spectrum}
         @return: The difference or error between the spectra
         @rtype: C{int}
+        @raise common.ServerError: If there are invalid spectra in the database
         '''
-        return sum([(a.data[i]-a.b[i])**2 for i in xrange(len(a.data))])
+        length = min([len(a.data), len(b.data)])
+        if length == 0 or a.data is None or b.data is None:
+            raise common.ServerError("Invalid spectra in the database.")
+        return sum([(a.data[i][1] - a.b[i][1])**2 for i in xrange(length)])
