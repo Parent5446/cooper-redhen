@@ -15,10 +15,10 @@ from pyjamas.ui.DockPanel import DockPanel
 from pyjamas.ui.DialogBox import DialogBox
 from pyjamas.ui.TextBox import TextBox
 
-class StartPage(Composite):
-    def __init__(self):
+class BasicControls(Composite):
+    def __init__(self, StyleName=None):
         Composite.__init__(self)
-        panel = AbsolutePanel(StyleName='start-control-panel')
+        panel = AbsolutePanel(Size=('250px', None), StyleName=StyleName)
         grid = Grid(2, 2)
         file_upload = FileUpload(StyleName='file-upload')
         uploaded_files = {}
@@ -28,22 +28,28 @@ class StartPage(Composite):
         browse_list.addChangeListener(lambda: file_upload.setVisible(browse_list.getSelectedItemText()[0]=='my computer'))
         def browse(event):
             dialog = DialogBox()
-            dock = DockPanel(StyleName='browse-dialog')
+            dock = DockPanel(StyleName='browse-dialog', Size=('250px', None))
             dock.setSpacing(4)
             dock.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)
             dock.add(HTML('Enter a chemical name from '+browse_list.getSelectedItemText()[0]+':'), DockPanel.NORTH)
             input = TextBox()
-            def suggest(key):
+            def keyPressed(self, sender, keycode, modifiers):
                 text = input.getText()
-                if len(text) > 3:
-                    Window.alert(text)
-            input.onKeyDown = suggest
-            dock.add(input, DockPanel.CENTER)
-            dock.add(Button("Done", dialog), DockPanel.SOUTH)
+                if len(text) == 5:
+                    Window.alert('Looking up '+text)
+                elif len(text) > 5:
+                    Window.alert('Narrowing down '+text)
             def done():
                 Window.alert( input.getText() )
                 dialog.hide()
             dialog.onClick = done
+            listener = object()
+            listener.onKeyPress = lambda: None
+            listener.onKeyUp = keyPressed
+            listener.onKeyDown = lambda: None
+            input.addKeyboardListener(listener)
+            dock.add(input, DockPanel.CENTER)
+            dock.add(Button("Done", dialog), DockPanel.SOUTH) #Passes button clicks to dialog
             dock.setWidth("100%")
             dialog.setWidget(dock)
             dialog.setPopupPosition(panel.getAbsoluteLeft(), panel.getAbsoluteTop()-10)
@@ -63,15 +69,12 @@ class StartPage(Composite):
         panel.add(grid)
         panel.add(file_upload, '-100px', '5px')
         
-        vertical = VerticalPanel()
-        vertical.add(Image('banner.png'))
-        vertical.add(panel)
-        vertical.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)
-        vertical.setWidth("100%")
-        self.initWidget(vertical)
+        self.initWidget(panel)
 
 if __name__ == '__main__':
-    dp = DockPanel(StyleName='start-panel')
-    dp.add(StartPage(), DockPanel.CENTER)
-    RootPanel().add(dp)
+    dock = DockPanel(StyleName='centered-panel')
+    dock.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)
+    dock.add(Image('banner.png'), DockPanel.NORTH)
+    dock.add(BasicControls(StyleName='frontpage-controls'), DockPanel.CENTER)
+    RootPanel().add(dock)
     
