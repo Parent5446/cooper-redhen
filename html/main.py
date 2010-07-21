@@ -1,3 +1,6 @@
+'''
+A spectra-comparison website, which compiles to Javascript via Pyjamas (version 0.7).
+'''
 from pyjamas.ui.RootPanel import RootPanel
 from pyjamas.ui.ListBox import ListBox
 from pyjamas.ui.FileUpload import FileUpload
@@ -17,12 +20,12 @@ from pyjamas.ui.TextBox import TextBox
 
 class BasicControls(Composite):
     def __init__(self, StyleName=None):
-        Composite.__init__(self)
-        panel = AbsolutePanel(Size=('250px', None), StyleName=StyleName)
-        grid = Grid(2, 2)
-        file_upload = FileUpload(StyleName='file-upload')
-        uploaded_files = {}
-
+        Composite.__init__(self) #Superclass constructor
+        panel = AbsolutePanel(Size=('250px', None), StyleName=StyleName) #Panel which contains the controls
+        file_upload = FileUpload(StyleName='file-upload') #File upload control (not visible)
+        uploaded_files = {} #Table of uploaded files
+        
+        #Make list of 'browse' options:
         browse_list = ListBox(StyleName='listbox')
         map(browse_list.addItem, ['my computer', 'my projects', 'main library'])
         browse_list.addChangeListener(lambda: file_upload.setVisible(browse_list.getSelectedItemText()[0]=='my computer'))
@@ -55,21 +58,23 @@ class BasicControls(Composite):
             dialog.setPopupPosition(panel.getAbsoluteLeft(), panel.getAbsoluteTop()-10)
             dialog.show()
         
+        #Make list of 'compare' options:
         compare_list = ListBox(StyleName='listbox')
         map(compare_list.addItem, ['to main library', 'to my projects', 'to each other'])
         def compare(event):
             file = file_upload.getFilename()
-            if file not in uploaded_files: Window.alert(HTML('<i>'+file+'</i>'))
+            if file not in uploaded_files: panel.add(HTML('<i>'+file+'</i>'))
             uploaded_files[file] = True
             
+        #Make grid layout:
+        grid = Grid(2, 2)
         grid.setWidget(0, 0, Button('<b>Browse</b>', browse, StyleName='button'))
         grid.setWidget(1, 0, Button('<b>Compare</b>', compare, StyleName='button'))
         grid.setWidget(0, 1, browse_list)
         grid.setWidget(1, 1, compare_list)
         panel.add(grid)
-        panel.add(file_upload, '-100px', '5px')
-        
-        self.initWidget(panel)
+        panel.add(file_upload, '-100px', '5px') #This is a kludge (transparent file upload layered over a visible button)
+        self.initWidget(panel) #This panel becomes the center of the widget, and we're done
 
 if __name__ == '__main__':
     dock = DockPanel(StyleName='centered-panel')
