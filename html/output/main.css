@@ -1,8 +1,12 @@
-.center-panel
+.start-control-panel
 {
     margin: auto;
     width: 250px;
     margin-top: 50px;
+}
+.start-panel
+{
+    margin: auto;
 }
 .listbox
 {
@@ -18,7 +22,7 @@
 	filter:alpha(opacity: 0);
 	opacity: 0;
 }
-.asdf
+.asdfas
 {
-    
+
 }
