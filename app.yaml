@@ -1,5 +1,5 @@
 application: cooper-redhen
-version: 2
+version: 1
 runtime: python
 api_version: 1
 
@@ -17,3 +17,9 @@ handlers:
   script: uploader.py
   login: admin
   secure: optional
+
+- url: /docs
+  static_dir: docs
+
+- url: /.*
+  static_dir: html/output
