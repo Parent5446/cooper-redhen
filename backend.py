@@ -193,8 +193,8 @@ class Spectrum(db.Model):
         xy = []
         # Process the XY data from JCAMP's (X++(Y..Y)) format.
         raw_xy = self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]
-        for match in re.finditer(r'(\D)([\d.-]+)', raw_xy):
-            if match.group(1) == '\n':
+        for match in re.finditer(r'(\D+)([\d.-]+)', raw_xy):
+            if '\n' in match.group(1):
                 # Number is the first on the line and is an x-value
                 x = float(match.group(2)) * x_factor
             else:

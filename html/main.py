@@ -12,6 +12,8 @@ from pyjamas.ui.VerticalPanel import VerticalPanel
 from pyjamas.ui.Composite import Composite
 from pyjamas.ui import HasAlignment
 from pyjamas.ui.DockPanel import DockPanel
+from pyjamas.ui.DialogBox import DialogBox
+from pyjamas.ui.TextBox import TextBox
 
 class StartPage(Composite):
     def __init__(self):
@@ -25,16 +27,35 @@ class StartPage(Composite):
         map(browse_list.addItem, ['my computer', 'my projects', 'main library'])
         browse_list.addChangeListener(lambda: file_upload.setVisible(browse_list.getSelectedItemText()[0]=='my computer'))
         def browse(event):
-            if browse_list.getSelectedItemText()[0] == 'my projects': pass
-            elif browse_list.getSelectedItemText()[0] == 'main library': pass
+            dialog = DialogBox()
+            dock = DockPanel(StyleName='browse-dialog')
+            dock.setSpacing(4)
+            dock.setHorizontalAlignment(HasAlignment.ALIGN_CENTER)
+            dock.add(HTML('Enter a chemical name from '+browse_list.getSelectedItemText()[0]+':'), DockPanel.NORTH)
+            input = TextBox()
+            def suggest(key):
+                text = input.getText()
+                if len(text) > 3:
+                    Window.alert(text)
+            input.onKeyDown = suggest
+            dock.add(input, DockPanel.CENTER)
+            dock.add(Button("Done", dialog), DockPanel.SOUTH)
+            def done():
+                Window.alert( input.getText() )
+                dialog.hide()
+            dialog.onClick = done
+            dock.setWidth("100%")
+            dialog.setWidget(dock)
+            dialog.setPopupPosition(panel.getAbsoluteLeft(), panel.getAbsoluteTop()-10)
+            dialog.show()
         
         compare_list = ListBox(StyleName='listbox')
         map(compare_list.addItem, ['to main library', 'to my projects', 'to each other'])
         def compare(event):
             file = file_upload.getFilename()
-            if file not in uploaded_files: self.add(HTML('<i>'+file+'</i>'))
+            if file not in uploaded_files: Window.alert(HTML('<i>'+file+'</i>'))
             uploaded_files[file] = True
-        
+            
         grid.setWidget(0, 0, Button('<b>Browse</b>', browse, StyleName='button'))
         grid.setWidget(1, 0, Button('<b>Compare</b>', compare, StyleName='button'))
         grid.setWidget(0, 1, browse_list)

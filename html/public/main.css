@@ -16,6 +16,14 @@
 {
     width: 120px;
 }
+.browse-dialog
+{
+    background-color:#CCF;
+    width:250px;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    behavior:url(border-radius.htc);
+}
 .file-upload
 {
     -moz-opacity:0;
