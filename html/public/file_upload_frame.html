@@ -1,0 +1,19 @@
+<html>
+    <form id='form' action='http://localhost:8082/api' method="post" enctype="multipart/form-data">
+        <input type="file" name='file' id="file" style='position:absolute; right:0px; top:0px;'/>
+        <input type="submit" style='visibility:hidden;'/>
+    </form>
+    <script language="JavaScript">
+        var file = document.getElementById('file');
+        file.onmouseout = function()
+        {
+            if(this.value)
+            {
+                file.onmouseout = function () {}
+                document.getElementById('form').submit();
+                parent.document.file_loaded(this.value);
+                window.location = 'file_upload_frame.html';
+            }
+		}
+    </script>
+</html>

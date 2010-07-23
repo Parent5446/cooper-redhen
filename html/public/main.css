@@ -26,14 +26,16 @@
 	filter:alpha(opacity=95);
 	opacity: 0.95;
 }
-.file-upload
+.invisible-frame
 {
+    height:20px;
+    border-style:none;
     -moz-opacity:0;
 	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 	filter:alpha(opacity=0);
-	opacity: 0;
+	opacity:0;
 }
 .asdfas
 {
-
+    
 }
