@@ -7,22 +7,22 @@ instructions, and all others will be ignored. The POST variables below
 may be passed. If uploading files, make sure to set enctype to
 multipart/form-data, or they will not be processed properly.
 
-- action (required):
-    - "compare" - Compare two targets, either from file upload or database.
-    - "analyze" - Does the same as compare, except instead of taking two
+ - action (required):
+     - "compare" - Compare two targets, either from file upload or database.
+     - "analyze" - Does the same as compare, except instead of taking two
                   targets, it takes one and searches the database in an
                   attempt to find the other (good for unknown spectra).
-    - "browse"  - Browse the database.
-- target (required):
+     - "browse"  - Browse the database.
+ - target (required):
     - When action is "search" or "compare": Can be either the text from a JCAMP
       file or "db:key", where key is the database key for a Spectrum object.
     - When action is "browse": Can be either "public" for browsing the public
       library or "private" for browsing your own private library.
-- limit (optional, used only when action is "browse"): How many spectra to get
+ - limit (optional, used only when action is "browse"): How many spectra to get
   when browsing (maximum is 50).
-- offset (optional, used only when action is "browse"): Where to start listing
+ - offset (optional, used only when action is "browse"): Where to start listing
   spectra from (used for pagination).
-- output (optional): Can be "xml", "json", "python", or "pickle" depending on
+ - output (optional): Can be "xml", "json", "python", or "pickle" depending on
                      what output format you want. Default is "pickle".
 
 @organization: The Cooper Union for the Advancement of the Science and the Arts

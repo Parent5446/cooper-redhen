@@ -4,8 +4,8 @@ the file to the Google Data Store.
 
 Usage:
 ./uploader.py <appcfg.py> <directory>
-- appcfg.py : Path to Google App Engine's appcfg.py script
-- directory : Directory to scan for JCAMP files
+ - appcfg.py : Path to Google App Engine's appcfg.py script
+ - directory : Directory to scan for JCAMP files
 
 NOTE: The directory given must contain only JCAMP files. Furthermore, this
 script will process recursively, so subdirectories will also be checked.

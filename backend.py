@@ -91,17 +91,17 @@ def browse(target, limit=10, offset=0):
     Get a list of spectrum for browsing.
     
     @param target: Where to list spectrum from ("public" or "private")
-    @type  target: C{str}
+    @type  target: C{str} or L{google.appengine.api.users.User}
     @param limit: Number of spectra to list
     @type  limit: C{int}
     @param offset: Where to start listing from (for pagination)
     @type  offset: C{int}
     @return: List of spectra
     @rtype: C{list} of L{backend.Spectrum}
-    @raise common.InputErro    @param target: Where to store the spectrum
-    @type  target: C{"public"} or L{google.appengine.api.users.User}r: If the user tries to retrieve too many spectra
+    @raise common.InputError: If the user tries to retrieve too many spectra
     at once, the user is not logged in and tries to access a private database,
     or if an invalid database choice is given.
+    
     '''
     if limit > 50:
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
