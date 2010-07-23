@@ -10,9 +10,6 @@ handlers:
 - url: /api
   script: frontend.py
 
-- url: /serve
-  script: frontend.py
-
 - url: /upload
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: admin
