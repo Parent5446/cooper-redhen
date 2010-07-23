@@ -187,10 +187,29 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="backend-module.html#add" class="summary-sig-name">add</a>(<span class="summary-sig-arg">spectrum_data</span>)</span><br />
+          <td><span class="summary-sig"><a href="backend-module.html#add" class="summary-sig-name">add</a>(<span class="summary-sig-arg">spectrum_data</span>,
+        <span class="summary-sig-arg">target</span>=<span class="summary-sig-default">&quot;public&quot;</span>)</span><br />
       Add a new spectrum to the database from a given file descriptor.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#add">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="backend-module.html#delete" class="summary-sig-name">delete</a>(<span class="summary-sig-arg">spectrum_data</span>,
+        <span class="summary-sig-arg">target</span>=<span class="summary-sig-default">&quot;public&quot;</span>)</span><br />
+      Delete a spectrum from the database and Matcher.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="backend-pysrc.html#delete">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -206,6 +225,7 @@
   <span title="operator">operator</span>,
   <span title="google.appengine.ext.db">db</span>,
   <span title="google.appengine.api.memcache">memcache</span>,
+  <span title="google.appengine.api.users">users</span>,
   <a href="common-module.html" title="common">common</a>
 </p><br />
 <!-- ==================== FUNCTION DETAILS ==================== -->
@@ -321,12 +341,6 @@
     <dt>Returns: <code>list</code> of <a href="backend.Spectrum-class.html" 
       class="link">backend.Spectrum</a></dt>
         <dd>List of spectra</dd>
-    <dt>Raises:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If the user tries to retrieve too many spectra at once, the user is
-        not logged in and tries to access a private database, or if an 
-        invalid database choice is given.</li>
-    </ul></dd>
   </dl>
 </td></tr></table>
 </div>
@@ -337,7 +351,8 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">add</span>(<span class="sig-arg">spectrum_data</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">add</span>(<span class="sig-arg">spectrum_data</span>,
+        <span class="sig-arg">target</span>=<span class="sig-default">&quot;public&quot;</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="backend-pysrc.html#add">source&nbsp;code</a></span>&nbsp;
@@ -353,6 +368,38 @@
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>spectrum_data</code></strong> (<code>str</code>) - String containing spectrum information</li>
+        <li><strong class="pname"><code>target</code></strong> (<code>&quot;public&quot;</code> or <code 
+          class="link">google.appengine.api.users.User</code>) - Where to store the spectrum</li>
+    </ul></dd>
+    <dt>Raises:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If a non-string is given as spectrum_data</li>
+    </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="delete"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">delete</span>(<span class="sig-arg">spectrum_data</span>,
+        <span class="sig-arg">target</span>=<span class="sig-default">&quot;public&quot;</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="backend-pysrc.html#delete">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Delete a spectrum from the database and Matcher.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>spectrum_data</code></strong> (<code>str</code>) - String containing database keys</li>
+        <li><strong class="pname"><code>target</code></strong> (<code>&quot;public&quot;</code> or <code 
+          class="link">google.appengine.api.users.User</code>) - Where to store the spectrum</li>
     </ul></dd>
     <dt>Raises:</dt>
     <dd><ul class="nomargin-top">
@@ -391,7 +438,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jul 20 20:12:39 2010</a>
+    3.0.1 on Thu Jul 22 21:23:09 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

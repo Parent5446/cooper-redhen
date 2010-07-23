@@ -13,7 +13,7 @@ import bisect # bisect.bisect (binary search of a list)
 import operator # operator.attrgetter, operator.itemgetter
 
 from google.appengine.ext import db # import database
-from google.appengine.api import memcache # import memory cache
+from google.appengine.api import memcache, users # import memory cache and user
 
 import common
 
@@ -98,7 +98,8 @@ def browse(target, limit=10, offset=0):
     @type  offset: C{int}
     @return: List of spectra
     @rtype: C{list} of L{backend.Spectrum}
-    @raise common.InputError: If the user tries to retrieve too many spectra
+    @raise common.InputErro    @param target: Where to store the spectrum
+    @type  target: C{"public"} or L{google.appengine.api.users.User}r: If the user tries to retrieve too many spectra
     at once, the user is not logged in and tries to access a private database,
     or if an invalid database choice is given.
     '''
@@ -106,15 +107,10 @@ def browse(target, limit=10, offset=0):
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
     if target == "public":
         return Spectrum.all().fetch(limit, offset)
-    elif target == "private":
-        user = get_current_user()
-        if user is None:
-            raise common.InputError(user, "You are not logged in.")
-        return Spectrum.gql("owner = :user", user).fetch(limit, offset)
     else:
-        raise common.InputError(target, "Invalid database to search.")
+        return Spectrum.gql("owner = :user", user).fetch(limit, offset)
 
-def add(spectrum_data):
+def add(spectrum_data, target="public"):
     '''
     Add a new spectrum to the database from a given file descriptor.
     
@@ -124,27 +120,67 @@ def add(spectrum_data):
     
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
+    @param target: Where to store the spectrum
+    @type  target: C{"public"} or L{google.appengine.api.users.User}
     @raise common.InputError: If a non-string is given as spectrum_data
     '''
-    if not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
+    if isinstance(spectrum_data, file):
+        spectrum_data = spectrum_data.read()
+    elif not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
     spectrum.parse_string(spectrum_data)
-    # Check cache for the Matcher. If not, get from database. If it's not there,
-    # make a new one.
-    matcher = memcache.get(spectrum.type + '_matcher')
-    if matcher is None:
-        matcher = Matcher.get_by_key_name(spectrum.type)
-    if not matcher:
-        matcher = Matcher(key_name=spectrum.type)
-    # Add the spectrum to the database and Matcher.
+    if target == "public":
+        # Check cache for the Matcher. If not, get from database. If it's
+        # not there, make a new one.
+        matcher = memcache.get(spectrum.type + '_matcher')
+        if matcher is None:
+            matcher = Matcher.get_by_key_name(spectrum.type)
+        if not matcher:
+            matcher = Matcher(key_name=spectrum.type)
+        matcher.add(spectrum)
+        # Update the Matcher to the database and the cache.
+        matcher.put()
+        memcache.set(spectrum.type + '_matcher', matcher)
+    else:
+        spectrum.owner = target
+    # Add the spectrum to the database.
     spectrum.put()
-    matcher.add(spectrum)
-    # Update the Matcher to the database and the cache.
-    matcher.put()
-    memcache.set(spectrum.type + '_matcher', matcher)
 
+def delete(spectrum_data, target="public"):
+    '''
+    Delete a spectrum from the database and Matcher.
+    
+    @param spectrum_data: String containing database keys
+    @type  spectrum_data: C{str}
+    @param target: Where to store the spectrum
+    @type  target: C{"public"} or L{google.appengine.api.users.User}
+    @raise common.InputError: If a non-string is given as spectrum_data
+    '''
+    if not str(spectrum_data)[0:3] == "db:":
+        raise common.InputError(spectrum_data, "Invalid database key.")
+    # Load the spectrum into a Spectrum object.
+    spectrum = Spectrum(spectrum_data)
+    # Remove it from the Matcher if in a public database.
+    if target == "public":
+        # Check cache for the Matcher. If not, get from database. If it's
+        # not there, make a new one.
+        matcher = memcache.get(spectrum.type + '_matcher')
+        if matcher is None:
+            matcher = Matcher.get_by_key_name(spectrum.type)
+        if not matcher:
+            matcher = Matcher(key_name=spectrum.type)
+        matcher.delete(spectrum)
+        # Update the Matcher to the database and the cache.
+        matcher.put()
+        memcache.set(spectrum.type + '_matcher', matcher)
+    else:
+        # If private, check if it is indeed the user's database.
+        if not spectrum.owner == target:
+            raise common.AuthError(target, "Need to be the owner of the spectrum.")
+    # Delete the spectrum to the database.
+    spectrum.delete()
 
 class Spectrum(db.Model):
     '''
@@ -159,7 +195,11 @@ class Spectrum(db.Model):
     chemical_type = db.StringProperty()
     '''The chemical type of the substance the spectrum represents
     @type: C{str}'''
-    
+
+    spectrum_type = db.StringProperty()
+    '''The spectrum type of the substance the spectrum represents
+    @type: C{str}'''
+
     data = common.GenericListProperty()
     '''A list of integrated X,Y points for the spectrum's graph
     @type: C{list}'''
@@ -185,7 +225,7 @@ class Spectrum(db.Model):
         @type  contents: C{unicode} or C{str}
         '''
         self.contents = contents
-        self.type = 'Infrared' # Later this will be variable
+        self.spectrum_type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
         delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
         x_factor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
@@ -193,7 +233,8 @@ class Spectrum(db.Model):
         xy = []
         # Process the XY data from JCAMP's (X++(Y..Y)) format.
         raw_xy = self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]
-        for match in re.finditer(r'(\D+)([\d.-]+)', raw_xy):
+        pattern = re.compile(r'(\D+)([\d.-]+)')
+        for match in re.finditer(pattern, raw_xy):
             if '\n' in match.group(1):
                 # Number is the first on the line and is an x-value
                 x = float(match.group(2)) * x_factor
@@ -332,7 +373,6 @@ class Matcher(db.Model):
         @param spectrum: The spectrum to add
         @type  spectrum: L{backend.Spectrum}
         '''
-
         #Flat heavyside: hash table of heavyside keys
         key = spectrum.calculate_heavyside()
         if key in self.flat_heavyside:
@@ -343,7 +383,18 @@ class Matcher(db.Model):
         #peak_list - positions of highest peaks:
         for peak in spectrum.calculate_peaks():
             bisect.insort(self.peak_list, (peak, spectrum.key()))
-
+    
+    def delete(self, spectrum):
+        '''
+        Delete a spectrum to the Matcher.
+        
+        @param spectrum: The spectrum to add
+        @type  spectrum: L{backend.Spectrum}
+        '''
+        # Remove it from the heavyside keys and peak lists.
+        [key.discard(spectrum) for spectrum in self.flat_heavyside]
+        [self.flat_heavyside.remove(peak) for peak in self.peak_list if x[1] == spectrum]
+    
     def get(self, spectrum):
         '''
         Find spectra similar to the given one.

@@ -196,3 +196,20 @@ class ServerError(Error):
         """
         self.msg = msg
         self.log()
+
+
+class AuthError(Error):
+    """Exception raised for authorization errors."""
+    
+    def __init__(self, nickname, msg):
+        """
+        Initialize the exception variables.
+        
+        @param nickname: The user's nickname, if applicable
+        @type  nickname: C{str}
+        @param msg: Explanation of what permissions were needed
+        @type  msg: C{str}
+        """
+        self.expr = nickname
+        self.msg = msg
+        self.log()

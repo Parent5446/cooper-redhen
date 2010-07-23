@@ -57,43 +57,23 @@
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module uploader</h1><p class="nomargin-top"><span class="codelink"><a href="uploader-pysrc.html">source&nbsp;code</a></span></p>
-<!-- ==================== CLASSES ==================== -->
-<a name="section-Classes"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Classes</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-Classes"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="uploader.Uploader-class.html" class="summary-name">Uploader</a><br />
-      Handle upload requests submitted to the server from the client-side 
-      version of this script.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="uploader.SpectrumTransfer-class.html" class="summary-name">SpectrumTransfer</a><br />
-      A copy of <a href="backend.Spectrum-class.html" 
-        class="link">backend.Spectrum</a> except without the Google App 
-        Engine dependencies.
-    </td>
-  </tr>
-</table>
+<pre class="literalblock">
+
+Take a directory of JCAMP files, store the data in a CSV file, and transfer
+the file to the Google Data Store.
+
+Usage:
+./uploader.py &lt;appcfg.py&gt; &lt;directory&gt;
+- appcfg.py : Path to Google App Engine's appcfg.py script
+- directory : Directory to scan for JCAMP files
+
+NOTE: The directory given must contain only JCAMP files. Furthermore, this
+script will process recursively, so subdirectories will also be checked.
+
+@todo: Create script to update the matcher.
+
+</pre>
+
 <!-- ==================== FUNCTIONS ==================== -->
 <a name="section-Functions"></a>
 <table class="summary" border="1" cellpadding="3"
@@ -117,7 +97,8 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="uploader-module.html#main_client" class="summary-sig-name">main_client</a>(<span class="summary-sig-arg">dirname</span>,
+          <td><span class="summary-sig"><a href="uploader-module.html#main_client" class="summary-sig-name">main_client</a>(<span class="summary-sig-arg">appcfg</span>,
+        <span class="summary-sig-arg">dirname</span>,
         <span class="summary-sig-arg">recursive</span>=<span class="summary-sig-default">False</span>)</span><br />
       Extract all files from a directory and transfer them to the server.</td>
           <td align="right" valign="top">
@@ -146,45 +127,48 @@
       
     </td>
   </tr>
-</table>
-<!-- ==================== VARIABLES ==================== -->
-<a name="section-Variables"></a>
-<table class="summary" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr bgcolor="#70b0f0" class="table-header">
-  <td colspan="2" class="table-header">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
-      <tr valign="top">
-        <td align="left"><span class="table-header">Variables</span></td>
-        <td align="right" valign="top"
-         ><span class="options">[<a href="#section-Variables"
-         class="privatelink" onclick="toggle_private();"
-         >hide private</a>]</span></td>
-      </tr>
-    </table>
-  </td>
-</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>str</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="uploader-module.html#get_field" class="summary-sig-name">get_field</a>(<span class="summary-sig-arg">contents</span>,
+        <span class="summary-sig-arg">name</span>)</span><br />
+      Get a specific data label from the file.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="uploader-pysrc.html#get_field">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="None">None</code><br />
-      hash(x)
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="uploader-module.html#get_data" class="summary-sig-name">get_data</a>(<span class="summary-sig-arg">contents</span>)</span><br />
+      Parse a string of JCAMP file data and extract all needed data.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="uploader-pysrc.html#get_data">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
     </td>
   </tr>
 </table>
 <p class="indent-wrapped-lines"><b>Imports:</b>
   <span title="cgi">cgi</span>,
   <span title="pickle">pickle</span>,
-  <span title="httplib">httplib</span>,
-  <span title="urllib">urllib</span>,
   <span title="os">os</span>,
   <span title="sys">sys</span>,
-  <span title="traceback">traceback</span>,
-  <span title="google.appengine.ext.webapp">webapp</span>,
-  <span title="google.appengine.ext.webapp.util.run_wsgi_app">run_wsgi_app</span>,
-  <span title="google.appengine.api.users">users</span>,
-  <a href="backend-module.html" title="backend">backend</a>
+  <span title="tempfile">tempfile</span>
 </p><br />
 <!-- ==================== FUNCTION DETAILS ==================== -->
 <a name="section-FunctionDetails"></a>
@@ -211,7 +195,8 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">main_client</span>(<span class="sig-arg">dirname</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">main_client</span>(<span class="sig-arg">appcfg</span>,
+        <span class="sig-arg">dirname</span>,
         <span class="sig-arg">recursive</span>=<span class="sig-default">False</span>)</span>
   </h3>
   </td><td align="right" valign="top"
@@ -251,7 +236,7 @@
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>file_obj</code></strong> (<code>type</code>) - File to load spectrum from</li>
+        <li><strong class="pname"><code>file_obj</code></strong> (<code>str</code>) - Filename to upload</li>
     </ul></dd>
     <dt>Raises:</dt>
     <dd><ul class="nomargin-top">
@@ -259,6 +244,64 @@
     </ul></dd>
   </dl>
 </td></tr></table>
+</div>
+<a name="get_field"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_field</span>(<span class="sig-arg">contents</span>,
+        <span class="sig-arg">name</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="uploader-pysrc.html#get_field">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Get a specific data label from the file.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>name</code></strong> (<code>str</code>) - Name of data label to retrieve</li>
+    </ul></dd>
+    <dt>Returns: <code>str</code></dt>
+        <dd>Value of the data label</dd>
+  </dl>
+<div class="fields">      <p><strong>Warning:</strong>
+        Does not support Windows-style line breaks.
+      </p>
+</div></td></tr></table>
+</div>
+<a name="get_data"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_data</span>(<span class="sig-arg">contents</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="uploader-pysrc.html#get_data">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Parse a string of JCAMP file data and extract all needed data.</p>
+  <p>Search a JCAMP file for the chemical's name, type, and spectrum data. 
+  Then integrate the X, Y data and store alGet a specific data label from 
+  the file.l variables in the object.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>contents</code></strong> (<code>unicode</code> or <code>str</code>) - String containing spectrum information</li>
+    </ul></dd>
+  </dl>
+<div class="fields">      <p><strong>Warning:</strong>
+        Does not handle Windows-format line breaks.
+      </p>
+</div></td></tr></table>
 </div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
@@ -290,7 +333,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Tue Jul 20 20:12:39 2010</a>
+    3.0.1 on Thu Jul 22 21:23:09 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
