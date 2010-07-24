@@ -1,3 +1,2 @@
 
-
-THE JAVASCRIPT FILES ARE MACHINE-GENERATED! DO NOT READ THESE FILES!
+The Javascript files are totally cool. Read 'em all you like.

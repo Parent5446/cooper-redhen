@@ -1,0 +1,78 @@
+.frontpage-controls
+{
+    width:250px;
+    height:80px;
+    position:relative;
+}
+.listbox
+{
+    width: 120px;
+}
+.button
+{
+    width: 120px;
+}
+.combobox-text
+{
+    width:150px;
+    margin:1px auto 0px auto;
+    display:block;
+    border:solid grey 1px;
+    font:inherit;
+}
+.combobox-dropdown
+{
+    width:148px;
+    margin:auto;
+    display:none;
+    border:solid gray 1px;
+    text-align:left;
+}
+.browse-dialog
+{
+    background-color:#FFF;
+    -moz-border-radius:10px;
+    -webkit-border-radius:10px;
+    border:solid gray 1px;
+    display:none;
+    position:absolute;
+    left:0px; top:0px;
+    width:100%;
+    z-index:2;
+}
+.controls-table
+{
+    position:absolute;
+    left:0px; top:0px;
+    width:100%;
+    height:80px;
+}
+.loaded-list
+{
+    font-style:italic;
+}
+.invisible-frame
+{
+    height:26px;
+    width:123px;
+    position:absolute;
+    border-style:none;
+    left:0px; top:0px;
+    -moz-opacity:0;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter:alpha(opacity=0);
+	opacity:0;
+}
+.graph
+{
+    width:500px;
+    height:300px;
+    display:none;
+    border:solid gray 1px;
+}
+.results
+{
+    width:250px;
+    height:200px;
+    display:none;
+}
