@@ -85,7 +85,7 @@ def compare(data1, data2, algorithm="bove"):
     else:
         raise common.InputError(algo, "Invalid algorithm selection.")
 
-def browse(target, limit=10, offset=0):
+def browse(target="public", limit=10, offset=0):
     '''
     Get a list of spectrum for browsing.
     
@@ -105,9 +105,8 @@ def browse(target, limit=10, offset=0):
     if limit > 50:
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
     if target == "public":
-        return Spectrum.all().fetch(limit, offset)
-    else:
-        return Spectrum.gql("owner = :user", user).fetch(limit, offset)
+        target = Project.get_or_insert("public")
+    return Spectrum.gql("WHERE project = :1", target).fetch(limit, offset)
 
 def add(spectrum_data, target="public"):
     '''
@@ -127,11 +126,13 @@ def add(spectrum_data, target="public"):
         spectrum_data = spectrum_data.read()
     elif not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
+    # If project does not exist, make a new one.
+    target = Project.get_or_insert(target, owners=[users.get_current_user()])
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
     spectrum.parse_string(spectrum_data)
-    if target != "public":
-        spectrum.owner = target
+    if isinstance(target, Project):
+        spectrum.project = target
     spectrum.put()
     if target == "public":
         # Check cache for the Matcher. If not, get from database. If it's
@@ -153,11 +154,10 @@ def delete(spectrum_data, target="public"):
     @param spectrum_data: String containing database keys
     @type  spectrum_data: C{str}
     @param target: Where to store the spectrum
-    @type  target: C{"public"} or L{google.appengine.api.users.User}
-    @raise common.InputError: If a non-string is given as spectrum_data
+    @type  target: C{"public"} or L{backend.Project} key
+    @raise common.AuthError: If a user tries to delete a spectrum outside
+    of his or her projects.
     '''
-    if not str(spectrum_data)[0:3] == "db:":
-        raise common.InputError(spectrum_data, "Invalid database key.")
     # Load the spectrum into a Spectrum object.
     spectrum = Spectrum(spectrum_data)
     # Remove it from the Matcher if in a public database.
@@ -175,10 +175,61 @@ def delete(spectrum_data, target="public"):
         memcache.set(spectrum.spectrum_type + '_matcher', matcher)
     else:
         # If private, check if it is indeed the user's database.
-        if not spectrum.owner == target:
-            raise common.AuthError(target, "Need to be the owner of the spectrum.")
+        if not spectrum.project == target:
+            raise common.AuthError(target, "Spectrum does not belong to targeted project.")
     # Delete the spectrum to the database.
     spectrum.delete()
+
+def auth(user, project, action):
+    '''
+    Check if user is allowed to do action on project.
+    
+    @param user: User trying to access the project
+    @type  user: L{google.appengine.api.users.User}
+    @param project: Project action is being done on
+    @type  project: "public" or L{backend.Project}
+    @param action: Action to be done. "View" means view the project. "Spectrum"
+    means add, edit, or delete spectra in the project. "Project" means change
+    the project itself and its permissions.
+    @type  action: "view", "spectrum", "project"
+    @return: Whether the user is allowed
+    @rtype: C{bool}
+    '''
+    # The main project has separate permissions
+    if project == "public":
+        # Only app admins can change the public project.
+        if action in ("spectrum", "project"):
+            return users.is_current_user_admin()
+        else:
+            # Everybody can view the main project
+            return True
+    # Owners can do anything.
+    if user in project.owners:
+        return True
+    # Uploaders can spectrum and view
+    if user in project.collaborators and action in ("spectrum", "view"):
+        return True
+    # Viewers can only view
+    if user in project.viewers and action == "view":
+        return True
+    # Otherwise, not allowed
+    return False
+
+
+class Project(db.Model):
+    owners = db.ListProperty(users.User)
+    '''The owners of the Project
+    @type: L{google.appengine.ext.db.UserProperty}'''
+    
+    collaborators = db.ListProperty(users.User)
+    '''People who can only change spectra in this project. They cannot change
+    the project or permissions.
+    @type: L{google.appengine.ext.db.UserProperty}'''
+    
+    viewers = db.ListProperty(users.User)
+    '''People who can only view the data (cannot add, change, etc.)
+    @type: L{google.appengine.ext.db.UserProperty}'''
+
 
 class Spectrum(db.Model):
     '''
@@ -198,17 +249,17 @@ class Spectrum(db.Model):
     '''The spectrum type of the substance the spectrum represents
     @type: C{str}'''
 
-    xvalues = db.ListProperty(int)
+    xvalues = db.ListProperty(int, indexed=False)
     '''A list of X points for the spectrum's graph
     @type: C{list}'''
     
-    yvalues = db.ListProperty(float)
+    yvalues = db.ListProperty(float, indexed=False)
     '''A list of integrated Y points for the spectrum's graph
     @type: C{list}'''
     
-    owner = db.UserProperty()
-    '''The owner of the Spectrum if in a private database
-    @type: L{google.appengine.ext.db.UserProperty}'''
+    project = db.ReferenceProperty(Project)
+    '''The project this spectrum belongs to.
+    @type: L{google.appengine.db.ReferenceProperty}'''
     
     notes = db.StringProperty()
     '''Notes on the spectrum if in a private database
@@ -336,6 +387,7 @@ class Spectrum(db.Model):
                 left_edge += width #for next iteration
             key += (left < right) << (Matcher.FLAT_HEAVYSIDE_BITS - bit)
         return key
+
 
 class Matcher(db.Model):
     '''

@@ -48,11 +48,15 @@ def main_client(appcfg, dirname, recursive=False):
                 chemical_type = 'Unknown'
                 spectrum_type = 'Infrared'
                 xvalues, yvalues = get_data(contents)
+                # AppEngine require integer lists to have 'L' at the end of
+                # each value.
+                xvalues = '[' + 'L, '.join([str(x) for x in xvalues]) + 'L]'
                 fp.write('"%s","%s","%s","%s","%s"' % (chemical_name,
-                           chemical_type, spectrum_type, str(xvalues), str(yvalues)))
+                           chemical_type, spectrum_type, xvalues, str(yvalues)))
     raise Exception(csvfile)
     os.execl(appcfg, "upload_data", "--config_file=bulkloader.yaml",
-             "--filename=%s" % filename, "--kind=Spectrum")
+             "--filename=%s" % csvfile, "--kind=Spectrum",
+             "--url=http://cooper-redhen.appspot.com/upload")
 
 def transfer(file_obj):
     """
@@ -138,7 +142,7 @@ def get_data(contents):
         if x > xvalue_range[1]:
             break #If finished, break
         oldX, oldY = x, y #Otherwise keep going
-    return (range(xvalue_range[0], xvalue_range[0] + len(data)), data)
+    return (range(int(xvalue_range[0]), int(xvalue_range[0] + len(data))), data)
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:

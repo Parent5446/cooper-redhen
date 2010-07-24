@@ -3,7 +3,7 @@
           "DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>common</title>
+  <title>backend.Project</title>
   <link rel="stylesheet" href="epydoc.css" type="text/css" />
   <script type="text/javascript" src="epydoc.js"></script>
 </head>
@@ -39,7 +39,8 @@
   <tr valign="top">
     <td width="100%">
       <span class="breadcrumbs">
-        Module&nbsp;common
+        <a href="backend-module.html">Module&nbsp;backend</a> ::
+        Class&nbsp;Project
       </span>
     </td>
     <td>
@@ -49,39 +50,36 @@
     onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
         <tr><td align="right"><span class="options"
             >[<a href="frames.html" target="_top">frames</a
-            >]&nbsp;|&nbsp;<a href="common-module.html"
+            >]&nbsp;|&nbsp;<a href="backend.Project-class.html"
             target="_top">no&nbsp;frames</a>]</span></td></tr>
       </table>
     </td>
   </tr>
 </table>
-<!-- ==================== MODULE DESCRIPTION ==================== -->
-<h1 class="epydoc">Module common</h1><p class="nomargin-top"><span class="codelink"><a href="common-pysrc.html">source&nbsp;code</a></span></p>
-<p>Provide functions and class definitions for use in both the front end 
-  and back end.</p>
-
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class Project</h1><p class="nomargin-top"><span class="codelink"><a href="backend-pysrc.html#Project">source&nbsp;code</a></span></p>
+<center>
+<center>  <map id="uml_class_diagram_for_backend__2" name="uml_class_diagram_for_backend__2">
+<area shape="rect" href="backend.Project-class.html#owners" title="The owners of the Project" alt="" coords="17,28,327,47"/>
+<area shape="rect" href="backend.Project-class.html#collaborators" title="People who can only change spectra in this project." alt="" coords="17,47,327,65"/>
+<area shape="rect" href="backend.Project-class.html#viewers" title="People who can only view the data (cannot add, change, etc.)" alt="" coords="17,65,327,84"/>
+<area shape="rect" href="backend.Project-class.html" title="backend.Project" alt="" coords="16,11,328,93"/>
+</map>
+  <img src="uml_class_diagram_for_backend__2.gif" alt='' usemap="#uml_class_diagram_for_backend__2" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
 <hr />
-<div class="fields">      <p><strong>Organization:</strong>
-        The Cooper Union for the Advancement of the Science and the Arts
-      </p>
-      <p><strong>License:</strong>
-        http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General 
-        Public License v3.0
-      </p>
-      <p><strong>Copyright:</strong>
-        Copyright (c) 2010, Cooper Union (Some Right Reserved)
-      </p>
-</div><!-- ==================== CLASSES ==================== -->
-<a name="section-Classes"></a>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
 <table class="summary" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr bgcolor="#70b0f0" class="table-header">
   <td colspan="2" class="table-header">
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr valign="top">
-        <td align="left"><span class="table-header">Classes</span></td>
+        <td align="left"><span class="table-header">Class Variables</span></td>
         <td align="right" valign="top"
-         ><span class="options">[<a href="#section-Classes"
+         ><span class="options">[<a href="#section-ClassVariables"
          class="privatelink" onclick="toggle_private();"
          >hide private</a>]</span></td>
       </tr>
@@ -90,58 +88,69 @@
 </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><code class="link">google.appengine.ext.db.UserProperty</code></span>
     </td><td class="summary">
-        <a href="common.DictProperty-class.html" class="summary-name">DictProperty</a><br />
-      Store a dictionary object in the Google Data Store.
+        <a name="owners"></a><span class="summary-name">owners</span> = <code title="db.ListProperty(users.User)">db.ListProperty(users.User)</code><br />
+      The owners of the Project
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><code class="link">google.appengine.ext.db.UserProperty</code></span>
     </td><td class="summary">
-        <a href="common.GenericListProperty-class.html" class="summary-name">GenericListProperty</a><br />
-      Store a list object in the Google Data Store.
+        <a href="backend.Project-class.html#collaborators" class="summary-name">collaborators</a> = <code title="db.ListProperty(users.User)">db.ListProperty(users.User)</code><br />
+      People who can only change spectra in this project.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
+      <span class="summary-type"><code class="link">google.appengine.ext.db.UserProperty</code></span>
     </td><td class="summary">
-        <a href="common.Error-class.html" class="summary-name">Error</a><br />
-      Base class for exceptions in this module.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="common.InputError-class.html" class="summary-name">InputError</a><br />
-      Exception raised for errors in the input.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="common.ServerError-class.html" class="summary-name">ServerError</a><br />
-      Exception raised for errors on the server side.
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a href="common.AuthError-class.html" class="summary-name">AuthError</a><br />
-      Exception raised for authorization errors.
+        <a name="viewers"></a><span class="summary-name">viewers</span> = <code title="db.ListProperty(users.User)">db.ListProperty(users.User)</code><br />
+      People who can only view the data (cannot add, change, etc.)
     </td>
   </tr>
 </table>
-<p class="indent-wrapped-lines"><b>Imports:</b>
-  <span title="logging">logging</span>,
-  <span title="pickle">pickle</span>,
-  <span title="google.appengine.ext.db">db</span>
-</p><br />
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="collaborators"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">collaborators</h3>
+  <p>People who can only change spectra in this project. They cannot change
+  the project or permissions.</p>
+  <dl class="fields">
+    <dt>Type:</dt>
+      <dd><code class="link">google.appengine.ext.db.UserProperty</code></dd>
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+db.ListProperty(users.User)
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">

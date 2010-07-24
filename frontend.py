@@ -45,7 +45,7 @@ class ApiHandler(webapp.RequestHandler):
         the API.
         """
         self.response.out.write("""<pre>
-RedHen API v0.1
+RedHen API v0.2
 
 All request must be POST requests. Any GET requests will just print these
 instructions, and all others will be ignored. The POST variables below
@@ -58,11 +58,13 @@ multipart/form-data, or they will not be processed properly.
                   targets, it takes one and searches the database in an
                   attempt to find the other (good for unknown spectra).
     - "browse"  - Browse the database.
-- target (required):
-    - When action is "search" or "compare": Can be either the text from a JCAMP
-      file or "db:key", where key is the database key for a Spectrum object.
-    - When action is "browse": Can be either "public" for browsing the public
-      library or "private" for browsing your own private library.
+    - "add"     - Add a spectrum to the database (or a project).
+    - "delete"  - Delete a spectrum from the database (or a project).
+- spectrum (required): The spectrum (either file or database key) to do the
+                       action on.
+- target (optional, used only when action is "browse", "add", or "delete):
+  Can be either "public" for browsing the public library or a database key
+  for a private project.
 - limit (optional, used only when action is "browse"): How many spectra to get
   when browsing (maximum is 50).
 - offset (optional, used only when action is "browse"): Where to start listing
@@ -82,70 +84,54 @@ multipart/form-data, or they will not be processed properly.
         POST variable or if an invalid action is given.
         """
         action = self.request.get("action")
-        targets = self.request.get_all("target")
+        target = self.request.get("target", "public")
+        spectra = self.request.get_all("spectrum")
+        limit = self.request.get("limit", 10)
+        offset = self.request.get("offset", 0)
+        algorithm = self.request.get("algorithm", "bove")
+        user = users.get_current_user()
         response = []
+        
+        # If not operating on the main project, try getting the private one.
+        if target != "public":
+            try:
+                target = backend.Project(targets[0])
+            except:
+                raise common.InputError(targets[0], "Invalid project ID.")
+        # Start doing the request
         if action == "analyze":
             # Search the database for something.
-            for target in targets:
+            for spectrum in spectra:
                 # User wants to commit a new search with a file upload.
-                # Send file upload to the back end for searching.
-                result = backend.search(target)
+                result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
                 info = [(i.chemical_name, i.error) for i in result]
                 response.append(info)
         elif action == "compare":
             # Compare two pre-uploaded spectra.
-            if targets is None:
-                raise common.InputError(targets, "No search targets given.")
+            if len(spectra) < 2:
+                raise common.InputError(targets, "Not enough spectra given.")
             # Default to Bove's algorithm if not given
-            algorithm = self.request.get("algorithm", "bove")
-            response.append(backend.compare(targets[0], targets[1], algorithm))
+            response.append(backend.compare(spectra[0], spectra[1], algorithm))
         elif action == "browse":
             # Get a list of spectra from the database for browsing
-            limit = self.request.get("limit", 10)
-            offset = self.request.get("offset", 0)
-            user = users.get_current_user()
-            if targets[0] == "public":
-                target = "public"
-            elif user is None:
-                # Must be logged in to access a private database.
-                raise common.AuthError(user, "Not logged in.")
-            else:
-                target = user
+            if not backend.auth(user, target, "view"):
+                raise common.AuthError(user, "Need to be viewer or higher.")
             # Return the database key, name, and chemical type.
-            results = [(str(spectrum.key()), spectrum.chemical_name, spectrum.chemical_type)
+            results = [(str(spectrum.key()), spectrum.chemical_name,
+                        spectrum.chemical_type, spectrum.project)
                        for spectrum in backend.browse(target, limit, offset)]
             response.extend(results)
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
-            spectra = self.request.get_all("spectrum")
-            user = users.get_current_user()
-            if targets[0] == "public":
-                if not users.is_current_user_admin():
-                    # User must be admin to change public database.
-                    raise AuthError(user, "Needs administrative privileges.")
-                target = "public"
-            elif user is None:
-                # Must be logged in to access a private database.
-                raise common.AuthError(user, "Not logged in.")
-            else:
-                target = user
+            if not backend.auth(user, target, "spectrum"):
+                raise common.AuthError(user, "Need to be viewer or higher.")
             for spectrum_data in spectra:
                 backend.add(spectrum_data, target)
         elif action == "delete":
             # Delete a spectrum from the database.
-            spectra = self.request.get_all("spectrum")
-            user = users.get_current_user()
-            if targets[0] == "public":
-                if not users.is_current_user_admin():
-                    # User must be admin to change public database.
-                    raise AuthError(user, "Needs administrative privileges.")
-                target = "public"
-            elif user is None:
-                # Must be logged in to access a private database.
-                raise common.AuthError(user, "Not logged in.")
-            else:
-                target = user
+            if not backend.auth(user, target, "spectrum"):
+                raise common.AuthError(user, "Need to be viewer or higher.")
             for spectrum_data in spectra:
                 backend.delete(spectrum_data, target)
         else:

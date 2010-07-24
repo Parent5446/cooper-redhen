@@ -92,6 +92,13 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a href="backend.Project-class.html" class="summary-name">Project</a>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a href="backend.Spectrum-class.html" class="summary-name">Spectrum</a><br />
       Store a spectrum, its related data, and any algorithms necessary to 
       compare the spectrum to the DataStore.
@@ -168,7 +175,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="backend-module.html#browse" class="summary-sig-name">browse</a>(<span class="summary-sig-arg">target</span>,
+          <td><span class="summary-sig"><a href="backend-module.html#browse" class="summary-sig-name">browse</a>(<span class="summary-sig-arg">target</span>=<span class="summary-sig-default">&quot;public&quot;</span>,
         <span class="summary-sig-arg">limit</span>=<span class="summary-sig-default">10</span>,
         <span class="summary-sig-arg">offset</span>=<span class="summary-sig-default">0</span>)</span><br />
       Get a list of spectrum for browsing.</td>
@@ -217,10 +224,28 @@
       
     </td>
   </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>bool</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="backend-module.html#auth" class="summary-sig-name">auth</a>(<span class="summary-sig-arg">user</span>,
+        <span class="summary-sig-arg">project</span>,
+        <span class="summary-sig-arg">action</span>)</span><br />
+      Check if user is allowed to do action on project.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="backend-pysrc.html#auth">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
 </table>
 <p class="indent-wrapped-lines"><b>Imports:</b>
   <span title="re">re</span>,
-  <span title="pickle">pickle</span>,
   <span title="bisect">bisect</span>,
   <span title="operator">operator</span>,
   <span title="google.appengine.ext.db">db</span>,
@@ -320,7 +345,7 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">browse</span>(<span class="sig-arg">target</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">browse</span>(<span class="sig-arg">target</span>=<span class="sig-default">&quot;public&quot;</span>,
         <span class="sig-arg">limit</span>=<span class="sig-default">10</span>,
         <span class="sig-arg">offset</span>=<span class="sig-default">0</span>)</span>
   </h3>
@@ -405,13 +430,48 @@
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>spectrum_data</code></strong> (<code>str</code>) - String containing database keys</li>
-        <li><strong class="pname"><code>target</code></strong> (<code>&quot;public&quot;</code> or <code 
-          class="link">google.appengine.api.users.User</code>) - Where to store the spectrum</li>
+        <li><strong class="pname"><code>target</code></strong> (<code>&quot;public&quot;</code> or <a 
+          href="backend.Project-class.html" 
+          class="link">backend.Project</a> key) - Where to store the spectrum</li>
     </ul></dd>
     <dt>Raises:</dt>
     <dd><ul class="nomargin-top">
-        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If a non-string is given as spectrum_data</li>
+        <li><code><strong class='fraise'><a href="common.AuthError-class.html">common.AuthError</a></strong></code> - If a user tries to delete a spectrum outside of his or her 
+        projects.</li>
     </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="auth"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">auth</span>(<span class="sig-arg">user</span>,
+        <span class="sig-arg">project</span>,
+        <span class="sig-arg">action</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="backend-pysrc.html#auth">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Check if user is allowed to do action on project.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>user</code></strong> (<code class="link">google.appengine.api.users.User</code>) - User trying to access the project</li>
+        <li><strong class="pname"><code>project</code></strong> (&quot;public&quot; or <a href="backend.Project-class.html" 
+          class="link">backend.Project</a>) - Project action is being done on</li>
+        <li><strong class="pname"><code>action</code></strong> (&quot;view&quot;, &quot;spectrum&quot;, &quot;project&quot;) - Action to be done. &quot;View&quot; means view the project. 
+          &quot;Spectrum&quot; means add, edit, or delete spectra in the 
+          project. &quot;Project&quot; means change the project itself and 
+          its permissions.</li>
+    </ul></dd>
+    <dt>Returns: <code>bool</code></dt>
+        <dd>Whether the user is allowed</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -445,7 +505,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jul 22 21:52:49 2010</a>
+    3.0.1 on Sat Jul 24 19:34:46 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

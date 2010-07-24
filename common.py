@@ -201,15 +201,18 @@ class ServerError(Error):
 class AuthError(Error):
     """Exception raised for authorization errors."""
     
-    def __init__(self, nickname, msg):
+    def __init__(self, user, msg):
         """
         Initialize the exception variables.
         
-        @param nickname: The user's nickname, if applicable
-        @type  nickname: C{str}
+        @param user: The user, or None if not logged in
+        @type  user: L{google.appengine.api.users.User}
         @param msg: Explanation of what permissions were needed
         @type  msg: C{str}
         """
-        self.expr = nickname
+        if user is not None:
+            self.expr = user.nickname
+        else:
+            self.expr = "Anonymous"
         self.msg = msg
         self.log()
