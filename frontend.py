@@ -203,6 +203,10 @@ multipart/form-data, or they will not be processed properly.
             # for all exception, but we want a 400 for an invalid request.
             self.error(400)
             self.output(["InputError", exception.expr, exception.msg])
+        elif isinstance(exception, common.AuthError):
+            self.error(401)
+            url = users.create_login_url("/")
+            self.output(["AuthError", exception.expr, exception.msg, url])
         else:
             # Send all else to Google.
             super(ApiHandler, self).handle_exception(exception, True)

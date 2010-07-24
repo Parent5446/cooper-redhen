@@ -8,7 +8,6 @@ various methods of database searching.
 '''
 
 import re # re.finditer (regex searches)
-import pickle # pickle.loads, pickle.dumps (data serialization)
 import bisect # bisect.bisect (binary search of a list)
 import operator # operator.attrgetter, operator.itemgetter
 
@@ -37,9 +36,9 @@ def search(spectrum_data):
     spectrum = Spectrum()
     spectrum.parse_string(spectrum_data)
     # Check cache for the Matcher. If not, get from database.
-    matcher = memcache.get(spectrum.type + '_matcher')
+    matcher = memcache.get(spectrum.spectrum_type + '_matcher')
     if matcher is None:
-        matcher = Matcher.get_by_key_name(spectrum.type)
+        matcher = Matcher.get_by_key_name(spectrum.spectrum_type)
     # Get the candidates for similar spectra.
     candidates = matcher.get(spectrum)
     # Do one-to-one on candidates and sort by error
@@ -131,22 +130,21 @@ def add(spectrum_data, target="public"):
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
     spectrum.parse_string(spectrum_data)
+    if target != "public":
+        spectrum.owner = target
+    spectrum.put()
     if target == "public":
         # Check cache for the Matcher. If not, get from database. If it's
         # not there, make a new one.
-        matcher = memcache.get(spectrum.type + '_matcher')
+        matcher = memcache.get(spectrum.spectrum_type + '_matcher')
         if matcher is None:
-            matcher = Matcher.get_by_key_name(spectrum.type)
+            matcher = Matcher.get_by_key_name(spectrum.spectrum_type)
         if not matcher:
-            matcher = Matcher(key_name=spectrum.type)
+            matcher = Matcher(key_name=spectrum.spectrum_type)
         matcher.add(spectrum)
         # Update the Matcher to the database and the cache.
         matcher.put()
-        memcache.set(spectrum.type + '_matcher', matcher)
-    else:
-        spectrum.owner = target
-    # Add the spectrum to the database.
-    spectrum.put()
+        memcache.set(spectrum.spectrum_type + '_matcher', matcher)
 
 def delete(spectrum_data, target="public"):
     '''
@@ -166,15 +164,15 @@ def delete(spectrum_data, target="public"):
     if target == "public":
         # Check cache for the Matcher. If not, get from database. If it's
         # not there, make a new one.
-        matcher = memcache.get(spectrum.type + '_matcher')
+        matcher = memcache.get(spectrum.spectrum_type + '_matcher')
         if matcher is None:
-            matcher = Matcher.get_by_key_name(spectrum.type)
+            matcher = Matcher.get_by_key_name(spectrum.spectrum_type)
         if not matcher:
-            matcher = Matcher(key_name=spectrum.type)
+            matcher = Matcher(key_name=spectrum.spectrum_type)
         matcher.delete(spectrum)
         # Update the Matcher to the database and the cache.
         matcher.put()
-        memcache.set(spectrum.type + '_matcher', matcher)
+        memcache.set(spectrum.spectrum_type + '_matcher', matcher)
     else:
         # If private, check if it is indeed the user's database.
         if not spectrum.owner == target:
@@ -200,8 +198,12 @@ class Spectrum(db.Model):
     '''The spectrum type of the substance the spectrum represents
     @type: C{str}'''
 
-    data = common.GenericListProperty()
-    '''A list of integrated X,Y points for the spectrum's graph
+    xvalues = db.ListProperty(int)
+    '''A list of X points for the spectrum's graph
+    @type: C{list}'''
+    
+    yvalues = db.ListProperty(float)
+    '''A list of integrated Y points for the spectrum's graph
     @type: C{list}'''
     
     owner = db.UserProperty()
@@ -247,19 +249,19 @@ class Spectrum(db.Model):
         if delta_x < 0:
             xy.reverse()
         # Integrate xy numerically over a fixed range.
-        range = (700.0, 3900.0)
+        xvalue_range = (700.0, 3900.0)
         # Initialize the data and find the interval of integration.
         data = [0.0 for i in xrange(1000)]
-        interval = (range[1] - range[0]) / len(data)
+        interval = (xvalue_range[1] - xvalue_range[0]) / len(data)
         # Find index in xy where integrals start
-        start = bisect.bisect_left(xy, (range[0], 0))
+        start = bisect.bisect_left(xy, (xvalue_range[0], 0))
         # oldX = start of range, oldY = linear interpolation of corresponding y
-        oldX, oldY = range[0], (xy[start - 1][1] +
-             (xy[start][1] - xy[start - 1][1]) * (range[0] - xy[start][0]) /
+        oldX, oldY = xvalue_range[0], (xy[start - 1][1] +
+             (xy[start][1] - xy[start - 1][1]) * (xvalue_range[0] - xy[start][0]) /
              (xy[start - 1][0] - xy[start][0]))
         for x, y in xy[start:]: #Iterate over xy from start
-            newIndex = int((x - range[0]) / interval)
-            oldIndex = int((oldX - range[0]) / interval)
+            newIndex = int((x - xvalue_range[0]) / interval)
+            oldIndex = int((oldX - xvalue_range[0]) / interval)
             if newIndex != oldIndex:
                 # We're starting a new integral.
                 boundary = newIndex * interval,\
@@ -270,10 +272,11 @@ class Spectrum(db.Model):
                     data[newIndex] += (boundary[1] + y) * (x - boundary[0]) / 2
             else:
                 data[newIndex] += (y + oldY) * (x - oldX) / 2
-            if x > range[1]:
+            if x > xvalue_range[1]:
                 break #If finished, break
             oldX, oldY = x, y #Otherwise keep going
-        self.data = [(int(range[0]) + i, data[i]) for i in xrange(len(data))]
+        self.xvalues = range(int(xvalue_range[0]), int(xvalue_range[0]) + len(data))
+        self.yvalues = data
         self.chemical_type = 'Unknown' # We will find this later
         # FIXME: Assumes chemical name is in TITLE label.
         self.chemical_name = self.get_field('##TITLE=')
@@ -304,12 +307,13 @@ class Spectrum(db.Model):
         @return: Either a list of peaks or one peak, depending on the parameter
         @rtype: C{list} or C{float}
         '''
+        data = zip(self.xvalues, self.yvalues)
         if one:
-            return max(self.data, key=operator.itemgetter(1))[0]
-        xy = sorted(self.data, key=operator.itemgetter(1), reverse=True)
+            return max(data, key=operator.itemgetter(1))[0]
+        data = sorted(data, key=operator.itemgetter(1), reverse=True)
         peaks = []
-        peaks = [x for x, y in xy
-                   if y >= xy[0][1]*0.95
+        peaks = [x for x, y in data
+                   if y >= data[0][1]*0.95
                    and not [peak for peak in peaks if abs(peak - x) < 1]]
         return peaks
     
@@ -320,11 +324,12 @@ class Spectrum(db.Model):
         @return: The heavyside index
         @rtype: C{int}
         '''
-        key, left_edge, width = 0, 0, len(self.data) # Initialize variables
+        data = zip(self.xvalues, self.yvalues)
+        key, left_edge, width = 0, 0, len(data) # Initialize variables
         for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS):
-            left = sum([i[1] for i in self.data[left_edge:left_edge + width / 2]])
-            right = sum([i[1] for i in self.data[left_edge + width / 2:left_edge + width]])
-            if left_edge + width == len(self.data):
+            left = sum([i[1] for i in data[left_edge:left_edge + width / 2]])
+            right = sum([i[1] for i in data[left_edge + width / 2:left_edge + width]])
+            if left_edge + width == len(data):
                 left_edge = 0
                 width = width / 2 #Adjust boundaries
             else:
@@ -448,10 +453,10 @@ class Matcher(db.Model):
         @rtype: C{int}
         @raise common.ServerError: If there are invalid spectra in the database
         '''
-        length = min([len(a.data), len(b.data)])
-        if length == 0 or a.data is None or b.data is None:
+        length = min([len(a.yvalues), len(b.yvalues)])
+        if length == 0 or a.yvalues is None or b.yvalues is None:
             raise common.ServerError("Invalid spectra in the database.")
-        return max([abs(a.data[i][1] - b.data[i][1]) for i in xrange(length)])
+        return max([abs(a.yvalues[i] - b.yvalues[i]) for i in xrange(length)])
     
     @staticmethod # Make a static method for faster execution
     def least_squares(a, b):
@@ -467,7 +472,7 @@ class Matcher(db.Model):
         @rtype: C{int}
         @raise common.ServerError: If there are invalid spectra in the database
         '''
-        length = min([len(a.data), len(b.data)])
-        if length == 0 or a.data is None or b.data is None:
+        length = min([len(a.yvalues), len(b.yvalues)])
+        if length == 0 or a.yvalues is None or b.yvalues is None:
             raise common.ServerError("Invalid spectra in the database.")
-        return sum([(a.data[i][1] - a.b[i][1])**2 for i in xrange(length)])
+        return sum([(a.yvalues[i] - a.yvalues[i])**2 for i in xrange(length)])

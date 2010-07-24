@@ -14,10 +14,10 @@ script will process recursively, so subdirectories will also be checked.
 """
 
 from __future__ import with_statement
-import cgi
-import pickle
+import re
 import os
 import sys
+import bisect
 import tempfile
 
 def main_client(appcfg, dirname, recursive=False):
@@ -28,11 +28,16 @@ def main_client(appcfg, dirname, recursive=False):
     @type  dirname: C{str}
     @raise Exception: If the given file name is not a directory
     """
-    with fp as tempfile.NamedTemporaryFile():
+    with tempfile.NamedTemporaryFile(delete=False) as fp:
         chem_types = flat_heavyside = ordered_heavyside = high_low = {}
         peak_list = []
-        filename = fp.name
-        fp.write('"chemcial_name","chemical_type","spectrum_type","data"\n')
+        csvfile = fp.name
+        header = 'chemcial_name,chemical_type,spectrum_type'
+        for x in xrange(1000):
+            header += ',xvalues'
+        for y in xrange(1000):
+            header += ',yvalues'
+        fp.write(header + "\n")
         if not os.path.exists(dirname) or not os.path.isdir(dirname):
             raise Exception("Not a directory.")
         files = os.listdir(dirname)
@@ -47,9 +52,12 @@ def main_client(appcfg, dirname, recursive=False):
                 chemical_name = get_field(contents, '##TITLE=')
                 chemical_type = 'Unknown'
                 spectrum_type = 'Infrared'
-                data = get_data(contents)
-                fp.write('"%s", "%s", "%s", "%s"' % (chemical_name,
-                          chemical_type, spectrum_type, str(data)))
+                xvalues, yvalues = get_data(contents)
+                data = '"%s", "%s", "%s"' % (chemical_name, chemical_type, spectrum_type)
+                data += ',' + ','.join([str(x) for x in xvalues])
+                data += ',' + ','.join([str(y) for y in yvalues])
+                fp.write(data)
+    raise Exception(csvfile)
     os.execl(appcfg, "upload_data", "--config_file=bulkloader.yaml",
              "--filename=%s" % filename, "--kind=Spectrum")
 
@@ -75,7 +83,8 @@ def get_field(contents, name):
     @warning: Does not support Windows-style line breaks.
     '''
     # FIXME: Does not support Windows format.
-    return contents[contents.index(name) + len(name):contents.index('\n', index)]
+    index = contents.index(name) + len(name)
+    return contents[index:contents.index('\n', index)].strip()
 
 def get_data(contents):
     '''
@@ -110,19 +119,19 @@ def get_data(contents):
     if delta_x < 0:
         xy.reverse()
     # Integrate xy numerically over a fixed range.
-    range = (700.0, 3900.0)
+    xvalue_range = (700.0, 3900.0)
     # Initialize the data and find the interval of integration.
     data = [0.0 for i in xrange(1000)]
-    interval = (range[1] - range[0]) / len(data)
+    interval = (xvalue_range[1] - xvalue_range[0]) / len(data)
     # Find index in xy where integrals start
-    start = bisect.bisect_left(xy, (range[0], 0))
+    start = bisect.bisect_left(xy, (xvalue_range[0], 0))
     # oldX = start of range, oldY = linear interpolation of corresponding y
-    oldX, oldY = range[0], (xy[start - 1][1] +
-         (xy[start][1] - xy[start - 1][1]) * (range[0] - xy[start][0]) /
+    oldX, oldY = xvalue_range[0], (xy[start - 1][1] +
+         (xy[start][1] - xy[start - 1][1]) * (xvalue_range[0] - xy[start][0]) /
          (xy[start - 1][0] - xy[start][0]))
     for x, y in xy[start:]: #Iterate over xy from start
-        newIndex = int((x - range[0]) / interval)
-        oldIndex = int((oldX - range[0]) / interval)
+        newIndex = int((x - xvalue_range[0]) / interval)
+        oldIndex = int((oldX - xvalue_range[0]) / interval)
         if newIndex != oldIndex:
             # We're starting a new integral.
             boundary = newIndex * interval,\
@@ -133,13 +142,13 @@ def get_data(contents):
                 data[newIndex] += (boundary[1] + y) * (x - boundary[0]) / 2
         else:
             data[newIndex] += (y + oldY) * (x - oldX) / 2
-        if x > range[1]:
+        if x > xvalue_range[1]:
             break #If finished, break
         oldX, oldY = x, y #Otherwise keep going
-    return [(int(range[0]) + i, data[i]) for i in xrange(len(data))]
+    return (range(xvalue_range[0], xvalue_range[0] + len(data)), data)
 
 if __name__ == '__main__':
-    if len(sys.argv) !== 3:
+    if len(sys.argv) != 3:
         print __doc__
     else:
         main_client(sys.argv[1], sys.argv[2], True)

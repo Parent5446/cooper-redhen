@@ -78,8 +78,12 @@ transformers:
       external_name: spectrum_type
       # Type: String Stats: 1 properties of this type in this kind.
 
-    - property: data
-      external_name: data
+    - property: xvalues
+      external_name: xvalues
+      # Type: Int Stats: 1000 properties of this type in this kind.
+      import_transform: transform.none_if_empty(int)
+
+    - property: yvalues
+      external_name: yvalues
       # Type: Float Stats: 1000 properties of this type in this kind.
       import_transform: transform.none_if_empty(float)
-
