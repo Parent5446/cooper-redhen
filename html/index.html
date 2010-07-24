@@ -1,34 +1,61 @@
 <html> <!--Front page for redhen spectra-->
-    <head>
+    <head> <!--Compress for use with tools such as http://www.peterbe.com/plog/blogitem-040406-1/compressor-->
         <link rel='stylesheet' href='main.css'> <!--Link to stylesheet-->
         <link rel='shortcut icon' href='favicon.ico'> <!--Favicon for site-->
         <script language="JavaScript"> //Scripts for the page
             function init()
-            { //Initialize all globals so as to avoid getElementById calls later
-                loaded_list = document.getElementById('loaded_list');
-                browse_options = document.getElementById('browse_options');
-                browse_dialog = document.getElementById('browse_dialog');
-                combobox_text = document.getElementById('combobox_text');
-                combobox_dropdown = document.getElementById('combobox_dropdown');
-                compare_options = document.getElementById('compare_options');
-                graph = document.getElementById('graph');
-                results = document.getElementById('results');
-                file_frame = document.getElementById('file_frame');
+            { //Initialize all globals to avoid function calls later
+                loaded_list = document.getElementById('loaded_list_id');
+                browse_options = document.getElementById('browse_options_id');
+                browse_dialog = document.getElementById('browse_dialog_id');
+                combobox_text = document.getElementById('combobox_text_id');
+                combobox_dropdown = document.getElementById('combobox_dropdown_id');
+                compare_options = document.getElementById('compare_options_id');
+                graph = document.getElementById('graph_id');
+                results = document.getElementById('results_id');
+                file_frame = document.getElementById('file_frame_id');
                 
-                document.file_loaded = function(file)
-                {
-                    loaded_list.innerHTML += '<div>'+file+'</div>';
-                }
+                if (window.XMLHttpRequest) http=new XMLHttpRequest(); // IE7+, Firefox, Chrome, Opera, Safari
+                else http=new ActiveXObject("Microsoft.XMLHTTP"); // IE6, IE5
+                
+                session_id = Math.floor(Math.random()*1e12)+(new Date()).getTime(); //Unique ID so the server can distinguish clients
+            }
+            function file_loaded(file)
+            {
+                loaded_list.style.display = 'block';
+                addToLoadedList(file);
+            }
+            function longServerRequest(data, action) //For long server requests: sets an action to perform when response comes
+            {
+                http.onreadystatechange = function() { if(http.readyState == 4) action(http.responseText); }; //On response, perform the action
+                http.open("POST", "/api", true); //True means nonblocking io
+                http.send(data); //Send
+            }
+            function shortServerRequest(data) //For short server requests: waits and returns response
+            {
+                http.open("POST", "/api", false); //False means blocking io
+                http.send(data); //Send, wait for response
+                return http.responseText; //Return answer
+            }
+            function unload(file)
+            {
+                document.getElementById('checkbox_'+file).style.display = 'none';
+                action = function(response) { alert('Response:\n'+response); };
+                longServerRequest(file, action);
             }
             function browse() //Browse button clicked
             {
                 var selected = browse_options.options[browse_options.selectedIndex].value;
                 browse_dialog.style.display = "block";
             }
+            function addToLoadedList(s)
+            {
+                loaded_list.innerHTML += '<div id="checkbox_'+s+'"><input type="checkbox" checked onclick="unload(\''+s+'\')"> '+s+'</div>';
+            }
             function done_browsing()
             {
                 browse_dialog.style.display = "none";
-                loaded_list.innerHTML += '<div>'+document.getElementById('combobox_text').value+'</div>';
+                addToLoadedList(combobox_text.value);
                 combobox_text.value = '';
                 combobox_dropdown.style.display = 'none';
                 combobox_dropdown.innerHTML = '';
@@ -70,13 +97,13 @@
         
         <table style='margin:auto;'> <!--Layout table, holds site's pieces in order-->
         
-        <tr><td rowspan='2'> <div id='graph' class='graph'></div> </td> <!--Graph of results-->   
+        <tr><td rowspan='2'> <div id='graph_id' class='graph'></div> </td> <!--Graph of results-->   
 
-        <td> <div class='frontpage-controls' id='controls'> <!--Main controls-->
+        <td> <div class='frontpage-controls' id='controls_id'> <!--Main controls-->
             <table class='controls-table'>
                 <tr>
-                    <td><input type='button' id='browse_button' value='Browse' onclick='browse()' class='button'></td>
-                    <td><select id='browse_options' class='listbox' onchange='browseChanged()'>
+                    <td><input type='button' id='browse_button_id' value='Browse' onclick='browse()' class='button'></td>
+                    <td><select id='browse_options_id' class='listbox' onchange='browseChanged()'>
                         <option>my computer</option>
                         <option>my projects</option>
                         <option>main library</option>
@@ -84,7 +111,7 @@
                 </tr>
                 <tr>
                     <td><input type='button' value='Compare' onclick='compare()' class='button'></td>
-                    <td><select id='compare_options' class='listbox'>
+                    <td><select id='compare_options_id' class='listbox'>
                         <option>to main library</option>
                         <option>to my projects</option>
                         <option>to each other</option>
@@ -92,20 +119,20 @@
                 </tr>
             </table>
             
-            <iframe class='invisible-frame' scrolling="no" id='file_frame' src='file_upload_frame.html'></iframe>
+            <iframe class='invisible-frame' scrolling="no" id='file_frame_id' src='file_upload_frame.html'></iframe>
             
-            <div class='browse-dialog' id='browse_dialog'> <!--Browse dialog, usually invisible-->
+            <div class='browse-dialog' id='browse_dialog_id'> <!--Browse dialog, usually invisible-->
                 Enter a chemical name to search:
-                <input type='text' class='combobox-text' id='combobox_text' onkeyup='combobox_typed(event)'>
-                <div class='combobox-dropdown' id='combobox_dropdown' onmouseover='document.body.style.cursor="pointer"' onmouseout='document.body.style.cursor="default"'></div>
+                <input type='text' class='combobox-text' id='combobox_text_id' onkeyup='combobox_typed(event)'>
+                <div class='combobox-dropdown' id='combobox_dropdown_id' onmouseover='document.body.style.cursor="pointer"' onmouseout='document.body.style.cursor="default"'></div>
                 <input type='button' value='Done' onclick='done_browsing()'>
             </div>
         </div> </td></tr> <!--End of main controls-->
         
-        <tr><td> <div id='results' class='results'></div> <!--List of results-->
+        <tr><td> <div id='results_id' class='results'></div> <!--List of results-->
         </td></tr> </table> <!--End of layout table-->
         
-        <div id='loaded_list' class='loaded-list'></div> <!--List of loaded files-->
+        <div id='loaded_list_id' class='loaded-list'></div> <!--List of loaded files-->
         
     </body>
 </html>

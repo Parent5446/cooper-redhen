@@ -52,18 +52,6 @@
 {
     font-style:italic;
 }
-.invisible-frame
-{
-    height:26px;
-    width:123px;
-    position:absolute;
-    border-style:none;
-    left:0px; top:0px;
-    -moz-opacity:0;
-	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-	filter:alpha(opacity=0);
-	opacity:0;
-}
 .graph
 {
     width:500px;
@@ -76,4 +64,16 @@
     width:250px;
     height:200px;
     display:none;
+}
+.invisible-frame
+{
+    height:26px;
+    width:123px;
+    position:absolute;
+    border-style:none;
+    left:0px; top:5px;
+    -moz-opacity:0;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter:alpha(opacity=0);
+	opacity:0;
 }

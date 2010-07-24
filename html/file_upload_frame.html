@@ -1,20 +1,29 @@
 <html>
-    <form id='form' action='/api' method="post" enctype="multipart/form-data">
-        <input type="file" name='file' id="file" style='position:absolute; right:0px; top:0px;'/>
-        <input type="submit" style='visibility:hidden;'/>
-    </form>
-    <script language="JavaScript">
-        var form = document.getElementById('form')
-        var file = document.getElementById('file');
-        file.onmouseout = function()
-        {
-            if(this.value)
+    <head>
+        <script language="JavaScript">
+            window.onload = function()
             {
-                file.onmouseout = function () {}
-                form.submit();
-                parent.document.file_loaded(this.value);
-                window.location = 'file_upload_frame.html';
-            }
-		}
-    </script>
+                var form = document.getElementById('form_id');
+                var file = document.getElementById('file_id');
+                
+                file.onmouseout = file.onchange = function()
+                {
+                    if(this.value)
+                    {
+                        file.onmouseout = file.onchange = function () {};
+                        alert('Session: '+parent.session_id+'\nFile: '+this.value);
+                        parent.file_loaded(this.value);
+                        form.submit();
+                        window.location = 'file_upload_frame.html';
+                    }
+                };
+            };
+        </script>
+    </head>
+    <body>
+        <form id='form_id' action='/api' method="post" enctype="multipart/form-data">
+            <input type="file" name='file' id="file_id" style='position:absolute; right:0px; top:0px;'/>
+            <input type="submit" style='visibility:hidden;'/>
+        </form>
+    </body>
 </html>
