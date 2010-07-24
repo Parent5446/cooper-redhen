@@ -32,12 +32,7 @@ def main_client(appcfg, dirname, recursive=False):
         chem_types = flat_heavyside = ordered_heavyside = high_low = {}
         peak_list = []
         csvfile = fp.name
-        header = 'chemcial_name,chemical_type,spectrum_type'
-        for x in xrange(1000):
-            header += ',xvalues'
-        for y in xrange(1000):
-            header += ',yvalues'
-        fp.write(header + "\n")
+        fp.write("chemcial_name,chemical_type,spectrum_type,xvalues,yvalues\n")
         if not os.path.exists(dirname) or not os.path.isdir(dirname):
             raise Exception("Not a directory.")
         files = os.listdir(dirname)
@@ -53,10 +48,8 @@ def main_client(appcfg, dirname, recursive=False):
                 chemical_type = 'Unknown'
                 spectrum_type = 'Infrared'
                 xvalues, yvalues = get_data(contents)
-                data = '"%s", "%s", "%s"' % (chemical_name, chemical_type, spectrum_type)
-                data += ',' + ','.join([str(x) for x in xvalues])
-                data += ',' + ','.join([str(y) for y in yvalues])
-                fp.write(data)
+                fp.write('"%s","%s","%s","%s","%s"' % (chemical_name,
+                           chemical_type, spectrum_type, str(xvalues), str(yvalues)))
     raise Exception(csvfile)
     os.execl(appcfg, "upload_data", "--config_file=bulkloader.yaml",
              "--filename=%s" % filename, "--kind=Spectrum")

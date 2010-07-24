@@ -81,9 +81,7 @@ transformers:
     - property: xvalues
       external_name: xvalues
       # Type: Int Stats: 1000 properties of this type in this kind.
-      import_transform: transform.none_if_empty(int)
 
     - property: yvalues
       external_name: yvalues
       # Type: Float Stats: 1000 properties of this type in this kind.
-      import_transform: transform.none_if_empty(float)
