@@ -5,14 +5,14 @@
             {
                 var form = document.getElementById('form_id');
                 var file = document.getElementById('file_id');
+                form.session_id.value = parent.session_id;
                 
                 file.onmouseout = file.onchange = function()
                 {
                     if(this.value)
                     {
                         file.onmouseout = file.onchange = function () {};
-                        alert('Session: '+parent.session_id+'\nFile: '+this.value);
-                        parent.file_loaded(this.value);
+                        parent.file_loaded( this.value.match('[^\\\\]+$') );
                         form.submit();
                         window.location = 'file_upload_frame.html';
                     }
@@ -23,6 +23,7 @@
     <body>
         <form id='form_id' action='/api' method="post" enctype="multipart/form-data">
             <input type="file" name='file' id="file_id" style='position:absolute; right:0px; top:0px;'/>
+            <input id="session_id" style='visibility:hidden;'/>
             <input type="submit" style='visibility:hidden;'/>
         </form>
     </body>
