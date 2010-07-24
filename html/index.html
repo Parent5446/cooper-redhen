@@ -3,57 +3,69 @@
         <link rel='stylesheet' href='main.css'> <!--Link to stylesheet-->
         <link rel='shortcut icon' href='favicon.ico'> <!--Favicon for site-->
         <script language="JavaScript"> //Scripts for the page
-            document.file_loaded = function(file)
-            {
-                alert(file);
+            function init()
+            { //Initialize all globals so as to avoid getElementById calls later
+                loaded_list = document.getElementById('loaded_list');
+                browse_options = document.getElementById('browse_options');
+                browse_dialog = document.getElementById('browse_dialog');
+                combobox_text = document.getElementById('combobox_text');
+                combobox_dropdown = document.getElementById('combobox_dropdown');
+                compare_options = document.getElementById('compare_options');
+                graph = document.getElementById('graph');
+                results = document.getElementById('results');
+                file_frame = document.getElementById('file_frame');
+                
+                document.file_loaded = function(file)
+                {
+                    loaded_list.innerHTML += '<div>'+file+'</div>';
+                }
             }
             function browse() //Browse button clicked
             {
-                var browse_options = document.getElementById('browse_options');
                 var selected = browse_options.options[browse_options.selectedIndex].value;
-                var browse_dialog = document.getElementById('browse_dialog');
-                //browse_dialog.innerHTML = 'Browse '+selected;
                 browse_dialog.style.display = "block";
             }
             function done_browsing()
             {
-                var browse_dialog = document.getElementById('browse_dialog');
                 browse_dialog.style.display = "none";
-                document.getElementById('loaded_list').innerHTML += '<div>'+document.getElementById('combobox_text').value+'</div>';
+                loaded_list.innerHTML += '<div>'+document.getElementById('combobox_text').value+'</div>';
+                combobox_text.value = '';
+                combobox_dropdown.style.display = 'none';
+                combobox_dropdown.innerHTML = '';
             }
-            function combobox_typed()
+            function combobox_typed(key)
             {
-                var combobox_text = document.getElementById('combobox_text');
-                var combobox_dropdown = document.getElementById('combobox_dropdown');
                 combobox_dropdown.innerHTML += '<div onclick="combobox_clicked(\''+combobox_text.value+'\')">'+combobox_text.value+'</div>';
                 combobox_dropdown.style.display = 'block';
+                var unicode = key.keyCode ? key.keyCode : key.charCode;
+                if(unicode==13) done_browsing();
             }
             function combobox_clicked(text)
             {
-                document.getElementById('combobox_text').value = text;
+                combobox_text.value = text;
+                combobox_dropdown.style.display = 'none';
+                combobox_text.focus();
             }
             function compare() //Compare button clicked
             {
-                var compare_options = document.getElementById('compare_options');
                 var selected = compare_options.options[compare_options.selectedIndex].value;
-                document.getElementById('loaded_list').style.display = 'none';
-                document.getElementById('graph').style.display = 'block';
-                document.getElementById('results').style.display = 'block';
-                document.getElementById('results').innerHTML = '<div style="margin:10px;">methanol<br>ethanol<br>propanol<br>butanol</div>';
-                document.getElementById('graph').innerHTML = "<img src='graph_mockup.png'>";
+                loaded_list.style.display = 'none';
+                graph.style.display = 'block';
+                results.style.display = 'block';
+                results.innerHTML = '<div style="margin:10px;">methanol<br>ethanol<br>propanol<br>butanol</div>';
+                graph.innerHTML = "<img src='graph_mockup.png'>";
                 document.body.style.padding = '0px';
                 alert('Compare '+selected);
             }
             function browseChanged() //Make file upload frame go away when not selected
             {
-                var browse_options = document.getElementById('browse_options');
                 var selected = browse_options.options[browse_options.selectedIndex].value;
-                if(selected == 'my computer') document.getElementById('file_frame').style.display = "block";
-                else document.getElementById('file_frame').style.display = "none";
+                if(selected == 'my computer') file_frame.style.display = "block";
+                else file_frame.style.display = "none";
             }
         </script>
     </head>
-    <body style='text-align:center; padding:40px;'> <!--Core HTML:-->
+    <body style='text-align:center; padding:40px;' onload='init()'> <!--Core HTML:-->
         <img src='banner.png'><!--Banner image-->
         
         <table style='margin:auto;'> <!--Layout table, holds site's pieces in order-->
@@ -84,8 +96,8 @@
             
             <div class='browse-dialog' id='browse_dialog'> <!--Browse dialog, usually invisible-->
                 Enter a chemical name to search:
-                <input type='text' class='combobox-text' id='combobox_text' onkeyup='combobox_typed()'>
-                <div class='combobox-dropdown' id='combobox_dropdown'></div>
+                <input type='text' class='combobox-text' id='combobox_text' onkeyup='combobox_typed(event)'>
+                <div class='combobox-dropdown' id='combobox_dropdown' onmouseover='document.body.style.cursor="pointer"' onmouseout='document.body.style.cursor="default"'></div>
                 <input type='button' value='Done' onclick='done_browsing()'>
             </div>
         </div> </td></tr> <!--End of main controls-->
