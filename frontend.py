@@ -94,9 +94,8 @@ multipart/form-data, or they will not be processed properly.
         
         # If not operating on the main project, try getting the private one.
         if target != "public":
-            try:
-                target = backend.Project(targets[0])
-            except:
+            target = backend.Project.get(targets[0])
+            if target is None:
                 raise common.InputError(targets[0], "Invalid project ID.")
         # Start doing the request
         if action == "analyze":

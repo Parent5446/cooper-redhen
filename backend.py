@@ -480,7 +480,6 @@ class Matcher(db.Model):
         @return: List of similar spectra
         @rtype: C{list} of L{backend.Spectrum}
         '''
-        
         # Get heavyside key and peaks.
         flatHeavysideKey = spectrum.calculate_heavyside()
         peak = spectrum.calculate_peaks(True)

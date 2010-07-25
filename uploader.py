@@ -32,7 +32,7 @@ def main_client(appcfg, dirname, recursive=False):
         chem_types = flat_heavyside = ordered_heavyside = high_low = {}
         peak_list = []
         csvfile = fp.name
-        fp.write("chemcial_name,chemical_type,spectrum_type,xvalues,yvalues\n")
+        fp.write("chemcial_name,chemical_type,spectrum_type,project,xvalues,yvalues\n")
         if not os.path.exists(dirname) or not os.path.isdir(dirname):
             raise Exception("Not a directory.")
         files = os.listdir(dirname)
@@ -51,7 +51,7 @@ def main_client(appcfg, dirname, recursive=False):
                 # AppEngine require integer lists to have 'L' at the end of
                 # each value.
                 xvalues = '[' + 'L, '.join([str(x) for x in xvalues]) + 'L]'
-                fp.write('"%s","%s","%s","%s","%s"' % (chemical_name,
+                fp.write('"%s","%s","%s","name=public","%s","%s"' % (chemical_name,
                            chemical_type, spectrum_type, xvalues, str(yvalues)))
     raise Exception(csvfile)
     os.execl(appcfg, "upload_data", "--config_file=bulkloader.yaml",
