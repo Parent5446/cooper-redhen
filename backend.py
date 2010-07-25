@@ -179,6 +179,22 @@ def delete(spectrum_data, target="public"):
     # Delete the spectrum to the database.
     spectrum.delete()
 
+def update():
+    '''
+    Purge the Matcher class and trigger a complete regeneration of heuristic
+    data. This should only be used when fixing a corrupt database.
+    '''
+    # Delete all matcher classes then re-add everything
+    [matcher.delete() for matcher in Matcher.all()]
+    # Regenerate heuristics data.
+    matchers = []
+    for spectrum in Spectrum.all():
+        if matchers[spectrum.spectrum_type] is None:
+            matchers[spectrum.spectrum_type] = Matcher.get_or_insert(spectrum.spectrum_type)
+        matchers[spectrum.spectrum_type].add(spectrum)
+    # Put Matchers back in database.
+    [matcher.put() for matcher in matchers]
+
 def auth(user, project, action):
     '''
     Check if user is allowed to do action on project.

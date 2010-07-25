@@ -125,15 +125,19 @@ multipart/form-data, or they will not be processed properly.
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
             if not backend.auth(user, target, "spectrum"):
-                raise common.AuthError(user, "Need to be viewer or higher.")
+                raise common.AuthError(user, "Need to be collaborator or higher.")
             for spectrum_data in spectra:
                 backend.add(spectrum_data, target)
         elif action == "delete":
             # Delete a spectrum from the database.
             if not backend.auth(user, target, "spectrum"):
-                raise common.AuthError(user, "Need to be viewer or higher.")
+                raise common.AuthError(user, "Need to be collaborator or higher.")
             for spectrum_data in spectra:
                 backend.delete(spectrum_data, target)
+        elif action == "update":
+            if not backend.auth(user, "public", "spectrum"):
+                raise common.AuthError(user, "Need to be collaborator or higher.")
+            backend.update()
         else:
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
