@@ -2,119 +2,29 @@
     <head> <!--Compress for use with tools such as http://www.peterbe.com/plog/blogitem-040406-1/compressor-->
         <link rel='stylesheet' href='main.css'> <!--Link to stylesheet-->
         <link rel='shortcut icon' href='favicon.ico'> <!--Favicon for site-->
-        <script language="JavaScript">
-            window.onload = function()
-            { //Initialize all globals to avoid function calls later
-                loaded_list = document.getElementById('loaded_list_id');
-                browse_options = document.getElementById('browse_options_id');
-                browse_dialog = document.getElementById('browse_dialog_id');
-                combobox_text = document.getElementById('combobox_text_id');
-                combobox_dropdown = document.getElementById('combobox_dropdown_id');
-                compare_options = document.getElementById('compare_options_id');
-                graph = document.getElementById('graph_id');
-                results = document.getElementById('results_id');
-                file_frame = document.getElementById('file_frame_id');
-                session_id = Math.floor(Math.random()*1e12)+(new Date()).getTime(); //Unique ID so the server can distinguish clients
-            };
-            function file_loaded(file)
-            {
-                loaded_list.style.display = 'block';
-                addToLoadedList(file);
-            }
-            function longServerRequest(data, action) //For long server requests: sets an action to perform when response comes
-            {
-                var http;
-                if (window.XMLHttpRequest) http=new XMLHttpRequest(); // IE7+, Firefox, Chrome, Opera, Safari
-                else http=new ActiveXObject("Microsoft.XMLHTTP"); // IE6, IE5
-                http.onreadystatechange = function() { if(http.readyState == 4) action(http.responseText); }; //On response, perform the action
-                http.open("POST", "/api", true); //True means nonblocking io
-                http.send(data); //Send
-            }
-            function shortServerRequest(data) //For short server requests: waits and returns response
-            {
-                var http;
-                if (window.XMLHttpRequest) http=new XMLHttpRequest(); // IE7+, Firefox, Chrome, Opera, Safari
-                else http=new ActiveXObject("Microsoft.XMLHTTP"); // IE6, IE5
-                http.open("POST", "/api", false); //False means blocking io
-                http.send(data); //Send, wait for response
-                return http.responseText; //Return answer
-            }
-            function unload(file)
-            {
-                document.getElementById('checkbox_'+file).style.display = 'none';
-                action = function(response) { alert('Response:\n'+response); };
-                longServerRequest(file, action);
-            }
-            function browse() //Browse button clicked
-            {
-                var selected = browse_options.options[browse_options.selectedIndex].innerHTML;
-                browse_dialog.style.display = "block";
-                combobox_text.focus();
-            }
-            function addToLoadedList(s)
-            {
-                loaded_list.innerHTML += '<div id="checkbox_'+s+'"><input type="checkbox" checked onclick="unload(\''+s+'\')"> '+s+'</div>';
-            }
-            function done_browsing()
-            {
-                browse_dialog.style.display = "none";
-                addToLoadedList(combobox_text.value);
-                combobox_text.value = '';
-                combobox_dropdown.style.display = 'none';
-                combobox_dropdown.innerHTML = '';
-            }
-            function combobox_typed(key)
-            {
-                combobox_dropdown.innerHTML += '<div onclick="combobox_clicked(\''+combobox_text.value+'\')">'+combobox_text.value+'</div>';
-                combobox_dropdown.style.display = 'block';
-                var unicode = key.keyCode ? key.keyCode : key.charCode;
-                if(unicode==13) done_browsing();
-            }
-            function combobox_clicked(text)
-            {
-                combobox_text.value = text;
-                combobox_dropdown.style.display = 'none';
-                combobox_text.focus();
-            }
-            function compare() //Compare button clicked
-            {
-                var selected = compare_options.options[compare_options.selectedIndex].innerHTML;
-                loaded_list.style.display = 'none';
-                graph.style.display = 'block';
-                results.style.display = 'block';
-                results.innerHTML = '<div style="margin:10px;">methanol<br>ethanol<br>propanol<br>butanol</div>';
-                graph.innerHTML = "<img src='graph_mockup.png'>";
-                document.body.style.padding = '0px';
-                alert('Compare '+selected);
-            }
-            function browseChanged() //Make file upload frame go away when not selected
-            {
-                var selected = browse_options.options[browse_options.selectedIndex].innerHTML;
-                if(selected == 'my computer') file_frame.style.display = "block";
-                else file_frame.style.display = "none";
-            }
-        </script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
+        <script type="text/javascript"></script>
     </head>
     <body style='text-align:center; padding:40px;'> <!--Core HTML:-->
         <img src='banner.png'><!--Banner image-->
         
         <table style='margin:auto;'> <!--Layout table, holds site's pieces in order-->
         
-        <tr><td rowspan='2'> <div id='graph_id' class='graph'></div> </td> <!--Graph of results-->   
+        <tr><td rowspan='2'> <div id='graph' class='graph'></div> </td> <!--Graph of results-->   
 
-        <td> <div class='frontpage-controls' id='controls_id'> <!--Main controls-->
+        <td> <div class='frontpage-controls' id='controls'> <!--Main controls-->
             <table class='controls-table'>
                 <tr>
-                    <td><input type='button' id='browse_button_id' value='Browse' onclick='browse();' class='button'></td>
-                    <td><select id='browse_options_id' class='listbox' onchange='browseChanged();'>
+                    <td><input type='button' id='browse_button' value='Browse' class='button'></td>
+                    <td><select id='browse_options' class='listbox'>
                         <option>my computer</option>
                         <option>my projects</option>
                         <option>main library</option>
                     </select></td>
                 </tr>
                 <tr>
-                    <td><input type='button' value='Compare' onclick='compare();' class='button'></td>
-                    <td><select id='compare_options_id' class='listbox'>
+                    <td><input type='button' id='compare_button' value='Compare' class='button'></td>
+                    <td><select id='compare_options' class='listbox'>
                         <option>to main library</option>
                         <option>to my projects</option>
                         <option>to each other</option>
@@ -122,20 +32,88 @@
                 </tr>
             </table>
             
-            <iframe class='invisible-frame' scrolling="no" id='file_frame_id' src='file_upload_frame.html'></iframe>
+            <iframe class='invisible-frame' scrolling="no" id='file_frame' src='file_upload_frame.html'></iframe>
             
-            <div class='browse-dialog' id='browse_dialog_id'> <!--Browse dialog, usually invisible-->
+            <div class='browse-dialog' id='browse_dialog'> <!--Browse dialog, usually invisible-->
                 Enter a chemical name to search:
-                <input type='text' class='combobox-text' id='combobox_text_id' onkeyup='combobox_typed(event)'>
-                <div class='combobox-dropdown' id='combobox_dropdown_id' onmouseover='document.body.style.cursor="pointer";' onmouseout='document.body.style.cursor="default";'></div>
-                <input type='button' value='Done' onclick='done_browsing();'>
+                <input type='text' class='combobox-text' id='combobox_text' />
+                <div class='combobox-dropdown' id='combobox_dropdown' onmouseover='document.body.style.cursor="pointer";' onmouseout='document.body.style.cursor="default";'></div>
+                <input type='button' value='Done' id='done_button' />
             </div>
         </div> </td></tr> <!--End of main controls-->
         
-        <tr><td> <div id='results_id' class='results'></div> <!--List of results-->
+        <tr><td> <div id='results' class='results'></div> <!--List of results-->
         </td></tr> </table> <!--End of layout table-->
         
-        <div id='loaded_list_id' class='loaded-list'></div> <!--List of loaded files-->
+        <div id='loaded_list' class='loaded-list'></div> <!--List of loaded files-->
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            session_id = Math.floor(Math.random()*1e12)+(new Date()).getTime(); //Unique ID so the server can distinguish clients
+        });
         
+        function file_loaded(file) {
+            $('#loaded_list').css('display', 'block');
+            addToLoadedList(file);
+        }
+        
+        function unload(file) {
+            $('#checkbox_'+file).css('display', 'none');
+            action = function(response) { alert('Response:\n'+response); };
+            $.post( '/api', file, action);
+        }
+        
+        function addToLoadedList(s) {
+            $('#loaded_list').append('<div id="checkbox_'+s+'"><input type="checkbox" checked onclick="unload(\''+s+'\')"> '+s+'</div>');
+        }
+         
+        function combobox_clicked(text) {
+            $('#combobox_text').val(text);
+            $('#combobox_dropdown').css('display', 'none');
+            $('#combobox_text').focus();
+        }
+        
+        $('#browse_button').click(function() {
+            var selected = $('#browse_options option:selected').val();
+            $('#browse_dialog').css('display', 'block');
+            $('#combobox_text').focus();
+        });
+        
+        $('#compare_button').click(function() {
+            var selected = $('#compare_options option:selected').val();
+            $('#loaded_list').css('display', 'none');
+            $('#graph').css('display', 'block');
+            $('#results').css('display', 'block');
+            $('#results').html('<div style="margin:10px;">methanol<br>ethanol<br>propanol<br>butanol</div>');
+            $('#graph').html("<img src='graph_mockup.png'>");
+            $('body').css('padding', '0px');
+            alert('Compare '+selected);
+        });
+        
+        $('#browse_options').change(function() {
+            //Make file upload frame go away when not selected
+            var selected = $('#browse_options option:selected').val();
+            if(selected == 'my computer') {
+                $('#file_frame').css('display', 'block');
+            } else {
+                $('#file_frame').css('display', 'none');
+            }
+        });
+        
+        $('#done_button').click(function() {
+            $('#browse_dialog').css('display', 'none');
+            addToLoadedList($('#combobox_text').val());
+            $('#combobox_text').val('');
+            $('#combobox_dropdown').css('display', 'none');
+            $('#combobox_dropdown').html('');
+        });
+        
+        $('#combobox_text').keyup(function(key) {
+            $('#combobox_dropdown').append('<div onclick="combobox_clicked(\''+$('#combobox_text').val()+'\')">'+$('#combobox_text').val()+'</div>');
+            $('#combobox_dropdown').css('display', 'block');
+            var unicode = key.keyCode ? key.keyCode : key.charCode;
+            if(unicode==13) done_browsing();
+        });
+    </script>
     </body>
 </html>
