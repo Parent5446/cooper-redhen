@@ -14,8 +14,17 @@ handlers:
   script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
   login: admin
 
+- url: /stats.*
+  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
+
 - url: /docs
   static_dir: docs
 
 - url: /html
   static_dir: html
+
+- url: /(.*)
+  static_files: html/\1
+  upload: html/(.*)
+  mime_type: text/html
+  
