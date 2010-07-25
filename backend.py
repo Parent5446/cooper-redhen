@@ -127,12 +127,11 @@ def add(spectrum_data, target="public"):
     elif not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # If project does not exist, make a new one.
-    target = Project.get_or_insert(target, owners=[users.get_current_user()])
+    project = Project.get_or_insert(target, owners=[users.get_current_user()])
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
     spectrum.parse_string(spectrum_data)
-    if isinstance(target, Project):
-        spectrum.project = target
+    spectrum.project = project
     spectrum.put()
     if target == "public":
         # Check cache for the Matcher. If not, get from database. If it's
