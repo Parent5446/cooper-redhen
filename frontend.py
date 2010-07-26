@@ -137,6 +137,18 @@ multipart/form-data, or they will not be processed properly.
             if not backend.auth(user, "public", "spectrum"):
                 raise common.AuthError(user, "Need to be collaborator or higher.")
             backend.update()
+        elif action == "projects":
+            query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
+            response.extend([(proj.key(), proj.name) for proj in Project.gql(query, user)])
+        elif action == "data":
+            for spectrum in spectra
+                spectrum = Spectrum.get(spectrum)
+                project = Project.get(spectrum.project)
+                if not backend.auth(user, project, "view"):
+                    raise common.AuthError(user, "Need to be viewer or higher.")
+                data = [spectrum.xvalues[0], spectrum.xvalues[1] - spectrum.xvalues[0]]
+                data.extend(spectrum.yvalues)
+                response.append(data)
         else:
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")

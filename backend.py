@@ -231,6 +231,15 @@ def auth(user, project, action):
 
 
 class Project(db.Model):
+    '''
+    Store a user's spectrum project, where different users have
+    different access levels and spectra are stored within the project.
+    ''''
+    
+    name = db.StringProperty()
+    '''Name for the project. Does not need to be unique.
+    @type: C{str}'''
+    
     owners = db.ListProperty(users.User)
     '''The owners of the Project
     @type: L{google.appengine.ext.db.UserProperty}'''
