@@ -58,6 +58,31 @@
     height:300px;
     display:none;
     border:solid gray 1px;
+    position:relative;
+}
+.graph-column
+{
+    height:300px;
+    width:1px;
+    position:absolute;
+    top:0px;
+    background-color:white;
+}
+.graph-line
+{
+    width:1px;
+    position:absolute;
+    bottom:0px;
+    background-color:blue;
+}
+.graph-floatybar
+{
+    background-color:white;
+    position:absolute;
+    border:solid gray 1px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    display:none;
 }
 .results
 {

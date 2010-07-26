@@ -12,7 +12,7 @@
         
         <table style='margin:auto;'> <!--Layout table, holds site's pieces in order-->
         
-        <tr><td rowspan='2'> <div id='graph' class='graph'></div> </td> <!--Graph of results-->   
+        <tr><td rowspan='2'> <div id='graph' class='graph' onmouseover='document.body.style.cursor="crosshair";' onmouseout='document.body.style.cursor="default"'></div> </td> <!--Graph of results-->   
 
         <td> <div class='frontpage-controls' id='controls'> <!--Main controls-->
             <table class='controls-table'>
@@ -91,11 +91,28 @@
             $('#results').css('display', 'block');
             $('#results').html('Getting results...');
             var got_results = function(response) {
-                $('#graph').html("<img src='graph_mockup.png'>");
                 $('#results').html(response);
+                $('#graph').data = Array();
+                var vertical_divs = Array();
+                for(var x=0; x<$('#graph').width(); x++) { 
+                    $('#graph').data[x] = Math.floor(Math.random()*20) + x/2;
+                    vertical_divs.push('<div class="graph-column" onmouseover="mouseover_graph(event,'+x+');" style="left:'+x+'px;"></div>');
+                    vertical_divs.push('<div class="graph-line" style="left:'+x+'px; height:'+$('#graph').data[x]+'px;"></div>');
+                }
+                vertical_divs.push('<div id="floatybar" class="graph-floatybar">0,0</div>');
+                $('#graph').html(vertical_divs.join(''));
             };
             $.ajax({ url: '/api', success: got_results });
         });
+        
+        function mouseover_graph(e, x) {
+            $('#floatybar').css('display', 'block');
+            var mx = e.pageX - $('#graph').position().left;
+            var my = e.pageY - $('#graph').position().top;
+            $('#floatybar').css('left', mx);
+            $('#floatybar').css('top', my);
+            $('#floatybar').html(x+', '+$('#graph').data[x]);
+        }
         
         $('#browse_options').change(function() {
             //Make file upload frame go away when not selected
