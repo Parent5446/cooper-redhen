@@ -94,12 +94,14 @@ multipart/form-data, or they will not be processed properly.
         limit = self.request.get("limit", 10)
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
+        guess = self.request.get("spectrum")
         session = Session.get_or_insert(self.request.get("session")) #Get (or create) the session
         user = users.get_current_user()
         response = []
         
         # If not operating on the main project, try getting the private one.
-        if target != "public" and not (action == "browse" and spectra):
+        # But abort if target is not supposed to be a project.
+        if target != "public" and not (action == "browse" and guess):
             target = backend.Project.get(target)
             if target is None:
                 raise common.InputError(targets, "Invalid project ID.")
@@ -123,7 +125,6 @@ multipart/form-data, or they will not be processed properly.
             if not backend.auth(user, target, "view"):
                 raise common.AuthError(user, "Need to be viewer or higher.")
             # Return the database key, name, and chemical type.
-            guess = self.request.get("spectrum", "")
             results = [(str(spectrum.key()), spectrum.chemical_name,
                         spectrum.chemical_type, spectrum.project)
                        for spectrum in backend.browse(target, limit, offset, guess)]

@@ -526,10 +526,8 @@ class Matcher(db.Model):
         return Spectrum.get([k[0] for k in keys])
     
     def browse(self, chemical_name):
-        index = bisect.bisect_left(self.chemical_names, chemical_name)
-        raise Exception(self.chemical_names)
         return [Spectrum.get(key)
-                for name, key in self.chemical_names[index:index + 5]
+                for name, key in self.chemical_names
                 if name.startswith(chemical_name)]
     
     @staticmethod # Make a static method for faster execution
