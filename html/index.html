@@ -90,19 +90,26 @@
             $('#graph').css('display', 'block');
             $('#results').css('display', 'block');
             $('#results').html('Getting results...');
-            var got_results = function(response) {
-                $('#results').html(response);
-                $('#graph').data('points', Array());
-                var vertical_divs = Array();
-                for(var x=0; x<$('#graph').width(); x++) { 
-                    $('#graph').data('points')[x] = Math.floor( Math.sin(x/50.0)*150 )+150;
-                    var y = $('#graph').data('points')[x];
-                    var oldy = y; if(x>0) oldy = $('#graph').data('points')[x-1];
-                    if(y>oldy) vertical_divs.push('<div class="graph-line" style="left:'+x+'px; height:'+(y-oldy+1)+'px; bottom:'+oldy+'px;"></div>');
-                    else vertical_divs.push('<div class="graph-line" style="left:'+x+'px; height:'+(oldy-y+1)+'px; bottom:'+y+'px;"></div>');
+            var got_results = function(response) { //Once the server has responded
+                $('#results').html(response); //List the spectra in the results bar
+                $('#graph').data('spectra', Array()); //Prepare the graph to hold data
+                $('#graph').data('spectra').push(Array()); //First spectrum
+                $('#graph').data('spectra').push(Array()); //Second spectrum
+                $('#graph').data('spectra')[0].color = 'blue';
+                $('#graph').data('spectra')[1].color = 'red';
+                for(var x=0; x<$('#graph').width(); x++) { //Make dummy values for testing
+                    $('#graph').data('spectra')[0].push(Math.floor( Math.sin(x/50.0)*150 )+150);
+                    $('#graph').data('spectra')[1].push(Math.floor( Math.sin(x/50.0+250)*150 )+150);
                 }
-                vertical_divs.push('<div id="floatybar" class="graph-floatybar">0,0</div>');
-                $('#graph').html(vertical_divs.join(''));
+                var vertical_divs = Array(); //Prepare the lines on the screen
+                jQuery.each($('#graph').data('spectra'), function(i, spectrum) { //For each spectrum to be graphed
+                    for(var x=0; x<$('#graph').width(); x++) { //For each point in the spectrum
+                        var y = spectrum[x]; var oldy = y; if(x>0) oldy = spectrum[x-1]; //get the y data
+                        if(y>oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(y-oldy+1)+'px; bottom:'+oldy+'px;"></div>'); //Make an upward rectangle
+                        else vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(oldy-y+1)+'px; bottom:'+y+'px;"></div>'); //or make a downward rectangle
+                }}); //Done processing spectra
+                vertical_divs.push('<div id="floatybar" class="graph-floatybar">0,0</div>'); //Make floating sign
+                $('#graph').html(vertical_divs.join('')); //Put it all in the graph
             };
             $.ajax({ url: '/api', success: got_results });
         });
@@ -113,10 +120,13 @@
             var y = Math.floor(e.pageY - $('#graph').position().top);
             $('#floatybar').css('left', x);
             $('#floatybar').css('top', y);
-            $('#floatybar').html(x+', '+$('#graph').data('points')[x]);
+            $('#floatybar').html(x+', '+$('#graph').data('spectra')[0][x]);
             $('#floatybar').css('display', 'block');
         });
-        $('#graph').mouseout( function(e) { onmouseout='document.body.style.cursor="default"'; } );
+        $('#graph').mouseout( function(e) {
+            $('#floatybar').css('display', 'none');
+            onmouseout='document.body.style.cursor="default"';
+        });
         
         $('#browse_options').change(function() {
             //Make file upload frame go away when not selected
