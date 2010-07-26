@@ -202,6 +202,7 @@ def update():
         matchers[spectrum.spectrum_type].add(spectrum)
     # Put Matchers back in database.
     [matcher.put() for matcher in matchers.itervalues()]
+    [memcache.set(key + '_matcher', value) for key, value in matchers.iteritems()]
 
 def auth(user, project, action):
     '''

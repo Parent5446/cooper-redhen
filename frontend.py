@@ -127,7 +127,7 @@ multipart/form-data, or they will not be processed properly.
                 raise common.AuthError(user, "Need to be viewer or higher.")
             # Return the database key, name, and chemical type.
             results = [(str(spectrum.key()), spectrum.chemical_name,
-                        spectrum.chemical_type, spectrum.project)
+                        spectrum.chemical_type)
                        for spectrum in backend.browse(type, limit, offset, guess)]
             response.extend(results)
         elif action == "add":
