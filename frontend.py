@@ -25,6 +25,7 @@ multipart/form-data, or they will not be processed properly.
   when browsing (maximum is 50).
  - offset (optional, used only when action is "browse"): Where to start listing
   spectra from (used for pagination).
+ - type (optional, used only for search suggestions): What type of spectrum
  - output (optional): Can be "xml", "json", "python", or "pickle" depending on
                      what output format you want. Default is "pickle".
 
@@ -55,27 +56,31 @@ instructions, and all others will be ignored. The POST variables below
 may be passed. If uploading files, make sure to set enctype to
 multipart/form-data, or they will not be processed properly.
 
-- action (required):
-    - "compare" - Compare two targets, either from file upload or database.
-    - "analyze" - Does the same as compare, except instead of taking two
+ - action (required):
+     - "compare" - Compare two targets, either from file upload or database.
+     - "analyze" - Does the same as compare, except instead of taking two
                   targets, it takes one and searches the database in an
                   attempt to find the other (good for unknown spectra).
-    - "browse"  - Browse the database.
-    - "add"     - Add a spectrum to the database (or a project).
-    - "delete"  - Delete a spectrum from the database (or a project).
-- spectrum (required): The spectrum (either file or database key) to do the
+     - "browse"  - Browse the database.
+ - target (required):
+    - When action is "search" or "compare": Can be either the text from a JCAMP
+      file or "db:key", where key is the database key for a Spectrum object.
+    - When action is "browse": Can be either "public" for browsing the public
+      library or "private" for browsing your own private library.
+ - spectrum (required): The spectrum (either file or database key) to do the
   action on. When action is "browse", this also takes the beginning of the
   name of the spectrum, which can be used for search suggestions.
-- target (optional, used only when action is "browse", "add", or "delete):
-  Can be either "public" for browsing the public library or a database key
-  for a private project. If using the "browse" action for search suggestions,
-  it also takes the spectrum type.
-- limit (optional, used only when action is "browse"): How many spectra to get
+ - limit (optional, used only when action is "browse"): How many spectra to get
   when browsing (maximum is 50).
-- offset (optional, used only when action is "browse"): Where to start listing
+ - offset (optional, used only when action is "browse"): Where to start listing
   spectra from (used for pagination).
-- output (optional): Can be "xml", "json", "python", or "pickle" depending on
+ - type (optional, used only for search suggestions): What type of spectrum
+ - output (optional): Can be "xml", "json", "python", or "pickle" depending on
                      what output format you want. Default is "pickle".
+
+@organization: The Cooper Union for the Advancement of the Science and the Arts
+@license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
+@copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
         </pre>""")
     
     def post(self):
