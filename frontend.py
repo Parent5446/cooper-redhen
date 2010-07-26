@@ -94,6 +94,7 @@ multipart/form-data, or they will not be processed properly.
         limit = self.request.get("limit", 10)
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
+        session = Session.get_or_insert(self.request.get("session")) #Get (or create) the session
         user = users.get_current_user()
         response = []
         
