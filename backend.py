@@ -85,7 +85,7 @@ def compare(data1, data2, algorithm="bove"):
     else:
         raise common.InputError(algo, "Invalid algorithm selection.")
 
-def browse(target="public", limit=10, offset=0):
+def browse(target="public", limit=10, offset=0, guess=""):
     '''
     Get a list of spectrum for browsing.
     
@@ -105,6 +105,12 @@ def browse(target="public", limit=10, offset=0):
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
     if target == "public":
         target = Project.get_or_insert("public")
+    if guess:
+        # Check cache for the Matcher. If not, get from database.
+        matcher = memcache.get(target + '_matcher')
+        if matcher is None:
+            matcher = Matcher.get_by_key_name(target)
+        return matcher.browse(guess)
     return Spectrum.gql("WHERE project = :1", target).fetch(limit, offset)
 
 def add(spectrum_data, target="public"):
