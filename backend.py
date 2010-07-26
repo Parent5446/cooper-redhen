@@ -442,8 +442,8 @@ class Matcher(db.Model):
     '''@ivar: List of high-low table indices
     @type: L{common.DictProperty}'''
     
-    chem_types = common.DictProperty()
-    '''@ivar: List of chemical types
+    chemical_names = common.GenericListProperty()
+    '''@ivar: List of all spectra in this spectrum type
     @type: L{common.DictProperty}'''
     
     def add(self, spectrum):
@@ -467,6 +467,7 @@ class Matcher(db.Model):
         #peak_list - positions of highest peaks:
         for peak in spectrum.calculate_peaks():
             bisect.insort(self.peak_list, (peak, spectrum.key()))
+        bisect.insort(self.chemical_names, (spectrum.chemical_name, spectrum.key()))
     
     def delete(self, spectrum):
         '''
@@ -516,6 +517,12 @@ class Matcher(db.Model):
         # Sort candidates by number of votes and return Spectrum objects.
         keys = sorted(keys.iteritems(), key=operator.itemgetter(1), reverse=True)
         return Spectrum.get([k[0] for k in keys])
+    
+    def browse(self, chemical_name):
+        index = bisect.bisect_left(self.chemical_names, chemical_name)
+        return [Spectrum.get(key)
+                for name, key in self.chemical_names[index:index + 5]
+                if name.startswith(chemical_name)]
     
     @staticmethod # Make a static method for faster execution
     def bove(a, b):

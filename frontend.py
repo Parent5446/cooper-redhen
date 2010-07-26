@@ -18,6 +18,9 @@ multipart/form-data, or they will not be processed properly.
       file or "db:key", where key is the database key for a Spectrum object.
     - When action is "browse": Can be either "public" for browsing the public
       library or "private" for browsing your own private library.
+ - spectrum (required): The spectrum (either file or database key) to do the
+  action on. When action is "browse", this also takes the beginning of the
+  name of the spectrum, which can be used for search suggestions.
  - limit (optional, used only when action is "browse"): How many spectra to get
   when browsing (maximum is 50).
  - offset (optional, used only when action is "browse"): Where to start listing
@@ -61,10 +64,12 @@ multipart/form-data, or they will not be processed properly.
     - "add"     - Add a spectrum to the database (or a project).
     - "delete"  - Delete a spectrum from the database (or a project).
 - spectrum (required): The spectrum (either file or database key) to do the
-                       action on.
+  action on. When action is "browse", this also takes the beginning of the
+  name of the spectrum, which can be used for search suggestions.
 - target (optional, used only when action is "browse", "add", or "delete):
   Can be either "public" for browsing the public library or a database key
-  for a private project.
+  for a private project. If using the "browse" action for search suggestions,
+  it also takes the spectrum type.
 - limit (optional, used only when action is "browse"): How many spectra to get
   when browsing (maximum is 50).
 - offset (optional, used only when action is "browse"): Where to start listing
@@ -117,9 +122,10 @@ multipart/form-data, or they will not be processed properly.
             if not backend.auth(user, target, "view"):
                 raise common.AuthError(user, "Need to be viewer or higher.")
             # Return the database key, name, and chemical type.
+            guess = self.request.get("spectrum", "")
             results = [(str(spectrum.key()), spectrum.chemical_name,
                         spectrum.chemical_type, spectrum.project)
-                       for spectrum in backend.browse(target, limit, offset)]
+                       for spectrum in backend.browse(target, limit, offset, guess)]
             response.extend(results)
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
