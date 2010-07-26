@@ -103,15 +103,15 @@ def browse(target="public", limit=10, offset=0, guess=""):
     '''
     if limit > 50:
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
-    if target == "public":
-        target = Project.get_or_insert("public")
     if guess:
         # Check cache for the Matcher. If not, get from database.
         matcher = memcache.get(target + '_matcher')
         if matcher is None:
             matcher = Matcher.get_by_key_name(target)
         return matcher.browse(guess)
-    return Spectrum.gql("WHERE project = :1", target).fetch(limit, offset)
+    else:
+        target = Project.get_or_insert(target)
+    return Spectrum.get([spectrum.key() for spectrum in target.spectra[offset:offset + limit]])
 
 def add(spectrum_data, target="public"):
     '''
@@ -136,8 +136,9 @@ def add(spectrum_data, target="public"):
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
     spectrum.parse_string(spectrum_data)
-    spectrum.project = project
     spectrum.put()
+    project.spectra.append(spectrum.key())
+    project.put()
     if target == "public":
         # Check cache for the Matcher. If not, get from database. If it's
         # not there, make a new one.
@@ -181,7 +182,9 @@ def delete(spectrum_data, target="public"):
         # If private, check if it is indeed the user's database.
         if not spectrum.project == target:
             raise common.AuthError(target, "Spectrum does not belong to targeted project.")
-    # Delete the spectrum to the database.
+    # Delete the spectrum from the database.
+    [matcher.spectrum.remove(spectrum.key())
+      for matcher in Matcher.gql("WHERE :1 in spectra", spectrum.key())]
     spectrum.delete()
 
 def update():
@@ -190,15 +193,15 @@ def update():
     data. This should only be used when fixing a corrupt database.
     '''
     # Delete all matcher classes then re-add everything
-    [matcher.delete() for matcher in Matcher.all()]
+    [db.delete(matcher) for matcher in Matcher.all()]
     # Regenerate heuristics data.
-    matchers = []
+    matchers = {}
     for spectrum in Spectrum.all():
-        if matchers[spectrum.spectrum_type] is None:
+        if not matchers.get(spectrum.spectrum_type):
             matchers[spectrum.spectrum_type] = Matcher.get_or_insert(spectrum.spectrum_type)
         matchers[spectrum.spectrum_type].add(spectrum)
     # Put Matchers back in database.
-    [matcher.put() for matcher in matchers]
+    [matcher.put() for matcher in matchers.itervalues()]
 
 def auth(user, project, action):
     '''
@@ -215,6 +218,8 @@ def auth(user, project, action):
     @return: Whether the user is allowed
     @rtype: C{bool}
     '''
+    if isinstance(project, unicode):
+        return True
     # The main project has separate permissions
     if project == "public":
         # Only app admins can change the public project.
@@ -234,34 +239,6 @@ def auth(user, project, action):
         return True
     # Otherwise, not allowed
     return False
-
-
-class Project(db.Model):
-    '''
-    Store a user's spectrum project, where different users have
-    different access levels and spectra are stored within the project.
-    '''
-    
-    name = db.StringProperty()
-    '''Name for the project. Does not need to be unique.
-    @type: C{str}'''
-    
-    owners = db.ListProperty(users.User)
-    '''The owners of the Project
-    @type: L{google.appengine.ext.db.UserProperty}'''
-    
-    collaborators = db.ListProperty(users.User)
-    '''People who can only change spectra in this project. They cannot change
-    the project or permissions.
-    @type: L{google.appengine.ext.db.UserProperty}'''
-    
-    viewers = db.ListProperty(users.User)
-    '''People who can only view the data (cannot add, change, etc.)
-    @type: L{google.appengine.ext.db.UserProperty}'''
-    
-    spectra = db.ListProperty(Spectrum)
-    '''Spectra included in this project.
-    @type: L{backend.Spectrm}'''
 
 
 class Spectrum(db.Model):
@@ -289,10 +266,6 @@ class Spectrum(db.Model):
     yvalues = db.ListProperty(float, indexed=False)
     '''A list of integrated Y points for the spectrum's graph
     @type: C{list}'''
-    
-    project = db.ReferenceProperty(Project)
-    '''The project this spectrum belongs to.
-    @type: L{google.appengine.db.ReferenceProperty}'''
     
     notes = db.StringProperty()
     '''Notes on the spectrum if in a private database
@@ -422,6 +395,34 @@ class Spectrum(db.Model):
         return key
 
 
+class Project(db.Model):
+    '''
+    Store a user's spectrum project, where different users have
+    different access levels and spectra are stored within the project.
+    '''
+    
+    name = db.StringProperty()
+    '''Name for the project. Does not need to be unique.
+    @type: C{str}'''
+    
+    owners = db.ListProperty(users.User)
+    '''The owners of the Project
+    @type: L{google.appengine.ext.db.UserProperty}'''
+    
+    collaborators = db.ListProperty(users.User)
+    '''People who can only change spectra in this project. They cannot change
+    the project or permissions.
+    @type: L{google.appengine.ext.db.UserProperty}'''
+    
+    viewers = db.ListProperty(users.User)
+    '''People who can only view the data (cannot add, change, etc.)
+    @type: L{google.appengine.ext.db.UserProperty}'''
+    
+    spectra = db.ListProperty(db.Key)
+    '''Spectra included in this project.
+    @type: L{backend.Spectrm}'''
+
+
 class Matcher(db.Model):
     '''
     Store spectra data necessary for searching the database, then search the
@@ -526,6 +527,7 @@ class Matcher(db.Model):
     
     def browse(self, chemical_name):
         index = bisect.bisect_left(self.chemical_names, chemical_name)
+        raise Exception(self.chemical_names)
         return [Spectrum.get(key)
                 for name, key in self.chemical_names[index:index + 5]
                 if name.startswith(chemical_name)]

@@ -33,7 +33,7 @@ multipart/form-data, or they will not be processed properly.
 @copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
 """
 from google.appengine.api import users, memcache
-from google.appengine.ext import webapp
+from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 import common
@@ -99,10 +99,10 @@ multipart/form-data, or they will not be processed properly.
         response = []
         
         # If not operating on the main project, try getting the private one.
-        if target != "public":
-            target = backend.Project.get(targets[0])
+        if target != "public" and not (action == "browse" and spectra):
+            target = backend.Project.get(target)
             if target is None:
-                raise common.InputError(targets[0], "Invalid project ID.")
+                raise common.InputError(targets, "Invalid project ID.")
         # Start doing the request
         if action == "compare to main library":
             # Search the database for something.
@@ -148,8 +148,8 @@ multipart/form-data, or they will not be processed properly.
             query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
             response.extend([(proj.key(), proj.name) for proj in Project.gql(query, user)])
         elif action == "data":
-            for spectrum in spectra
-                spectrum = Spectrum.get(spectrum)
+            for spectrum in spectra:
+                spectrum = backend.Spectrum.get(spectrum)
                 project = Project.get(spectrum.project)
                 if not backend.auth(user, project, "view"):
                     raise common.AuthError(user, "Need to be viewer or higher.")
@@ -276,7 +276,7 @@ class Session(db.Model):
     '''The user logged on for this session (can be blank).
     @type: L{google.appengine.ext.db.UserProperty}'''
     
-    spectra = db.ListProperty(backend.Spectrum)
+    spectra = db.ListProperty(db.Key)
     '''The list of active spectra uploaded by the user in this session.
     @type: L{backend.Spectrm}'''
     
