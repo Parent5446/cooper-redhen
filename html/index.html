@@ -92,12 +92,12 @@
             $('#results').html('Getting results...');
             var got_results = function(response) {
                 $('#results').html(response);
-                $('#graph').data = Array();
+                $('#graph').data('points', Array());
                 var vertical_divs = Array();
                 for(var x=0; x<$('#graph').width(); x++) { 
-                    $('#graph').data[x] = Math.floor( Math.sin(x/50.0)*150 )+150;
-                    var y = $('#graph').data[x];
-                    var oldy = y; if(x>0) oldy = $('#graph').data[x-1];
+                    $('#graph').data('points')[x] = Math.floor( Math.sin(x/50.0)*150 )+150;
+                    var y = $('#graph').data('points')[x];
+                    var oldy = y; if(x>0) oldy = $('#graph').data('points')[x-1];
                     if(y>oldy) vertical_divs.push('<div class="graph-line" style="left:'+x+'px; height:'+(y-oldy+1)+'px; bottom:'+oldy+'px;"></div>');
                     else vertical_divs.push('<div class="graph-line" style="left:'+x+'px; height:'+(oldy-y+1)+'px; bottom:'+y+'px;"></div>');
                 }
@@ -109,11 +109,11 @@
         
         $('#graph').mousemove( function(e) {
             document.body.style.cursor="crosshair";
-            var x = e.pageX - $('#graph').position().left;
-            var y = e.pageY - $('#graph').position().top;
+            var x = Math.floor(e.pageX - $('#graph').position().left);
+            var y = Math.floor(e.pageY - $('#graph').position().top);
             $('#floatybar').css('left', x);
             $('#floatybar').css('top', y);
-            $('#floatybar').html(x+', '+$('#graph').data[x]);
+            $('#floatybar').html(x+', '+$('#graph').data('points')[x]);
             $('#floatybar').css('display', 'block');
         });
         $('#graph').mouseout( function(e) { onmouseout='document.body.style.cursor="default"'; } );
