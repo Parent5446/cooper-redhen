@@ -15,14 +15,14 @@
 .combobox-text
 {
     width:150px;
-    margin:1px auto 0px auto;
+    margin:1px auto -1px auto;
     display:block;
     border:solid gray 1px;
     font:inherit;
 }
 .combobox-dropdown
 {
-    width:148px;
+    width:150px;
     margin:auto;
     display:none;
     border:solid gray 1px;

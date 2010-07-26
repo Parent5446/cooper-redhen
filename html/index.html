@@ -54,7 +54,7 @@
         $(document).ready(function() {
             session_id = Math.floor(Math.random()*1e12)+(new Date()).getTime(); //Unique ID so the server can distinguish clients
         });
-        
+            
         function file_loaded(file) {
             $('#loaded_list').css('display', 'block');
             addToLoadedList(file);
@@ -62,8 +62,8 @@
         
         function unload(file) {
             $('#checkbox_'+file).css('display', 'none');
-            action = function(response) { alert('Response:\n'+response); };
-            $.post( '/api', file, action);
+            var action = function(response) { alert('Response:\n'+response); };
+            $.ajax({ url: '/api', success: action });
         }
         
         function addToLoadedList(s) {
@@ -85,12 +85,15 @@
         $('#compare_button').click(function() {
             var selected = $('#compare_options option:selected').val();
             $('#loaded_list').css('display', 'none');
+            $('body').css('padding', '0px');
             $('#graph').css('display', 'block');
             $('#results').css('display', 'block');
-            $('#results').html('<div style="margin:10px;">methanol<br>ethanol<br>propanol<br>butanol</div>');
-            $('#graph').html("<img src='graph_mockup.png'>");
-            $('body').css('padding', '0px');
-            alert('Compare '+selected);
+            $('#results').html('Getting results...');
+            var got_results = function(response) {
+                $('#graph').html("<img src='graph_mockup.png'>");
+                $('#results').html(response);
+            };
+            $.ajax({ url: '/api', success: got_results });
         });
         
         $('#browse_options').change(function() {
@@ -112,10 +115,11 @@
         });
         
         $('#combobox_text').keyup(function(key) {
-            $('#combobox_dropdown').append('<div onclick="combobox_clicked(\''+$('#combobox_text').val()+'\')">'+$('#combobox_text').val()+'</div>');
-            $('#combobox_dropdown').css('display', 'block');
             var unicode = key.keyCode ? key.keyCode : key.charCode;
             if(unicode==13) done_browsing();
+            if($('#combobox_text').val().length<4) return;
+            $('#combobox_dropdown').load( '/api', $('#combobox_text').val() )
+            $('#combobox_dropdown').css('display', 'block');
         });
        //-->
     </script>
