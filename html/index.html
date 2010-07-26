@@ -62,12 +62,13 @@
         
         function unload(file) {
             $('#checkbox_'+file).css('display', 'none');
-            var action = function(response) { alert('Response:\n'+response); };
+            var action = function(response) { alert('Deleted '+file+' from server.'); };
             $.ajax({ url: '/api', success: action });
         }
         
         function addToLoadedList(s) {
-            $('#loaded_list').append('<div id="checkbox_'+s+'"><input type="checkbox" checked onclick="unload(\''+s+'\')"> '+s+'</div>');
+            var id = String(s).replace('.','_');
+            $('#loaded_list').append('<div id="checkbox_'+id+'"><input type="checkbox" checked onclick="unload(\''+id+'\')"> '+s+'</div>');
         }
          
         function combobox_clicked(text) {
@@ -116,7 +117,7 @@
         
         $('#combobox_text').keyup(function(key) {
             var unicode = key.keyCode ? key.keyCode : key.charCode;
-            if(unicode==13) done_browsing();
+            if(unicode==13) $('#done_button').click();
             if($('#combobox_text').val().length<4) return;
             $('#combobox_dropdown').load( '/api', $('#combobox_text').val() )
             $('#combobox_dropdown').css('display', 'block');

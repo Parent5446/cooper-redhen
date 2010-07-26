@@ -85,7 +85,7 @@ multipart/form-data, or they will not be processed properly.
         """
         action = self.request.get("action")
         target = self.request.get("target", "public")
-        spectra = self.request.get_all("spectrum")
+        spectra = self.request.get_all("spectrum") #Some of these will be in session data
         limit = self.request.get("limit", 10)
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
@@ -98,7 +98,7 @@ multipart/form-data, or they will not be processed properly.
             if target is None:
                 raise common.InputError(targets[0], "Invalid project ID.")
         # Start doing the request
-        if action == "analyze":
+        if action == "compare to main library":
             # Search the database for something.
             for spectrum in spectra:
                 # User wants to commit a new search with a file upload.
@@ -106,7 +106,7 @@ multipart/form-data, or they will not be processed properly.
                 # Extract relevant information and add to the response.
                 info = [(i.chemical_name, i.error) for i in result]
                 response.append(info)
-        elif action == "compare":
+        elif action == "compare to each other":
             # Compare two pre-uploaded spectra.
             if len(spectra) < 2:
                 raise common.InputError(targets, "Not enough spectra given.")
