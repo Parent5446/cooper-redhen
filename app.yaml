@@ -26,5 +26,4 @@ handlers:
 - url: /(.*)
   static_files: html/\1
   upload: html/(.*)
-  mime_type: text/html
   
