@@ -100,7 +100,6 @@ def browse(target="public", limit=10, offset=0):
     @raise common.InputError: If the user tries to retrieve too many spectra
     at once, the user is not logged in and tries to access a private database,
     or if an invalid database choice is given.
-    
     '''
     if limit > 50:
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
@@ -244,6 +243,10 @@ class Project(db.Model):
     viewers = db.ListProperty(users.User)
     '''People who can only view the data (cannot add, change, etc.)
     @type: L{google.appengine.ext.db.UserProperty}'''
+    
+    spectra = db.ListProperty(Spectrum)
+    '''Spectra included in this project.
+    @type: L{backend.Spectrm}'''
 
 
 class Spectrum(db.Model):
