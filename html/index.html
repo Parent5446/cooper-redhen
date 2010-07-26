@@ -95,8 +95,11 @@
                 $('#graph').data = Array();
                 var vertical_divs = Array();
                 for(var x=0; x<$('#graph').width(); x++) { 
-                    $('#graph').data[x] = Math.floor(Math.random()*20) + x/2;
-                    vertical_divs.push('<div class="graph-line" style="left:'+x+'px; height:'+$('#graph').data[x]+'px;"></div>');
+                    $('#graph').data[x] = Math.floor( Math.sin(x/50.0)*150 )+150;
+                    var y = $('#graph').data[x];
+                    var oldy = y; if(x>0) oldy = $('#graph').data[x-1];
+                    if(y>oldy) vertical_divs.push('<div class="graph-line" style="left:'+x+'px; height:'+(y-oldy+1)+'px; bottom:'+oldy+'px;"></div>');
+                    else vertical_divs.push('<div class="graph-line" style="left:'+x+'px; height:'+(oldy-y+1)+'px; bottom:'+y+'px;"></div>');
                 }
                 vertical_divs.push('<div id="floatybar" class="graph-floatybar">0,0</div>');
                 $('#graph').html(vertical_divs.join(''));

@@ -60,17 +60,9 @@
     border:solid gray 1px;
     position:relative;
 }
-.graph-column
-{
-    height:300px;
-    width:1px;
-    position:absolute;
-    top:0px;
-    background-color:white;
-}
 .graph-line
 {
-    width:1px;
+    width:2px;
     position:absolute;
     bottom:0px;
     background-color:blue;
