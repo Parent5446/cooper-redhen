@@ -267,7 +267,19 @@ multipart/form-data, or they will not be processed properly.
                 xml += "<" + key + ">" + self._convert_to_xml_internal(item) + "</" + key + ">"
             return xml
 
-
+class Session(db.Model):
+    '''
+    Store a session on the site.
+    '''
+    user = db.UserProperty()
+    '''The user logged on for this session (can be blank).
+    @type: L{google.appengine.ext.db.UserProperty}'''
+    
+    spectra = db.ListProperty(backend.Spectrum)
+    '''The list of active spectra uploaded by the user in this session.
+    @type: L{backend.Spectrm}'''
+    
+            
 application = webapp.WSGIApplication([
     ('/api', ApiHandler)
 ], debug=True)
