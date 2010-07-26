@@ -112,7 +112,7 @@ multipart/form-data, or they will not be processed properly.
             if target is None:
                 raise common.InputError(targets, "Invalid project ID.")
         # Start doing the request
-        if action == "compare to main library":
+        if action == "compare" and target == "public":
             # Search the database for something.
             for spectrum in spectra:
                 # User wants to commit a new search with a file upload.
@@ -120,12 +120,9 @@ multipart/form-data, or they will not be processed properly.
                 # Extract relevant information and add to the response.
                 info = [(i.chemical_name, i.error) for i in result]
                 response.append(info)
-        elif action == "compare to each other":
+        elif action == "compare":
             # Compare two pre-uploaded spectra.
-            if len(spectra) < 2:
-                raise common.InputError(targets, "Not enough spectra given.")
-            # Default to Bove's algorithm if not given
-            response.append(backend.compare(spectra[0], spectra[1], algorithm))
+            response.append(backend.compare(spectra[0], target, algorithm))
         elif action == "browse":
             # Get a list of spectra from the database for browsing
             if not backend.auth(user, target, "view"):
