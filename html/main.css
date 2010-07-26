@@ -17,7 +17,7 @@
     width:150px;
     margin:1px auto 0px auto;
     display:block;
-    border:solid grey 1px;
+    border:solid gray 1px;
     font:inherit;
 }
 .combobox-dropdown
@@ -72,8 +72,9 @@
     position:absolute;
     border-style:none;
     left:0px; top:5px;
-    -moz-opacity:0;
-	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-	filter:alpha(opacity=0);
-	opacity:0;
+    -moz-opacity: 0;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: alpha(opacity=0);
+	opacity: 0;
+	overflow: hidden
 }

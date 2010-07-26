@@ -1,12 +1,14 @@
-<html> <!--Front page for redhen spectra-->
-    <head> <!--Compress for use with tools such as http://www.peterbe.com/plog/blogitem-040406-1/compressor-->
-        <link rel='stylesheet' href='main.css'> <!--Link to stylesheet-->
-        <link rel='shortcut icon' href='favicon.ico'> <!--Favicon for site-->
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" />
-        <script type="text/javascript"></script>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>RedHen Spectrum Analyzer</title>
+        <meta charset="utf-8"></meta>
+        <link rel='stylesheet' href='main.css' /> <!--Link to stylesheet-->
+        <link rel='shortcut icon' href='favicon.ico' /> <!--Favicon for site-->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     </head>
     <body style='text-align:center; padding:40px;'> <!--Core HTML:-->
-        <img src='banner.png'><!--Banner image-->
+        <div id="header"><img src='banner.png' alt="RedHen logo" /></div>
         
         <table style='margin:auto;'> <!--Layout table, holds site's pieces in order-->
         
@@ -15,7 +17,7 @@
         <td> <div class='frontpage-controls' id='controls'> <!--Main controls-->
             <table class='controls-table'>
                 <tr>
-                    <td><input type='button' id='browse_button' value='Browse' class='button'></td>
+                    <td><input type='button' id='browse_button' value='Browse' class='button' /></td>
                     <td><select id='browse_options' class='listbox'>
                         <option>my computer</option>
                         <option>my projects</option>
@@ -23,7 +25,7 @@
                     </select></td>
                 </tr>
                 <tr>
-                    <td><input type='button' id='compare_button' value='Compare' class='button'></td>
+                    <td><input type='button' id='compare_button' value='Compare' class='button' /></td>
                     <td><select id='compare_options' class='listbox'>
                         <option>to main library</option>
                         <option>to my projects</option>
@@ -31,8 +33,8 @@
                     </select></td>
                 </tr>
             </table>
-            
-            <iframe class='invisible-frame' scrolling="no" id='file_frame' src='file_upload_frame.html'></iframe>
+
+            <iframe class='invisible-frame' id='file_frame' src='file_upload_frame.html'></iframe>
             
             <div class='browse-dialog' id='browse_dialog'> <!--Browse dialog, usually invisible-->
                 Enter a chemical name to search:
@@ -48,6 +50,7 @@
         <div id='loaded_list' class='loaded-list'></div> <!--List of loaded files-->
     
     <script type="text/javascript">
+        //<!--
         $(document).ready(function() {
             session_id = Math.floor(Math.random()*1e12)+(new Date()).getTime(); //Unique ID so the server can distinguish clients
         });
@@ -114,6 +117,7 @@
             var unicode = key.keyCode ? key.keyCode : key.charCode;
             if(unicode==13) done_browsing();
         });
+       //-->
     </script>
     </body>
 </html>
