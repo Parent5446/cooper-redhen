@@ -12,7 +12,7 @@
         
         <table style='margin:auto;'> <!--Layout table, holds site's pieces in order-->
         
-        <tr><td rowspan='2'> <div id='graph' class='graph' onmousemove='graph_mouseover(event);' onmouseout='document.body.style.cursor="default"'></div> </td> <!--Graph of results-->   
+        <tr><td rowspan='2'> <div id='graph' class='graph'></div> </td> <!--Graph of results-->   
 
         <td> <div class='frontpage-controls' id='controls'> <!--Main controls-->
             <table class='controls-table'>
@@ -107,7 +107,7 @@
             $.ajax({ url: '/api', success: got_results });
         });
         
-        function graph_mouseover(e, x) {
+        $('#graph').mousemove( function(e) {
             document.body.style.cursor="crosshair";
             var x = e.pageX - $('#graph').position().left;
             var y = e.pageY - $('#graph').position().top;
@@ -115,7 +115,8 @@
             $('#floatybar').css('top', y);
             $('#floatybar').html(x+', '+$('#graph').data[x]);
             $('#floatybar').css('display', 'block');
-        }
+        });
+        $('#graph').mouseout( function(e) { onmouseout='document.body.style.cursor="default"'; } );
         
         $('#browse_options').change(function() {
             //Make file upload frame go away when not selected
