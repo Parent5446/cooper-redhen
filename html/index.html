@@ -121,6 +121,7 @@
                         else vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:1px; bottom:'+y+'px;"></div>'); //or make a horizontal rectangle
                     }}); //Done processing spectra
                 vertical_divs.push('<div id="floatybar" class="graph-floatybar">0,0</div>'); //Make floating sign
+                vertical_divs.push('<div id="tracepoint" class="graph-trace"></div>'); //Make trace point
                 $('#graph').html(vertical_divs.join('')); //Put it all in the graph
                 $('#graph').mousemove( function(e) { //Add functions to the graph
                     document.body.style.cursor="crosshair";
@@ -129,14 +130,18 @@
                     $('#floatybar').css('bottom', spectra[selected].data[x]);
                     $('#floatybar').html(x+', '+spectra[selected].data[x]);
                     $('#floatybar').css('display', 'block');
+                    $('#tracepoint').css('left', x-2);
+                    $('#tracepoint').css('bottom', spectra[selected].data[x]-2);
+                    $('#tracepoint').css('display', 'block');
                 });
                 $('#graph').click( function(e) {
                     var x = Math.floor(e.pageX - $('#graph').position().left);
                     var y = 300+$('#graph').position().top-e.pageY;
-                    for(var i in spectra) if(Math.abs(spectra[i].data[x]-y)<10) { selected=i; break; }
+                    for(var i in spectra) if(Math.abs(spectra[i].data[x]-y)<15) { selected=i; break; }
                 });
                 $('#graph').mouseout( function(e) {
                     $('#floatybar').css('display', 'none');
+                    $('#tracepoint').css('display', 'none');
                     document.body.style.cursor="default";
                 });
             };

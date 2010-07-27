@@ -89,6 +89,16 @@
 	filter:alpha(opacity=80);
 	opacity:0.8;
 }
+.graph-trace
+{
+    background-color:black;
+    position:absolute;
+    height:5px;
+    width:5px;
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    display:none;
+}
 .results
 {
     width:250px;
