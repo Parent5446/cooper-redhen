@@ -18,8 +18,10 @@ import re
 import os
 import sys
 import bisect
+import urllib
+import httplib
 
-def main_client(appcfg, dirname, recursive=False):
+def main_client(appcfg, dirname, recursive=False, send=True):
     """
     Extract all files from a directory and transfer them to the server.
     
@@ -27,36 +29,40 @@ def main_client(appcfg, dirname, recursive=False):
     @type  dirname: C{str}
     @raise Exception: If the given file name is not a directory
     """
-    with open("tmp.csv", 'w') as fp:
-        chem_types = flat_heavyside = ordered_heavyside = high_low = {}
-        peak_list = []
-        csvfile = fp.name
-        fp.write("chemcial_name,chemical_type,spectrum_type,project,xvalues,yvalues\n")
-        if not os.path.exists(dirname) or not os.path.isdir(dirname):
-            raise Exception("Not a directory.")
-        files = os.listdir(dirname)
-        for file_name in files:
-            file_name = os.path.join(dirname, file_name)
-            if os.path.isdir(file_name):
-                if recursive:
-                    main_client(file_name)
-                else:
-                    continue
-            with open(file_name) as file_obj:
-                contents = file_obj.read()
-                chemical_name = get_field(contents, '##TITLE=')
-                chemical_type = 'Unknown'
-                spectrum_type = 'Infrared'
-                xvalues, yvalues = get_data(contents)
-                # AppEngine require integer lists to have 'L' at the end of
-                # each value.
-                xvalues = '[' + 'L, '.join([str(x) for x in xvalues]) + 'L]'
-                fp.write('"%s","%s","%s","name=public","%s","%s"' % (chemical_name,
-                           chemical_type, spectrum_type, xvalues, str(yvalues)))
-    raise Exception(csvfile)
-    os.execl(appcfg, "upload_data", "--config_file=bulkloader.yaml",
-             "--filename=tmp.csv", "--kind=Spectrum",
-             "--url=http://cooper-redhen.appspot.com/upload")
+    upload_data = []
+    if not os.path.exists(dirname) or not os.path.isdir(dirname):
+        raise Exception("Not a directory.")
+    files = os.listdir(dirname)
+    for file_name in files:
+        file_name = os.path.join(dirname, file_name)
+        if os.path.isdir(file_name):
+            if recursive:
+                upload_data.extend(main_client(appcfg, file_name, recursive, False))
+            else:
+                continue
+        with open(file_name) as file_obj:
+            contents = file_obj.read()
+            xvalues, yvalues = get_data(contents)
+            upload_data.append(urllib.quote(str({
+                'chemical_name': get_field(contents, '##TITLE='),
+                'chemical_type': 'Unknown',
+                'spectrum_type': 'infrared',
+                'xvalues': xvalues,
+                'yvalues': yvalues
+            })))
+    if send:
+        upload_data = 'spectrum=' + '&spectrum='.join(upload_data)
+        upload_data += '&action=add&raw=True&session=bulk_uploader'
+        headers = {"Content-type": "application/x-www-form-urlencoded",
+                   "Accept": "text/plain"}
+        conn = httplib.HTTPConnection("cooper-redhen.appspot.com")
+        conn.request("POST", "/api", upload_data, headers)
+        response = conn.getresponse()
+        print response.status, response.reason
+        print response.read()
+        conn.close()
+    else:
+        return upload_data
 
 def transfer(file_obj):
     """

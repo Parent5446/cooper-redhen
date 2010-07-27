@@ -20,8 +20,8 @@ def search(spectrum_data):
     '''
     Search for a spectrum based on a given file descriptor.
     
-    Parse the given file and create a Spectrum object for it. Use the Matcher
     object to find candidates for similar spectra in the database and compare
+    Parse the given file and create a Spectrum object for it. Use the Matcher
     all candidates to the original spectrum using linear comparison algorithms.
     
     @param spectrum_data: String containing spectrum information
@@ -126,13 +126,14 @@ def add(spectrum_data, target="public", raw=False):
     @param target: Where to store the spectrum
     '''
     # If project does not exist, make a new one.
-    project = Project.get_or_insert(target, owners=[users.get_current_user()])
+    project = Project.get_or_insert(target)
     # Load the user's spectrum into a Spectrum object.
     if not raw:
         spectrum = Spectrum()
         spectrum.parse_string(spectrum_data)
     else:
-        data = pickle.loads(spectrum_data)
+        import pickle, urllib
+        data = eval(urllib.unquote(spectrum_data))
         spectrum = Spectrum(**data)
     spectrum.put()
     project.spectra.append(spectrum.key())
@@ -245,7 +246,6 @@ class Spectrum(db.Model):
     Store a spectrum, its related data, and any algorithms necessary
     to compare the spectrum to the DataStore.
     '''
-    
     chemical_name = db.StringProperty()
     '''The chemical name associated with the spectrum
     @type: C{str}'''
