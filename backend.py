@@ -113,7 +113,7 @@ def browse(target="public", limit=10, offset=0, guess="", type=""):
         target = Project.get_or_insert(target)
         return Spectrum.get(target.spectra[offset:offset + limit])
 
-def add(spectrum_data, target="public", raw=False):
+def add(spectrum_data, target="public", preprocessed=False):
     '''
     Add a new spectrum to the database from a given file descriptor.
     
@@ -124,15 +124,18 @@ def add(spectrum_data, target="public", raw=False):
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
     @param target: Where to store the spectrum
+    @type  target: "public" or a db key
+    @param preprocessed: Whether spectrum_data is already integrated or not
+    @type  preprocessed: C{bool}
     '''
     # If project does not exist, make a new one.
     project = Project.get_or_insert(target)
     # Load the user's spectrum into a Spectrum object.
-    if not raw:
+    if not preprocessed:
         spectrum = Spectrum()
         spectrum.parse_string(spectrum_data)
     else:
-        import pickle, urllib
+        import urllib
         data = eval(urllib.unquote(spectrum_data))
         spectrum = Spectrum(**data)
     spectrum.put()
@@ -238,6 +241,13 @@ def auth(user, project, action):
     if user in project.viewers and action == "view":
         return True
     # Otherwise, not allowed
+    if action == "project":
+        need = "owner"
+    elif action == "spectrum":
+        need = "collaborator"
+    else:
+        need = "viewer"
+    raise common.AuthError(user, "Need to be %s or higher." % need)
     return False
 
 

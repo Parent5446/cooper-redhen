@@ -2,10 +2,10 @@
 Take a POST request with JSON data and process it. If it contains a spectrum
 file, send it to the back end to search the database.
 
-All request must be POST requests. Any GET requests will just print these
-instructions, and all others will be ignored. The POST variables below
-may be passed. If uploading files, make sure to set enctype to
-multipart/form-data, or they will not be processed properly.
+Any request that requires a file upload must be a POST request. Only the
+update, projects, data, and browse actions are allowed in a GET request.
+The GET/POST variables below may be passed. If uploading files, make sure
+to set enctype to multipart/form-data, or they will not be processed properly.
 
 General Options:
  - action (required):
@@ -13,71 +13,11 @@ General Options:
      - "add" - Add a spectrum to a project or the public database.
      - "delete" - Add a spectrum to a project or the public database.
      - "update" - Clear all heuristic data and rebuild the Matcher (admin-only).
+     - "browse" - Browse either the public database or a specific project.
      - "projects" - List all projects the user can access.
      - "data" - Get the X,Y data for a spectrum graph. NOTE: This gives a list
        with the first x value, delta x, and then the y values.
- - spectrum (required): The spectrum (either file or database key) to do the
-   action on. Depending on the action, multiple spectra can be uploaded here.
- - target (optional, defaults to "public"):
-    - When action is "compare": Can be either "public" to search the spectrum
-      against the public database or it can be another file upload if comparing
-      two spectra against each other.
-    - When action is "browse": Can be either "public" for browsing the public
-      library or a database key referring to the project being browsed.
- - output (optional, defaults to "pickle"): Can be "xml", "json", "python", or
-   "pickle" depending on what output format you want.
-
-Browsing Options:
- - limit: How many spectra to get when browsing (maximum is 50).
- - offset: Where to start listing spectra from (used for pagination).
- - type (used for search suggestions): What type of spectrum (infrared or raman)
- - guess (used only search suggestions): What the user has typed already and
-   what we are giving suggestions for.
-
-Comparing Options:
- - algorithm (defaults to "bove"): Which linear algorithm to compare spectra with
-
-Adding Options:
- - raw (defaults to False): Whether the uploaded spectrum is in a standard JCAMP
-   or SPC file format, or if it has been pre-processed and integrated. This is
-   used primarily for bulk uploading spectra.
-
-@organization: The Cooper Union for the Advancement of the Science and the Arts
-@license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
-@copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
-"""
-from google.appengine.api import users, memcache
-from google.appengine.ext import webapp, db
-from google.appengine.ext.webapp.util import run_wsgi_app
-
-import common
-import backend
-
-class ApiHandler(webapp.RequestHandler):
-    """Handle any API requests and return a JSON response."""
-    
-    def get(self):
-        """
-        Handle a GET request to the API. Print instructions on how to use
-        the API.
-        """
-        self.response.out.write("""<pre>
-RedHen API v0.2
-
-All request must be POST requests. Any GET requests will just print these
-instructions, and all others will be ignored. The POST variables below
-may be passed. If uploading files, make sure to set enctype to
-multipart/form-data, or they will not be processed properly.
-
-General Options:
- - action (required):
-     - "compare" - Compare two targets, either from file upload or database.
-     - "add" - Add a spectrum to a project or the public database.
-     - "delete" - Add a spectrum to a project or the public database.
-     - "update" - Clear all heuristic data and rebuild the Matcher (admin-only).
-     - "projects" - List all projects the user can access.
-     - "data" - Get the X,Y data for a spectrum graph. NOTE: This gives a list
-       with the first x value, delta x, and then the y values.
+     - "bulkadd" - Add a mass amount of spectra to the database as once.
  - spectrum (required for some actions): The spectrum (either file or database
    key) to do the action on. Depending on the action, multiple spectra can be
    uploaded here.
@@ -100,11 +40,26 @@ Browsing Options:
 Comparing Options:
  - algorithm (defaults to "bove"): Which linear algorithm to compare spectra with
 
-Adding Options:
- - raw (defaults to False): Whether the uploaded spectrum is in a standard JCAMP
-   or SPC file format, or if it has been pre-processed and integrated. This is
-   used primarily for bulk uploading spectra.
-        </pre>""")
+@organization: The Cooper Union for the Advancement of the Science and the Arts
+@license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
+@copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
+"""
+from google.appengine.api import users, memcache
+from google.appengine.ext import webapp, db
+from google.appengine.ext.webapp.util import run_wsgi_app
+
+import appengine_utilities.sessions
+import common
+import backend
+
+class ApiHandler(webapp.RequestHandler):
+    """Handle any API requests and return a JSON response."""
+    
+    def get(self):
+        if self.request.get("action") in ("update", "projects", "data", "browse"):
+            self.post()
+        else:
+            self.help()
     
     def post(self):
         """
@@ -125,7 +80,7 @@ Adding Options:
         guess = self.request.get("guess")
         type = self.request.get("type")
         raw = self.request.get("raw", False)
-        session = Session.get_or_insert(self.request.get("session")) #Get (or create) the session
+        session = appengine_utilities.sessions.Session()
         user = users.get_current_user()
         response = []
         
@@ -150,8 +105,7 @@ Adding Options:
             response.append(backend.compare(spectra[0], target, algorithm))
         elif action == "browse":
             # Get a list of spectra from the database for browsing
-            if not backend.auth(user, target, "view"):
-                raise common.AuthError(user, "Need to be viewer or higher.")
+            backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
             results = [(str(spectrum.key()), spectrum.chemical_name,
                         spectrum.chemical_type)
@@ -159,19 +113,22 @@ Adding Options:
             response.extend(results)
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
-            if not backend.auth(user, target, "spectrum"):
-                raise common.AuthError(user, "Need to be collaborator or higher.")
+            backend.auth(user, target, "spectrum")
             for spectrum_data in spectra:
-                backend.add(spectrum_data, target, raw)
+                backend.add(spectrum_data, target, False)
+        elif action == "bulkadd":
+            # Add a new spectrum to the database. Supports multiple spectra.
+            if session.key().name() != "uploader":
+                raise common.AuthError(user, "Only the uploader can bulkadd.")
+            for spectrum_data in spectra:
+                backend.add(spectrum_data, target, True)
         elif action == "delete":
             # Delete a spectrum from the database.
-            if not backend.auth(user, target, "spectrum"):
-                raise common.AuthError(user, "Need to be collaborator or higher.")
+            backend.auth(user, target, "spectrum")
             for spectrum_data in spectra:
                 backend.delete(spectrum_data, target)
         elif action == "update":
-            if not backend.auth(user, "public", "spectrum"):
-                raise common.AuthError(user, "Need to be collaborator or higher.")
+            backend.auth(user, "public", "spectrum")
             backend.update()
         elif action == "projects":
             query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
@@ -245,6 +202,50 @@ Adding Options:
             # Send all else to Google.
             super(ApiHandler, self).handle_exception(exception, True)
 
+    def help(self):
+        """Print help information for the API."""
+        self.response.out.write("""<pre>
+RedHen API v0.2
+
+All request must be POST requests. Any GET requests will just print these
+instructions, and all others will be ignored. The POST variables below
+may be passed. If uploading files, make sure to set enctype to
+multipart/form-data, or they will not be processed properly.
+
+General Options:
+ - action (required):
+     - "compare" - Compare two targets, either from file upload or database.
+     - "add" - Add a spectrum to a project or the public database.
+     - "delete" - Add a spectrum to a project or the public database.
+     - "update" - Clear all heuristic data and rebuild the Matcher (admin-only).
+     - "browse" - Browse either the public database or a specific project.
+     - "projects" - List all projects the user can access.
+     - "data" - Get the X,Y data for a spectrum graph. NOTE: This gives a list
+       with the first x value, delta x, and then the y values.
+     - "bulkadd" - Add a mass amount of spectra to the database as once.
+ - spectrum (required for some actions): The spectrum (either file or database
+   key) to do the action on. Depending on the action, multiple spectra can be
+   uploaded here.
+ - target (optional, defaults to "public"):
+    - When action is "compare": Can be either "public" to search the spectrum
+      against the public database or it can be another file upload if comparing
+      two spectra against each other.
+    - When action is "browse": Can be either "public" for browsing the public
+      library or a database key referring to the project being browsed.
+ - output (optional, defaults to "pickle"): Can be "xml", "json", "python", or
+   "pickle" depending on what output format you want.
+
+Browsing Options:
+ - limit: How many spectra to get when browsing (maximum is 50).
+ - offset: Where to start listing spectra from (used for pagination).
+ - type (used for search suggestions): What type of spectrum (infrared or raman)
+ - guess (used only search suggestions): What the user has typed already and
+   what we are giving suggestions for.
+
+Comparing Options:
+ - algorithm (defaults to "bove"): Which linear algorithm to compare spectra with
+        </pre>""")
+    
     def _convert_to_xml(self, item):
         """
         Convert a given item to XML.
@@ -294,19 +295,6 @@ Adding Options:
                 xml += "<" + key + ">" + self._convert_to_xml_internal(item) + "</" + key + ">"
             return xml
 
-class Session(db.Model):
-    '''
-    Store a session on the site.
-    '''
-    user = db.UserProperty()
-    '''The user logged on for this session (can be blank).
-    @type: L{google.appengine.ext.db.UserProperty}'''
-    
-    spectra = db.ListProperty(db.Key)
-    '''The list of active spectra uploaded by the user in this session.
-    @type: L{backend.Spectrm}'''
-    
-            
 application = webapp.WSGIApplication([
     ('/api', ApiHandler)
 ], debug=True)
