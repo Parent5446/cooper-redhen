@@ -7,27 +7,40 @@ instructions, and all others will be ignored. The POST variables below
 may be passed. If uploading files, make sure to set enctype to
 multipart/form-data, or they will not be processed properly.
 
+General Options:
  - action (required):
      - "compare" - Compare two targets, either from file upload or database.
-     - "analyze" - Does the same as compare, except instead of taking two
-                  targets, it takes one and searches the database in an
-                  attempt to find the other (good for unknown spectra).
-     - "browse"  - Browse the database.
- - target (required):
-    - When action is "search" or "compare": Can be either the text from a JCAMP
-      file or "db:key", where key is the database key for a Spectrum object.
-    - When action is "browse": Can be either "public" for browsing the public
-      library or "private" for browsing your own private library.
+     - "add" - Add a spectrum to a project or the public database.
+     - "delete" - Add a spectrum to a project or the public database.
+     - "update" - Clear all heuristic data and rebuild the Matcher (admin-only).
+     - "projects" - List all projects the user can access.
+     - "data" - Get the X,Y data for a spectrum graph. NOTE: This gives a list
+       with the first x value, delta x, and then the y values.
  - spectrum (required): The spectrum (either file or database key) to do the
-  action on. When action is "browse", this also takes the beginning of the
-  name of the spectrum, which can be used for search suggestions.
- - limit (optional, used only when action is "browse"): How many spectra to get
-  when browsing (maximum is 50).
- - offset (optional, used only when action is "browse"): Where to start listing
-  spectra from (used for pagination).
- - type (optional, used only for search suggestions): What type of spectrum
- - output (optional): Can be "xml", "json", "python", or "pickle" depending on
-                     what output format you want. Default is "pickle".
+   action on. Depending on the action, multiple spectra can be uploaded here.
+ - target (optional, defaults to "public"):
+    - When action is "compare": Can be either "public" to search the spectrum
+      against the public database or it can be another file upload if comparing
+      two spectra against each other.
+    - When action is "browse": Can be either "public" for browsing the public
+      library or a database key referring to the project being browsed.
+ - output (optional, defaults to "pickle"): Can be "xml", "json", "python", or
+   "pickle" depending on what output format you want.
+
+Browsing Options:
+ - limit: How many spectra to get when browsing (maximum is 50).
+ - offset: Where to start listing spectra from (used for pagination).
+ - type (used for search suggestions): What type of spectrum (infrared or raman)
+ - guess (used only search suggestions): What the user has typed already and
+   what we are giving suggestions for.
+
+Comparing Options:
+ - algorithm (defaults to "bove"): Which linear algorithm to compare spectra with
+
+Adding Options:
+ - raw (defaults to False): Whether the uploaded spectrum is in a standard JCAMP
+   or SPC file format, or if it has been pre-processed and integrated. This is
+   used primarily for bulk uploading spectra.
 
 @organization: The Cooper Union for the Advancement of the Science and the Arts
 @license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
@@ -56,31 +69,40 @@ instructions, and all others will be ignored. The POST variables below
 may be passed. If uploading files, make sure to set enctype to
 multipart/form-data, or they will not be processed properly.
 
+General Options:
  - action (required):
      - "compare" - Compare two targets, either from file upload or database.
-     - "analyze" - Does the same as compare, except instead of taking two
-                  targets, it takes one and searches the database in an
-                  attempt to find the other (good for unknown spectra).
-     - "browse"  - Browse the database.
- - target (required):
-    - When action is "search" or "compare": Can be either the text from a JCAMP
-      file or "db:key", where key is the database key for a Spectrum object.
-    - When action is "browse": Can be either "public" for browsing the public
-      library or "private" for browsing your own private library.
+     - "add" - Add a spectrum to a project or the public database.
+     - "delete" - Add a spectrum to a project or the public database.
+     - "update" - Clear all heuristic data and rebuild the Matcher (admin-only).
+     - "projects" - List all projects the user can access.
+     - "data" - Get the X,Y data for a spectrum graph. NOTE: This gives a list
+       with the first x value, delta x, and then the y values.
  - spectrum (required): The spectrum (either file or database key) to do the
-  action on. When action is "browse", this also takes the beginning of the
-  name of the spectrum, which can be used for search suggestions.
- - limit (optional, used only when action is "browse"): How many spectra to get
-  when browsing (maximum is 50).
- - offset (optional, used only when action is "browse"): Where to start listing
-  spectra from (used for pagination).
- - type (optional, used only for search suggestions): What type of spectrum
- - output (optional): Can be "xml", "json", "python", or "pickle" depending on
-                     what output format you want. Default is "pickle".
+   action on. Depending on the action, multiple spectra can be uploaded here.
+ - target (optional, defaults to "public"):
+    - When action is "compare": Can be either "public" to search the spectrum
+      against the public database or it can be another file upload if comparing
+      two spectra against each other.
+    - When action is "browse": Can be either "public" for browsing the public
+      library or a database key referring to the project being browsed.
+ - output (optional, defaults to "pickle"): Can be "xml", "json", "python", or
+   "pickle" depending on what output format you want.
 
-@organization: The Cooper Union for the Advancement of the Science and the Arts
-@license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
-@copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
+Browsing Options:
+ - limit: How many spectra to get when browsing (maximum is 50).
+ - offset: Where to start listing spectra from (used for pagination).
+ - type (used for search suggestions): What type of spectrum (infrared or raman)
+ - guess (used only search suggestions): What the user has typed already and
+   what we are giving suggestions for.
+
+Comparing Options:
+ - algorithm (defaults to "bove"): Which linear algorithm to compare spectra with
+
+Adding Options:
+ - raw (defaults to False): Whether the uploaded spectrum is in a standard JCAMP
+   or SPC file format, or if it has been pre-processed and integrated. This is
+   used primarily for bulk uploading spectra.
         </pre>""")
     
     def post(self):
@@ -101,6 +123,7 @@ multipart/form-data, or they will not be processed properly.
         algorithm = self.request.get("algorithm", "bove")
         guess = self.request.get("spectrum")
         type = self.request.get("type")
+        raw = self.request.get("raw", False)
         session = Session.get_or_insert(self.request.get("session")) #Get (or create) the session
         user = users.get_current_user()
         response = []
@@ -118,7 +141,8 @@ multipart/form-data, or they will not be processed properly.
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                info = [(i.chemical_name, i.error) for i in result]
+                info = [(str(i.key()), i.chemical_name,
+                         i.chemical_type, i.error) for i in result]
                 response.append(info)
         elif action == "compare":
             # Compare two pre-uploaded spectra.
@@ -130,14 +154,14 @@ multipart/form-data, or they will not be processed properly.
             # Return the database key, name, and chemical type.
             results = [(str(spectrum.key()), spectrum.chemical_name,
                         spectrum.chemical_type)
-                       for spectrum in backend.browse(type, limit, offset, guess)]
+                       for spectrum in backend.browse(target, limit, offset, guess, type)]
             response.extend(results)
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
             if not backend.auth(user, target, "spectrum"):
                 raise common.AuthError(user, "Need to be collaborator or higher.")
             for spectrum_data in spectra:
-                backend.add(spectrum_data, target)
+                backend.add(spectrum_data, target, raw)
         elif action == "delete":
             # Delete a spectrum from the database.
             if not backend.auth(user, target, "spectrum"):
@@ -154,9 +178,6 @@ multipart/form-data, or they will not be processed properly.
         elif action == "data":
             for spectrum in spectra:
                 spectrum = backend.Spectrum.get(spectrum)
-                project = Project.get(spectrum.project)
-                if not backend.auth(user, project, "view"):
-                    raise common.AuthError(user, "Need to be viewer or higher.")
                 data = [spectrum.xvalues[0], spectrum.xvalues[1] - spectrum.xvalues[0]]
                 data.extend(spectrum.yvalues)
                 response.append(data)
@@ -176,7 +197,7 @@ multipart/form-data, or they will not be processed properly.
         @type  response: Mixed
         @raise common.InputError: If an invalid output format is given.
         """
-        format = self.request.get("output", "pickle")
+        format = self.request.get("output", "json")
         if format == "pickle":
             import pickle
             response = pickle.dumps(response)

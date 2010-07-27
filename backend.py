@@ -85,7 +85,7 @@ def compare(data1, data2, algorithm="bove"):
     else:
         raise common.InputError(algo, "Invalid algorithm selection.")
 
-def browse(target="public", limit=10, offset=0, guess=""):
+def browse(target="public", limit=10, offset=0, guess="", type=""):
     '''
     Get a list of spectrum for browsing.
     
@@ -105,15 +105,15 @@ def browse(target="public", limit=10, offset=0, guess=""):
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
     if guess:
         # Check cache for the Matcher. If not, get from database.
-        matcher = memcache.get(target + '_matcher')
+        matcher = memcache.get(type + '_matcher')
         if matcher is None:
-            matcher = Matcher.get_by_key_name(target)
+            matcher = Matcher.get_by_key_name(type)
         return matcher.browse(guess)
     else:
         target = Project.get_or_insert(target)
-    return Spectrum.get([spectrum.key() for spectrum in target.spectra[offset:offset + limit]])
+        return Spectrum.get(target.spectra[offset:offset + limit])
 
-def add(spectrum_data, target="public"):
+def add(spectrum_data, target="public", raw=False):
     '''
     Add a new spectrum to the database from a given file descriptor.
     
@@ -124,18 +124,16 @@ def add(spectrum_data, target="public"):
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
     @param target: Where to store the spectrum
-    @type  target: C{"public"} or L{google.appengine.api.users.User}
-    @raise common.InputError: If a non-string is given as spectrum_data
     '''
-    if isinstance(spectrum_data, file):
-        spectrum_data = spectrum_data.read()
-    elif not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
-        raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # If project does not exist, make a new one.
     project = Project.get_or_insert(target, owners=[users.get_current_user()])
     # Load the user's spectrum into a Spectrum object.
-    spectrum = Spectrum()
-    spectrum.parse_string(spectrum_data)
+    if not raw:
+        spectrum = Spectrum()
+        spectrum.parse_string(spectrum_data)
+    else:
+        data = pickle.loads(spectrum_data)
+        spectrum = Spectrum(**data)
     spectrum.put()
     project.spectra.append(spectrum.key())
     project.put()
