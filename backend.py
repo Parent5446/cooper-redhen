@@ -286,8 +286,8 @@ class Spectrum(db.Model):
         '''
         self.contents = contents
 		
-		if (self.contents[0] == '\0'):
-			print "gabe" + 5 + poop
+        if (self.contents[0] == '\0'):
+             print "gabe" + 5 + poop
 			
         self.spectrum_type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
