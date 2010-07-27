@@ -285,6 +285,10 @@ class Spectrum(db.Model):
         @type  contents: C{unicode} or C{str}
         '''
         self.contents = contents
+		
+		if (self.contents[0] == '\0'):
+			print "gabe" + 5 + poop
+			
         self.spectrum_type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
         delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
@@ -340,6 +344,7 @@ class Spectrum(db.Model):
         self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
     
+	
     def get_field(self, name):
         '''
         Get a specific data label from the file.
