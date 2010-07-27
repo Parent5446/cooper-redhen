@@ -65,6 +65,16 @@
     position:absolute;
     background-color:black;
 }
+.graph-antialias
+{
+    width:1px;
+    position:absolute;
+    background-color:black;
+    -moz-opacity:0.3;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+	filter:alpha(opacity=30);
+	opacity:0.3;
+}
 .graph-floatybar
 {
     background-color:white;
