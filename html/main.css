@@ -30,7 +30,6 @@
 }
 .browse-dialog
 {
-    background-color:#FFF;
     -moz-border-radius:10px;
     -webkit-border-radius:10px;
     border:solid gray 1px;
@@ -62,7 +61,7 @@
 }
 .graph-line
 {
-    width:2px;
+    width:1px;
     position:absolute;
     background-color:black;
 }
@@ -74,6 +73,10 @@
     -moz-border-radius:5px;
     -webkit-border-radius:5px;
     display:none;
+    -moz-opacity:0.8;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+	filter:alpha(opacity=80);
+	opacity:0.8;
 }
 .results
 {
@@ -89,8 +92,8 @@
     border-style:none;
     left:0px; top:5px;
 	overflow:hidden;
-    -moz-opacity: 0;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-	filter: alpha(opacity=0);
-	opacity: 0;
+    -moz-opacity:0;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter:alpha(opacity=0);
+	opacity:0;
 }

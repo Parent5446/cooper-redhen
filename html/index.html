@@ -87,9 +87,9 @@
             var selected = $('#compare_options option:selected').val();
             $('#loaded_list').css('display', 'none');
             $('body').css('padding', '0px');
+            $('#results').html('Getting results...');
             $('#graph').css('display', 'block');
             $('#results').css('display', 'block');
-            $('#results').html('Getting results...');
             var got_results = function(response) { //Once the server has responded
                 $('#results').html(response); //List the spectra in the results bar
                 $('#graph').data('spectra', Array()); //Prepare the graph to hold data
@@ -100,32 +100,33 @@
                 for(var x=0; x<$('#graph').width(); x++) { //Make dummy values for testing
                     $('#graph').data('spectra')[0].push(Math.floor( Math.sin(x/50.0)*150 )+150);
                     $('#graph').data('spectra')[1].push(Math.floor( Math.sin(x/50.0+250)*150 )+150);
-                }
+                } //Done with dummy values
                 var vertical_divs = Array(); //Prepare the lines on the screen
                 jQuery.each($('#graph').data('spectra'), function(i, spectrum) { //For each spectrum to be graphed
                     for(var x=0; x<$('#graph').width(); x++) { //For each point in the spectrum
                         var y = spectrum[x]; var oldy = y; if(x>0) oldy = spectrum[x-1]; //get the y data
-                        if(y>oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(y-oldy+1)+'px; bottom:'+oldy+'px;"></div>'); //Make an upward rectangle
-                        else vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(oldy-y+1)+'px; bottom:'+y+'px;"></div>'); //or make a downward rectangle
+                        if(y>oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(y-oldy)+'px; bottom:'+oldy+'px;"></div>'); //Make an upward rectangle
+                        else if(y<oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(oldy-y)+'px; bottom:'+y+'px;"></div>'); //or make a downward rectangle
+                        else vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:1px; bottom:'+y+'px;"></div>'); //or make a horizontal rectangle
+
                 }}); //Done processing spectra
                 vertical_divs.push('<div id="floatybar" class="graph-floatybar">0,0</div>'); //Make floating sign
                 $('#graph').html(vertical_divs.join('')); //Put it all in the graph
+                $('#graph').mousemove( function(e) { //Add functions to the graph
+                    document.body.style.cursor="crosshair";
+                    var x = Math.floor(e.pageX - $('#graph').position().left);
+                    var y = Math.floor(e.pageY - $('#graph').position().top);
+                    $('#floatybar').css('left', x);
+                    $('#floatybar').css('top', y);
+                    $('#floatybar').html(x+', '+$('#graph').data('spectra')[0][x]);
+                    $('#floatybar').css('display', 'block');
+                });
+                $('#graph').mouseout( function(e) {
+                    $('#floatybar').css('display', 'none');
+                    onmouseout='document.body.style.cursor="default"';
+                });
             };
             $.ajax({ url: '/api', success: got_results });
-        });
-        
-        $('#graph').mousemove( function(e) {
-            document.body.style.cursor="crosshair";
-            var x = Math.floor(e.pageX - $('#graph').position().left);
-            var y = Math.floor(e.pageY - $('#graph').position().top);
-            $('#floatybar').css('left', x);
-            $('#floatybar').css('top', y);
-            $('#floatybar').html(x+', '+$('#graph').data('spectra')[0][x]);
-            $('#floatybar').css('display', 'block');
-        });
-        $('#graph').mouseout( function(e) {
-            $('#floatybar').css('display', 'none');
-            onmouseout='document.body.style.cursor="default"';
         });
         
         $('#browse_options').change(function() {
