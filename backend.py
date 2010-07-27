@@ -68,12 +68,12 @@ def compare(data1, data2, algorithm="bove"):
         raise common.InputError(data2, "Invalid spectrum data.")
     # Load spectrum either as a database key or a file.
     if data1[0:3] == "db:":
-        spectrum1 = Spectrum(data1[3:])
+        spectrum1 = Spectrum.get(data1[3:])
     else:                        
         spectrum1 = Spectrum()
         spectrum1.parse_string(data1)
     if data2[0:3] == "db:":
-        spectrum2 = Spectrum(data2[3:])
+        spectrum2 = Spectrum.get(data2[3:])
     else:                        
         spectrum1 = Spectrum()
         spectrum1.parse_string(data2)
@@ -166,7 +166,7 @@ def delete(spectrum_data, target="public"):
     of his or her projects.
     '''
     # Load the spectrum into a Spectrum object.
-    spectrum = Spectrum(spectrum_data)
+    spectrum = Spectrum.get(spectrum_data)
     # Remove it from the Matcher if in a public database.
     if target == "public":
         # Check cache for the Matcher. If not, get from database. If it's
@@ -539,9 +539,9 @@ class Matcher(db.Model):
         return Spectrum.get([k[0] for k in keys])
     
     def browse(self, chemical_name):
-        return [Spectrum.get(key)
-                for name, key in self.chemical_names
+        keys = [key for name, key in self.chemical_names
                 if name.startswith(chemical_name)]
+        return Spectrum.get(keys)
     
     @staticmethod # Make a static method for faster execution
     def bove(a, b):

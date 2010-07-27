@@ -133,8 +133,8 @@ class ApiHandler(webapp.RequestHandler):
             query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
             response.extend([(proj.key(), proj.name) for proj in Project.gql(query, user)])
         elif action == "data":
+            spectra = backend.Spectrum.get(spectra)
             for spectrum in spectra:
-                spectrum = backend.Spectrum.get(spectrum)
                 data = [spectrum.xvalues[0], spectrum.xvalues[1] - spectrum.xvalues[0]]
                 data.extend(spectrum.yvalues)
                 response.append(data)
