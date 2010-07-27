@@ -78,8 +78,9 @@ General Options:
      - "projects" - List all projects the user can access.
      - "data" - Get the X,Y data for a spectrum graph. NOTE: This gives a list
        with the first x value, delta x, and then the y values.
- - spectrum (required): The spectrum (either file or database key) to do the
-   action on. Depending on the action, multiple spectra can be uploaded here.
+ - spectrum (required for some actions): The spectrum (either file or database
+   key) to do the action on. Depending on the action, multiple spectra can be
+   uploaded here.
  - target (optional, defaults to "public"):
     - When action is "compare": Can be either "public" to search the spectrum
       against the public database or it can be another file upload if comparing
@@ -121,7 +122,7 @@ Adding Options:
         limit = self.request.get("limit", 10)
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
-        guess = self.request.get("spectrum")
+        guess = self.request.get("guess")
         type = self.request.get("type")
         raw = self.request.get("raw", False)
         session = Session.get_or_insert(self.request.get("session")) #Get (or create) the session
