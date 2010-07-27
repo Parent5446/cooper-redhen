@@ -256,7 +256,7 @@ class Spectrum(db.Model):
     '''The chemical type of the substance the spectrum represents
     @type: C{str}'''
 
-    spectrum_type = db.StringProperty()
+    spectrum_type = db.StringProperty(choices=["infrared", "raman"])
     '''The spectrum type of the substance the spectrum represents
     @type: C{str}'''
 
@@ -268,7 +268,7 @@ class Spectrum(db.Model):
     '''A list of integrated Y points for the spectrum's graph
     @type: C{list}'''
     
-    notes = db.StringProperty()
+    notes = db.StringProperty(indexed=False)
     '''Notes on the spectrum if in a private database
     @type: C{str}'''
     
@@ -285,11 +285,10 @@ class Spectrum(db.Model):
         @type  contents: C{unicode} or C{str}
         '''
         self.contents = contents
-		
+        self.spectrum_type = 'infrared' # Later this will be variable
         if (self.contents[0] == '\0'):
              print "gabe" + 5 + poop
 			
-        self.spectrum_type = 'Infrared' # Later this will be variable
         x = float(self.get_field('##FIRSTX=')) # The first x-value
         delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
         x_factor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
@@ -439,23 +438,23 @@ class Matcher(db.Model):
     '''Number of bits in the heavyside index
     @type: C{int}'''
     
-    flat_heavyside = common.DictProperty()
+    flat_heavyside = common.DictProperty(indexed=False)
     '''@ivar: List of flat-heavyside indices
     @type: L{common.DictProperty}'''
     
-    ordered_heavyside = common.DictProperty()
+    ordered_heavyside = common.DictProperty(indexed=False)
     '''@ivar: List of ordered-heavyside indices
     @type: L{common.DictProperty}'''
     
-    peak_list = common.GenericListProperty()
+    peak_list = common.GenericListProperty(indexed=False)
     '''@ivar: List of x-values for peaks and their associated spectra
     @type: L{common.GenericListProperty}'''
     
-    high_low = common.DictProperty()
+    high_low = common.DictProperty(indexed=False)
     '''@ivar: List of high-low table indices
     @type: L{common.DictProperty}'''
     
-    chemical_names = common.GenericListProperty()
+    chemical_names = common.GenericListProperty(indexed=False)
     '''@ivar: List of all spectra in this spectrum type
     @type: L{common.DictProperty}'''
     

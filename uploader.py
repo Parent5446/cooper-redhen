@@ -18,7 +18,6 @@ import re
 import os
 import sys
 import bisect
-import tempfile
 
 def main_client(appcfg, dirname, recursive=False):
     """
@@ -28,7 +27,7 @@ def main_client(appcfg, dirname, recursive=False):
     @type  dirname: C{str}
     @raise Exception: If the given file name is not a directory
     """
-    with tempfile.NamedTemporaryFile(delete=False) as fp:
+    with open("tmp.csv", 'w') as fp:
         chem_types = flat_heavyside = ordered_heavyside = high_low = {}
         peak_list = []
         csvfile = fp.name
@@ -37,6 +36,7 @@ def main_client(appcfg, dirname, recursive=False):
             raise Exception("Not a directory.")
         files = os.listdir(dirname)
         for file_name in files:
+            file_name = os.path.join(dirname, file_name)
             if os.path.isdir(file_name):
                 if recursive:
                     main_client(file_name)
@@ -55,7 +55,7 @@ def main_client(appcfg, dirname, recursive=False):
                            chemical_type, spectrum_type, xvalues, str(yvalues)))
     raise Exception(csvfile)
     os.execl(appcfg, "upload_data", "--config_file=bulkloader.yaml",
-             "--filename=%s" % csvfile, "--kind=Spectrum",
+             "--filename=tmp.csv", "--kind=Spectrum",
              "--url=http://cooper-redhen.appspot.com/upload")
 
 def transfer(file_obj):
