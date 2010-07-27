@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>RedHen Spectrum Analyzer</title>
+        <meta charset="utf-8" />
+        <link rel='stylesheet' href='main.css' /> <!--Link to stylesheet-->
+        <link rel='shortcut icon' href='favicon.ico' /> <!--Favicon for site-->
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    </head>
+    <body style='text-align:center; padding:40px;'> <!--Core HTML:-->
+        <div id="header"><img src='banner.png' alt="RedHen logo" /></div>
+        
+        <table style='margin:auto;'> <!--Layout table, holds site's pieces in order-->
+        
+        <tr><td rowspan='2'> <div id='graph_box' class='graph-box'><div id='graph' class='graph'></div></div> </td> <!--Graph of results-->   
+
+        <td> <div class='frontpage-controls' id='controls'> <!--Main controls-->
+            <table class='controls-table'>
+                <tr>
+                    <td><input type='button' id='browse_button' value='Browse' class='button' /></td>
+                    <td><select id='browse_options' class='listbox'>
+                        <option>my computer</option>
+                        <option>my projects</option>
+                        <option>main library</option>
+                    </select></td>
+                </tr>
+                <tr>
+                    <td><input type='button' id='compare_button' value='Compare' class='button' /></td>
+                    <td><select id='compare_options' class='listbox'>
+                        <option>to main library</option>
+                        <option>to my projects</option>
+                        <option>to each other</option>
+                    </select></td>
+                </tr>
+            </table>
+
+            <iframe class='invisible-frame' scrolling="no" id='file_frame' src='file_upload_frame.html'></iframe>
+            
+            <div class='browse-dialog' id='browse_dialog'> <!--Browse dialog, usually invisible-->
+                Enter a chemical name to search:
+                <input type='text' class='combobox-text' id='combobox_text' />
+                <div class='combobox-dropdown' id='combobox_dropdown' onmouseover='document.body.style.cursor="pointer";' onmouseout='document.body.style.cursor="default";'></div>
+                <input type='button' value='Done' id='done_button' />
+            </div>
+        </div> </td></tr> <!--End of main controls-->
+        
+        <tr><td> <div id='results' class='results'></div> <!--List of results-->
+        </td></tr> </table> <!--End of layout table-->
+        
+        <div id='loaded_list' class='loaded-list'></div> <!--List of loaded files-->
+    
+    <script type="text/javascript" src="grapher.js"></script>
+    </body>
+</html>
