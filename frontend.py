@@ -1,6 +1,5 @@
 """
-Take a POST request with JSON data and process it. If it contains a spectrum
-file, send it to the back end to search the database.
+RedHen API v0.2
 
 Any request that requires a file upload must be a POST request. Only the
 update, projects, data, and browse actions are allowed in a GET request.
@@ -204,47 +203,7 @@ class ApiHandler(webapp.RequestHandler):
 
     def help(self):
         """Print help information for the API."""
-        self.response.out.write("""<pre>
-RedHen API v0.2
-
-All request must be POST requests. Any GET requests will just print these
-instructions, and all others will be ignored. The POST variables below
-may be passed. If uploading files, make sure to set enctype to
-multipart/form-data, or they will not be processed properly.
-
-General Options:
- - action (required):
-     - "compare" - Compare two targets, either from file upload or database.
-     - "add" - Add a spectrum to a project or the public database.
-     - "delete" - Add a spectrum to a project or the public database.
-     - "update" - Clear all heuristic data and rebuild the Matcher (admin-only).
-     - "browse" - Browse either the public database or a specific project.
-     - "projects" - List all projects the user can access.
-     - "data" - Get the X,Y data for a spectrum graph. NOTE: This gives a list
-       with the first x value, delta x, and then the y values.
-     - "bulkadd" - Add a mass amount of spectra to the database as once.
- - spectrum (required for some actions): The spectrum (either file or database
-   key) to do the action on. Depending on the action, multiple spectra can be
-   uploaded here.
- - target (optional, defaults to "public"):
-    - When action is "compare": Can be either "public" to search the spectrum
-      against the public database or it can be another file upload if comparing
-      two spectra against each other.
-    - When action is "browse": Can be either "public" for browsing the public
-      library or a database key referring to the project being browsed.
- - output (optional, defaults to "pickle"): Can be "xml", "json", "python", or
-   "pickle" depending on what output format you want.
-
-Browsing Options:
- - limit: How many spectra to get when browsing (maximum is 50).
- - offset: Where to start listing spectra from (used for pagination).
- - type (used for search suggestions): What type of spectrum (infrared or raman)
- - guess (used only search suggestions): What the user has typed already and
-   what we are giving suggestions for.
-
-Comparing Options:
- - algorithm (defaults to "bove"): Which linear algorithm to compare spectra with
-        </pre>""")
+        self.response.out.write("<pre>%s</pre>" % __doc__)
     
     def _convert_to_xml(self, item):
         """
