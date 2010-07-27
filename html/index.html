@@ -104,7 +104,7 @@
                 var selected = 0;
                 jQuery.each(spectra, function(i, spectrum) { //Make dummy values for testing
                     for(var x=0; x<$('#graph').width(); x++) { 
-                        spectrum.data.push(Math.floor( Math.sin(x/50.0)*(50+50*i) )+150);
+                        spectrum.data.push(Math.round( Math.sin(x/53.0517)*(50+50*i) )+150);
                     }}); //Done with dummy values
                 var vertical_divs = Array(); //Prepare the lines on the screen
                 jQuery.each(spectra, function(i, spectrum) { //For each spectrum to be graphed
@@ -124,15 +124,19 @@
                 $('#graph').mousemove( function(e) { //Add functions to the graph
                     document.body.style.cursor="crosshair";
                     var x = Math.floor(e.pageX - $('#graph').position().left);
-                    var y = Math.floor(e.pageY - $('#graph').position().top);
                     $('#floatybar').css('left', x);
-                    $('#floatybar').css('top', y);
-                    $('#floatybar').html(x+', '+spectra[selected][x]);
+                    $('#floatybar').css('bottom', spectra[selected].data[x]);
+                    $('#floatybar').html(x+', '+spectra[selected].data[x]);
                     $('#floatybar').css('display', 'block');
+                });
+                $('#graph').click( function(e) {
+                    var x = Math.floor(e.pageX - $('#graph').position().left);
+                    var y = 300+$('#graph').position().top-e.pageY;
+                    for(var i in spectra) if(Math.abs(spectra[i].data[x]-y)<5) { selected=i; break; }
                 });
                 $('#graph').mouseout( function(e) {
                     $('#floatybar').css('display', 'none');
-                    onmouseout='document.body.style.cursor="default"';
+                    document.body.style.cursor="default";
                 });
             };
             $.ajax({ url: '/api', success: got_results });
