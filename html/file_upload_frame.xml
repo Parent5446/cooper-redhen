@@ -1,4 +1,6 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     </head>
@@ -6,23 +8,25 @@
         <form id='form' action='/api' method="post" enctype="multipart/form-data">
             <input type="hidden" name="action" value="analyze" />
             <input type="file" name='spectrum' id="file" style="position: absolute; right:0px; top:0px;"/>
-            <input id="session_id" style='visibility:hidden;'/>
+            <input type="text" id="session_id" style='visibility:hidden;'/>
             <input type="submit" style='visibility:hidden;'/>
         </form>
 
         <script type="text/javascript">
+            /* <![CDATA[ */
             $(document).ready(function() {
-                form.session_id.value = parent.session_id;
+                $('#session_id').value = parent.session_id;
             });
             $('#file').change(function() {
                 if(this.value) {
                     $('#file').unbind('mouseout')
                     $('#file').unbind('change')
-                    parent.file_loaded(this.value.match('[^\\\\]+$'));
+                    parent.add_to_list(this.value.match('[^\\\\]+$'));
                     $('#form').submit();
-                    window.location = 'file_upload_frame.html';
+                    window.location = 'file_upload_frame.xml';
                 }
             });
+            /* ]]> */
         </script>
 
     </body>
