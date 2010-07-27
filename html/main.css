@@ -30,6 +30,7 @@
 }
 .browse-dialog
 {
+    background-color:white;
     -moz-border-radius:10px;
     -webkit-border-radius:10px;
     border:solid gray 1px;

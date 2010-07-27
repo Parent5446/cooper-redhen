@@ -67,6 +67,7 @@
         }
         
         function addToLoadedList(s) {
+            if( !s ) return;
             var id = String(s).replace('.','_');
             $('#loaded_list').append('<div id="checkbox_'+id+'"><input type="checkbox" checked onclick="unload(\''+id+'\')"> '+s+'</div>');
         }
@@ -132,7 +133,7 @@
                 $('#graph').click( function(e) {
                     var x = Math.floor(e.pageX - $('#graph').position().left);
                     var y = 300+$('#graph').position().top-e.pageY;
-                    for(var i in spectra) if(Math.abs(spectra[i].data[x]-y)<5) { selected=i; break; }
+                    for(var i in spectra) if(Math.abs(spectra[i].data[x]-y)<10) { selected=i; break; }
                 });
                 $('#graph').mouseout( function(e) {
                     $('#floatybar').css('display', 'none');
@@ -145,11 +146,7 @@
         $('#browse_options').change(function() {
             //Make file upload frame go away when not selected
             var selected = $('#browse_options option:selected').val();
-            if(selected == 'my computer') {
-                $('#file_frame').css('display', 'block');
-            } else {
-                $('#file_frame').css('display', 'none');
-            }
+            $('#file_frame').css('display', (selected=='my computer')?'block':'none');
         });
         
         $('#done_button').click(function() {
