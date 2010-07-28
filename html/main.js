@@ -46,12 +46,12 @@ $('#compare_button').click(function() {
         spectra.push(new Spectrum('ethanol', Array(), 'blue'));
         spectra.push(new Spectrum('propanol', Array(), 'green'));
         var selected = 0;
-        jQuery.each(spectra, function(i, spectrum) { //Make dummy values for testing
+        $.each(spectra, function(i, spectrum) { //Make dummy values for testing
             for(var x=0; x<$('#graph').width(); x++) { 
                 spectrum.data.push(Math.round( Math.sin(x/53.0517)*(50+50*i) )+150);
             }}); //Done with dummy values
         var vertical_divs = Array(); //Prepare the lines on the screen
-        jQuery.each(spectra, function(i, spectrum) { //For each spectrum to be graphed
+        $.each(spectra, function(i, spectrum) { //For each spectrum to be graphed
             for(var x=0; x<$('#graph').width(); x++) { //For each point in the spectrum
                 var y = spectrum.data[x]; var oldy = y; if(x>0) oldy = spectrum.data[x-1]; //get the y data
                 /*

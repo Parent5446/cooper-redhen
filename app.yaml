@@ -25,5 +25,6 @@ handlers:
 
 - url: /(.*)
   static_files: html/\1
-  upload: html/(.*)
+  upload: html/index.html
+  mime_type: application/xhtml+xml
   
