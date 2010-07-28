@@ -103,9 +103,7 @@ class ApiHandler(webapp.RequestHandler):
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                response.append(result[0].chemical_name)
-                scale = 300/max(result[0].data)
-                info = [ i*scale for i in result[0].data ]
+                info = [(str(i.key()), i.chemical_name, i.error) for i in result]
                 response.append(info)
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
@@ -143,8 +141,7 @@ class ApiHandler(webapp.RequestHandler):
         elif action == "data":
             spectra = backend.Spectrum.get(spectra)
             for spectrum in spectra:
-                data = [spectrum.xvalues[0], spectrum.xvalues[1] - spectrum.xvalues[0]]
-                data.extend(spectrum.yvalues)
+                data = [ i*scale for i in spectrum.data ]
                 response.append(data)
         else:
             # Invalid action. Raise an error.
