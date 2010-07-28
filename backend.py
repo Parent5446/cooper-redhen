@@ -271,6 +271,10 @@ class Spectrum(db.Model):
     '''A list of integrated Y points for the spectrum's graph
     @type: C{list}'''
     
+    data = db.ListProperty(float, indexed=False)
+    '''A list of integrated Y points for the spectrum's graph
+    @type: C{list}'''
+    
     notes = db.StringProperty(indexed=False)
     '''Notes on the spectrum if in a private database
     @type: C{str}'''
@@ -414,19 +418,14 @@ class Spectrum(db.Model):
     
     def get_field(self, name):
         '''
-        Get a specific data label from the file.
+        Get a specific data field from the file.
         
-        @param name: Name of data label to retrieve
+        @param name: Name of the field to retrieve
         @type  name: C{str}
-        @return: Value of the data label
+        @return: Value of the field
         @rtype: C{str}
-        
-        @warning: Does not support Windows-style line breaks.
         '''
-        # Find where the field ends.
-        # FIXME: Does not support Windows format.
-        index = self.contents.index(name) + len(name)
-        return self.contents[index:self.contents.index('\n', index)]
+        return re.search(name+'([^\\r\\n]+)', self.contents).group(1)
      
     def calculate_peaks(self, one=False):
         '''
@@ -614,7 +613,7 @@ class Matcher(db.Model):
         @param b: Other Spectrum to compare
         @type  b: L{backend.Spectrum}
         @return: The difference or error between the spectra
-        @rtype: C{int}
+        @rtype: C{float}
         @raise common.ServerError: If there are invalid spectra in the database
         '''
         length = min([len(a.data), len(b.data)])
@@ -633,7 +632,7 @@ class Matcher(db.Model):
         @param b: Other Spectrum to compare
         @type  b: L{backend.Spectrum}
         @return: The difference or error between the spectra
-        @rtype: C{int}
+        @rtype: C{float}
         @raise common.ServerError: If there are invalid spectra in the database
         '''
         length = min([len(a.data), len(b.data)])
