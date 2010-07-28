@@ -36,12 +36,16 @@
                 </tr>
             </table>
 
-            <iframe class='invisible-frame' scrolling="no" id='file_frame' src='file_upload_frame.html'></iframe>
+            <object class='invisible-frame' id='file_frame'
+             type='application/xhtml+xml' data='file_upload_frame.html'>
+            </object>
             
             <div class='browse-dialog' id='browse_dialog'> <!--Browse dialog, usually invisible-->
                 Enter a chemical name to search:
                 <input type='text' class='combobox-text' id='combobox_text' />
-                <div class='combobox-dropdown' id='combobox_dropdown' onmouseover='document.body.style.cursor="pointer";' onmouseout='document.body.style.cursor="default";'></div>
+                <div class='combobox-dropdown' id='combobox_dropdown'
+                     onmouseover='document.body.style.cursor="pointer";'
+                     onmouseout='document.body.style.cursor="default";'></div>
                 <input type='button' value='Done' id='done_button' />
             </div>
         </div> </td></tr> <!--End of main controls-->

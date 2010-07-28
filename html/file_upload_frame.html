@@ -1,15 +1,25 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
     <head>
+        <title>RedHen File Uploader Frame</title>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <style type="text/css">
+            HTML, body {
+                margin: 0;
+                overflow: hidden;
+                border: none; }
+        </style>
     </head>
     <body>
         <form id='form' action='/api' method="post" enctype="multipart/form-data">
+            <div id="inputs">
             <input type="hidden" name="action" value="analyze" />
             <input type="file" name='spectrum' id="file" style="position: absolute; right:0px; top:0px;"/>
             <input type="text" id="session_id" style='visibility:hidden;'/>
             <input type="submit" style='visibility:hidden;'/>
+            </div>
         </form>
 
         <script type="text/javascript">
@@ -28,6 +38,5 @@
             });
             /* ]]> */
         </script>
-
     </body>
 </html>
