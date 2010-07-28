@@ -379,34 +379,30 @@ class Spectrum(db.Model):
                     # Number is a relative y-value.
                     xy.append((x, float(match.group(2)) * y_factor))
                     x += delta_x
-        # Keep the data in ascending order. It will be descending in the file
-        # if our delta X is negative.
-        if delta_x < 0:
-            xy.reverse()
+        if delta_x < 0: xy.reverse() # Keep the points in ascending x order
         # Integrate xy numerically over a fixed range.
-        x_range = (700.0, 3900.0)
-        # Initialize the data and find the interval of integration.
-        data = [0.0 for i in xrange(500)]
-        interval = (x_range[1] - x_range[0]) / len(data)
-        # Find index in xy where integrals start
-        start = bisect.bisect_left(xy, (x_range[0], 0))
-        # oldX = start of range, oldY = linear interpolation of corresponding y
-        oldX, oldY = x_range[0], xy[start-1][1] + (xy[start-1][0]-x_range[0]) * (xy[start][1] - xy[start-1][1]) / (xy[start-1][0] - xy[start][0])
-        #raise Exception(oldY, '==', xy[start][1])
+        x_range = (700.0, 3900.0) #Set the range
+        data = [0.0 for i in xrange(500)] #Initialize data
+        interval = (x_range[1] - x_range[0]) / len(data) #Find width of each integral
+        start = bisect.bisect_right(xy, (x_range[0], 0))  # Find index in xy where integrals start, by bisection
+        
+        old_x = x_range[0] #start of range
+        old_y = xy[start-1][1] + (xy[start-1][0]-old_x) * (xy[start][1] - xy[start-1][1]) / (xy[start-1][0] - xy[start][0]) #linear interpolation of corresponding y
+        
         for x, y in xy[start:]: #Iterate over xy from start
             newIndex = int((x - x_range[0]) / interval) #index in data for this loop
-            oldIndex = int((oldX - x_range[0]) / interval) #index in data of previous loop
+            oldIndex = int((old_x - x_range[0]) / interval) #index in data of previous loop
             if newIndex != oldIndex: # We're starting a new integral, find the x and y values at the boundary
                 boundary_x = x_range[0] + newIndex*interval #Get x value, easy
-                boundary_y = (y - oldY)*(x_range[0] + newIndex*interval - oldX) / (x - oldX + oldY) #Linear interpolation for y value
-                data[oldIndex] += (boundary_y + oldY) * (boundary_x - oldX) / 2 #Finsh old integral
+                boundary_y = old_y + (y-old_y)*(boundary_x-old_x)/(x-old_x) #Linear interpolation for y value
+                data[oldIndex] += (boundary_x - old_x)*(boundary_y + old_y) / 2 #Finish old integral
                 if newIndex < len(data): #If data isn't filled
-                    data[newIndex] += (boundary_y + y) * (x - boundary_x) / 2 #Start new integral
-            else:
-                data[newIndex] += (y + oldY) * (x - oldX) / 2 #Continue integral
+                    data[newIndex] += (x-boundary_x) * (y+boundary_y) / 2 #Start new integral
+            else: #If not starting a new integral
+                data[newIndex] += (x-old_x)*(y+old_y) / 2 #Continue integral
             if x > x_range[1]:
                 break #If finished, break
-            oldX, oldY = x, y #Otherwise keep going
+            old_x, old_y = x, y #Otherwise keep going
         self.data = data
         self.xy = xy
         self.chemical_type = 'Unknown' # We will find this later (maybe)
@@ -415,16 +411,6 @@ class Spectrum(db.Model):
         else:
             self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
-        s = 0.0
-        
-        oldx, oldy = xy[start]
-        for x,y in xy:
-            if x > x_range[0] and x < x_range[1]:
-                s += (x-oldx)*(oldy+y)/2
-                oldx, oldy = x, y
-
-        raise Exception(sum(data), s)
-    
     
     def get_field(self, name):
         '''
@@ -605,7 +591,7 @@ class Matcher(db.Model):
                 # If bisect gives us an index near the beginning or end of list
                 continue
             # Give the spectrum (5 - offest) votes
-            peak_index = self.peak_list[index+offset][0]
+            peak_index = self.peak_list[index+offset][1]
             keys[peak_index] = keys.get(peak_index, 0) + (5 - abs(offset))
             
         # Sort candidates by number of votes and return Spectrum objects.

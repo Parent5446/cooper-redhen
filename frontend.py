@@ -97,7 +97,6 @@ class ApiHandler(webapp.RequestHandler):
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
                 info = [ (i.chemical_name, i.data) for i in result]
-                raise Exception(result[0].data)
                 response.append(info)
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
