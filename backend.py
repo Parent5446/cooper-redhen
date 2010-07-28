@@ -39,9 +39,10 @@ def search(spectrum_data):
     spectrum = Spectrum()
     spectrum.parse_string(spectrum_data)
     # Check cache for the Matcher. If not, get from database.
-    matcher = memcache.get(spectrum.spectrum_type + '_matcher')
+    matcher = memcache.get(spectrum.spectrum_type+'_matcher')
     if matcher is None:
-        matcher = Matcher.get_by_key_name(spectrum.spectrum_type)
+        matcher = Matcher.get_by_key_name(spectrum.spectrum_type+'_matcher')
+    matcher = Matcher.all().get() #Debugging
     # Get the candidates for similar spectra.
     candidates = matcher.get(spectrum)
     # Do one-to-one on candidates and sort by error
@@ -51,42 +52,37 @@ def search(spectrum_data):
     # Let frontend do the rest
     return candidates
 
-def compare(data1, data2, algorithm="bove"):
+def compare(dataList, algorithm="bove"):
     '''
-    Compare two spectra using the given algorithm.
+    Compare multiple spectra using the given algorithm.
     
-    @param data1: String containing spectrum information
-    @type  data1: C{str}
-    @param data2: String containing spectrum information
-    @type  data2: C{str}
+    @param dataList: A list of spectra strings to compare
+    @type  dataList: [C{str}]
     @return: Calculated error between the two spectra
     @rtype: C{int}
     @raise common.InputError: If a non-string is given as spectrum_data or if
     an invalid algorithm is given.
     '''
     # First check for invalid spectrum data (if they are not strings).
-    if not isinstance(data1, str) or isinstance(spectrum_data, unicode):
-        raise common.InputError(data1, "Invalid spectrum data.")
-    if not isinstance(data2, str) or isinstance(spectrum_data, unicode):
-        raise common.InputError(data2, "Invalid spectrum data.")
-    # Load spectrum either as a database key or a file.
-    if data1[0:3] == "db:":
-        spectrum1 = Spectrum.get(data1[3:])
-    else:                        
-        spectrum1 = Spectrum()
-        spectrum1.parse_string(data1)
-    if data2[0:3] == "db:":
-        spectrum2 = Spectrum.get(data2[3:])
-    else:                        
-        spectrum1 = Spectrum()
-        spectrum1.parse_string(data2)
+    spectra = []
+    for data in dataList:
+        if not isinstance(data1, str) or isinstance(spectrum_data, unicode):
+            raise common.InputError(data, "Invalid spectrum data.")
+        if data[0:3] == "db:":
+            spectrum1 = Spectrum.get(data[3:])
+        else:
+            spectrum = Spectrum()
+            spectrum.parse_string(data)
+            spectra.append(spectrum)
     # Start comparing
-    if algorithm == "bove":
-        return Matcher.bove(spectrum1, spectrum2)
-    elif algorithm == "leastsquares":
-        return Matcher.leastsquares(spectrum1, spectrum2)
-    else:
-        raise common.InputError(algo, "Invalid algorithm selection.")
+    for spectrum in spectra:
+        if algorithm == "bove":
+            spectrum.error = Matcher.bove(spectra[0], spectrum)
+        elif algorithm == "leastsquares":
+            spectrum.error = Matcher.leastsquares(spectra[0], spectrum)
+        else:
+            raise common.InputError(algo, "Invalid algorithm selection.")
+    return spectra
 
 def browse(target="public", limit=10, offset=0, guess="", type=""):
     '''
@@ -270,12 +266,8 @@ class Spectrum(db.Model):
     spectrum_type = db.StringProperty(choices=["infrared", "raman"])
     '''The spectrum type of the substance the spectrum represents
     @type: C{str}'''
-
-    xvalues = db.ListProperty(int, indexed=False)
-    '''A list of X points for the spectrum's graph
-    @type: C{list}'''
     
-    yvalues = db.ListProperty(float, indexed=False)
+    data = db.ListProperty(float, indexed=False)
     '''A list of integrated Y points for the spectrum's graph
     @type: C{list}'''
     
@@ -298,7 +290,6 @@ class Spectrum(db.Model):
         self.contents = contents
         self.spectrum_type = 'infrared' # Later this will be variable
         
-        
         '''
         The following block of code interprets GRAMS file types
         This block of code will only run if the GRAMS file is in old format or new, LSB format
@@ -311,31 +302,30 @@ class Spectrum(db.Model):
         f = StringIO.StringIO()
         f.write(contents)
         f.seek(0)
-        ftflgs = f.read(1) 
-        fversn = f.read(1)
-        GRAMS = false
+        ftflgs = f.read(1) #ftflgs == null means that the data is single-file, and is stored with evenly spaced x data
+        fversn = f.read(1) #fversn determines if the file is MSB 1st, LSB 1st, or 'old-format' (L, K, M respectively)
+        GRAMS = False #Is it a grams file?
         if(ftflgs == '\0'):
-            #ftflgs == null means that the data is single-file, and is stored with evenly spaced x data
             if(fversn == 'K'):
-                GRAMS = true
+                GRAMS = True
                 fexper = f.read(1)
                 #fexper tells the program what type of spectrum this is.
                 #Below is a quote of the SPC.h header file defining fexper values.
                 '''
-                #define SPCGEN	0	/* General SPC (could be anything) */
-                #define SPCGC	1	/* Gas Chromatogram */
-                #define SPCCGM	2	/* General Chromatogram (same as SPCGEN with TCGRAM) */
-                #define SPCHPLC 3	/* HPLC Chromatogram */
-                #define SPCFTIR 4	/* FT-IR, FT-NIR, FT-Raman Spectrum or Igram (Can also be used for scanning IR.) */
-                #define SPCNIR	5	/* NIR Spectrum (Usually multi-spectral data sets for calibration.) */
-                #define SPCUV	7	/* UV-VIS Spectrum (Can be used for single scanning UV-VIS-NIR.) */
-                #define SPCXRY	8	/* X-ray Diffraction Spectrum */
-                #define SPCMS	9	/* Mass Spectrum  (Can be single, GC-MS, Continuum, Centroid or TOF.) */
-                #define SPCNMR	10	/* NMR Spectrum or FID */
-                #define SPCRMN	11	/* Raman Spectrum (Usually Diode Array, CCD, etc. use SPCFTIR for FT-Raman.) */
-                #define SPCFLR	12	/* Fluorescence Spectrum */
-                #define SPCATM	13	/* Atomic Spectrum */
-                #define SPCDAD	14	/* Chromatography Diode Array Spectra */
+                #define SPCGEN    0    /* General SPC (could be anything) */
+                #define SPCGC    1    /* Gas Chromatogram */
+                #define SPCCGM    2    /* General Chromatogram (same as SPCGEN with TCGRAM) */
+                #define SPCHPLC 3    /* HPLC Chromatogram */
+                #define SPCFTIR 4    /* FT-IR, FT-NIR, FT-Raman Spectrum or Igram (Can also be used for scanning IR.) */
+                #define SPCNIR    5    /* NIR Spectrum (Usually multi-spectral data sets for calibration.) */
+                #define SPCUV    7    /* UV-VIS Spectrum (Can be used for single scanning UV-VIS-NIR.) */
+                #define SPCXRY    8    /* X-ray Diffraction Spectrum */
+                #define SPCMS    9    /* Mass Spectrum  (Can be single, GC-MS, Continuum, Centroid or TOF.) */
+                #define SPCNMR    10    /* NMR Spectrum or FID */
+                #define SPCRMN    11    /* Raman Spectrum (Usually Diode Array, CCD, etc. use SPCFTIR for FT-Raman.) */
+                #define SPCFLR    12    /* Fluorescence Spectrum */
+                #define SPCATM    13    /* Atomic Spectrum */
+                #define SPCDAD    14    /* Chromatography Diode Array Spectra */
                 '''
                 #Code executing here is for "LSB 1st" and "new format" files
                 f.seek(1,1)
@@ -351,7 +341,7 @@ class Spectrum(db.Model):
                 #Code executing here is for GRAMS files that are "MSB 1st" and "new format".
                 #There are no MSB files to test, and I don't know what MSB means.
             else:
-                GRAMS = true
+                GRAMS = True
                 #Code executing here is for GRAMS files that are in the "old format"
                 #This code is UNTESTED
                 f.seek(2,1)
@@ -362,10 +352,10 @@ class Spectrum(db.Model):
                 a = array.array('f')
                 a.fromstring(f.read(numpoints * 4))
         else:
+            pass
             #The GRAMS file is multi-file or something like that.
             #Until we add file-extension support, multi-file GRAMS will throw errors!!
 
-			
         x = float(self.get_field('##FIRSTX=')) # The first x-value
         if GRAMS:
             delta_x = (lastx - firstx)/(numpoints - 1)
@@ -381,9 +371,7 @@ class Spectrum(db.Model):
             for i in range(0, numpoints -1 ):
                 xy.append((i * deltax + firstx), a[i])
         else:
-            raw_xy = self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]
-            pattern = re.compile(r'(\D+)([\d.-]+)')
-            for match in re.finditer(pattern, raw_xy):
+            for match in re.finditer(r'(\D+)([\d.-]+)', self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]):
                 if '\n' in match.group(1):
                     # Number is the first on the line and is an x-value
                     x = float(match.group(2)) * x_factor
@@ -396,42 +384,48 @@ class Spectrum(db.Model):
         if delta_x < 0:
             xy.reverse()
         # Integrate xy numerically over a fixed range.
-        xvalue_range = (700.0, 3900.0)
+        x_range = (700.0, 3900.0)
         # Initialize the data and find the interval of integration.
-        data = [0.0 for i in xrange(1000)]
-        interval = (xvalue_range[1] - xvalue_range[0]) / len(data)
+        data = [0.0 for i in xrange(500)]
+        interval = (x_range[1] - x_range[0]) / len(data)
         # Find index in xy where integrals start
-        start = bisect.bisect_left(xy, (xvalue_range[0], 0))
+        start = bisect.bisect_left(xy, (x_range[0], 0))
         # oldX = start of range, oldY = linear interpolation of corresponding y
-        oldX, oldY = xvalue_range[0], (xy[start - 1][1] +
-             (xy[start][1] - xy[start - 1][1]) * (xvalue_range[0] - xy[start][0]) /
-             (xy[start - 1][0] - xy[start][0]))
+        oldX, oldY = x_range[0], xy[start-1][1] + (xy[start-1][0]-x_range[0]) * (xy[start][1] - xy[start-1][1]) / (xy[start-1][0] - xy[start][0])
+        #raise Exception(oldY, '==', xy[start][1])
         for x, y in xy[start:]: #Iterate over xy from start
-            newIndex = int((x - xvalue_range[0]) / interval)
-            oldIndex = int((oldX - xvalue_range[0]) / interval)
-            if newIndex != oldIndex:
-                # We're starting a new integral.
-                boundary = newIndex * interval,\
-                           ((y - oldY) * (newIndex * interval - oldX) /
-                           (x - oldX) + oldY) #Linear interpolation
-                data[oldIndex] += (boundary[1] + oldY) * (boundary[0] - oldX) / 2
-                if newIndex < len(data): # if data isn't filled 
-                    data[newIndex] += (boundary[1] + y) * (x - boundary[0]) / 2
+            newIndex = int((x - x_range[0]) / interval) #index in data for this loop
+            oldIndex = int((oldX - x_range[0]) / interval) #index in data of previous loop
+            if newIndex != oldIndex: # We're starting a new integral, find the x and y values at the boundary
+                boundary_x = x_range[0] + newIndex*interval #Get x value, easy
+                boundary_y = (y - oldY)*(x_range[0] + newIndex*interval - oldX) / (x - oldX + oldY) #Linear interpolation for y value
+                data[oldIndex] += (boundary_y + oldY) * (boundary_x - oldX) / 2 #Finsh old integral
+                if newIndex < len(data): #If data isn't filled
+                    data[newIndex] += (boundary_y + y) * (x - boundary_x) / 2 #Start new integral
             else:
-                data[newIndex] += (y + oldY) * (x - oldX) / 2
-            if x > xvalue_range[1]:
+                data[newIndex] += (y + oldY) * (x - oldX) / 2 #Continue integral
+            if x > x_range[1]:
                 break #If finished, break
             oldX, oldY = x, y #Otherwise keep going
-        self.xvalues = range(int(xvalue_range[0]), int(xvalue_range[0]) + len(data))
-        self.yvalues = data
-        self.chemical_type = 'Unknown' # We will find this later
+        self.data = data
+        self.xy = xy
+        self.chemical_type = 'Unknown' # We will find this later (maybe)
         # FIXME: Assumes chemical name is in TITLE label.
-        if GRAMS:
+        if GRAMS: self.chemical_name = 'Unknown'
         else:
             self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
+        s = 0.0
+        
+        oldx, oldy = xy[start]
+        for x,y in xy:
+            if x > x_range[0] and x < x_range[1]:
+                s += (x-oldx)*(oldy+y)/2
+                oldx, oldy = x, y
+
+        raise Exception(sum(data), s)
     
-	
+    
     def get_field(self, name):
         '''
         Get a specific data label from the file.
@@ -457,13 +451,12 @@ class Spectrum(db.Model):
         @return: Either a list of peaks or one peak, depending on the parameter
         @rtype: C{list} or C{float}
         '''
-        data = zip(self.xvalues, self.yvalues)
         if one:
-            return max(data, key=operator.itemgetter(1))[0]
-        data = sorted(data, key=operator.itemgetter(1), reverse=True)
+            return max(self.xy, key=operator.itemgetter(1))[0]
+        self.xy = sorted(self.xy, key=operator.itemgetter(1), reverse=True)
         peaks = []
-        peaks = [x for x, y in data
-                   if y >= data[0][1]*0.95
+        peaks = [x for x, y in self.xy
+                   if y >= self.xy[0][1]*0.95
                    and not [peak for peak in peaks if abs(peak - x) < 1]]
         return peaks
     
@@ -474,12 +467,11 @@ class Spectrum(db.Model):
         @return: The heavyside index
         @rtype: C{int}
         '''
-        data = zip(self.xvalues, self.yvalues)
-        key, left_edge, width = 0, 0, len(data) # Initialize variables
+        key, left_edge, width = 0, 0, len(self.xy) # Initialize variables
         for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS):
-            left = sum([i[1] for i in data[left_edge:left_edge + width / 2]])
-            right = sum([i[1] for i in data[left_edge + width / 2:left_edge + width]])
-            if left_edge + width == len(data):
+            left = sum([i[1] for i in self.xy[left_edge:left_edge + width / 2]])
+            right = sum([i[1] for i in self.xy[left_edge + width / 2:left_edge + width]])
+            if left_edge + width == len(self.xy):
                 left_edge = 0
                 width = width / 2 #Adjust boundaries
             else:
@@ -607,20 +599,22 @@ class Matcher(db.Model):
         # If a spectrum has a peak within five indices of our given spectrum's
         # peaks in either direction, give it votes depending on how close it is
         index = bisect.bisect(self.peak_list, peak)
+        
         for offset in xrange(-5,5):
             if index + offset < 0 or index + offset >= len(self.peak_list):
                 # If bisect gives us an index near the beginning or end of list
                 continue
             # Give the spectrum (5 - offest) votes
-            peak_index = self.peak_list[index+offset][1]
+            peak_index = self.peak_list[index+offset][0]
             keys[peak_index] = keys.get(peak_index, 0) + (5 - abs(offset))
+            
         # Sort candidates by number of votes and return Spectrum objects.
         keys = sorted(keys.iteritems(), key=operator.itemgetter(1), reverse=True)
+        
         return Spectrum.get([k[0] for k in keys])
     
     def browse(self, chemical_name):
-        keys = [key for name, key in self.chemical_names
-                if name.startswith(chemical_name)]
+        keys = [key for name, key in self.chemical_names if name.startswith(chemical_name)]
         return Spectrum.get(keys)
     
     @staticmethod # Make a static method for faster execution
@@ -637,10 +631,10 @@ class Matcher(db.Model):
         @rtype: C{int}
         @raise common.ServerError: If there are invalid spectra in the database
         '''
-        length = min([len(a.yvalues), len(b.yvalues)])
-        if length == 0 or a.yvalues is None or b.yvalues is None:
+        length = min([len(a.data), len(b.data)])
+        if length == 0 or a.data is None or b.data is None:
             raise common.ServerError("Invalid spectra in the database.")
-        return max([abs(a.yvalues[i] - b.yvalues[i]) for i in xrange(length)])
+        return max([abs(a.data[i] - b.data[i]) for i in xrange(length)])
     
     @staticmethod # Make a static method for faster execution
     def least_squares(a, b):
@@ -656,7 +650,7 @@ class Matcher(db.Model):
         @rtype: C{int}
         @raise common.ServerError: If there are invalid spectra in the database
         '''
-        length = min([len(a.yvalues), len(b.yvalues)])
-        if length == 0 or a.yvalues is None or b.yvalues is None:
+        length = min([len(a.data), len(b.data)])
+        if length == 0 or a.data is None or b.data is None:
             raise common.ServerError("Invalid spectra in the database.")
-        return sum([(a.yvalues[i] - a.yvalues[i])**2 for i in xrange(length)])
+        return sum([(a.data[i] - a.data[i])**2 for i in xrange(length)])

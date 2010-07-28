@@ -96,12 +96,12 @@ class ApiHandler(webapp.RequestHandler):
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                info = [(str(i.key()), i.chemical_name,
-                         i.chemical_type, i.error) for i in result]
+                info = [ (i.chemical_name, i.data) for i in result]
+                raise Exception(result[0].data)
                 response.append(info)
         elif action == "compare":
-            # Compare two pre-uploaded spectra.
-            response.append(backend.compare(spectra[0], target, algorithm))
+            # Compare multiple spectra uploaded in this session.
+            response.append(backend.compare(spectra, algorithm))
         elif action == "browse":
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
