@@ -83,6 +83,8 @@ class ApiHandler(webapp.RequestHandler):
         user = users.get_current_user()
         response = []
         
+        spectra = [open('infrared/iodobenzene1.jdx').read()] # Just for testing
+        
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
         if target and target != "public":
@@ -96,7 +98,9 @@ class ApiHandler(webapp.RequestHandler):
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                info = [ (i.chemical_name, i.data) for i in result]
+                response.append(result[0].chemical_name)
+                scale = 300/max(result[0].data)
+                info = [ i*scale for i in result[0].data ]
                 response.append(info)
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.

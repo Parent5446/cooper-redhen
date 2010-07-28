@@ -40,25 +40,20 @@ $('#compare_button').click(function() {
     $('#graph').show();
     $('#results').show();
     var got_results = function(response) { //Once the server has responded
-        $('#results').html(response); //List the spectra in the results bar
+        response = $.parseJSON(response);
+        $('#results').html(response[0]); //List the spectra in the results bar
         var spectra = Array(); //Hold data
-        spectra.push(new Spectrum('methanol', Array(), 'red'));
-        spectra.push(new Spectrum('ethanol', Array(), 'blue'));
-        spectra.push(new Spectrum('propanol', Array(), 'green'));
+        spectra.push(new Spectrum('methanol', response[1], 'red'));
         var selected = 0;
-        $.each(spectra, function(i, spectrum) { //Make dummy values for testing
-            for(var x=0; x<$('#graph').width(); x++) { 
-                spectrum.data.push(Math.round( Math.sin(x/53.0517)*(50+50*i) )+150);
-            }}); //Done with dummy values
         var vertical_divs = Array(); //Prepare the lines on the screen
         $.each(spectra, function(i, spectrum) { //For each spectrum to be graphed
             for(var x=0; x<$('#graph').width(); x++) { //For each point in the spectrum
-                var y = spectrum.data[x]; var oldy = y; if(x>0) oldy = spectrum.data[x-1]; //get the y data
-                /*
+                var y = spectrum.data[x]; if(x>0) var oldy = spectrum.data[x-1]; else var oldy = y; //get the y data
+                
                 if(y>oldy) vertical_divs.push('<div class="graph-antialias" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(y-oldy+2)+'px; bottom:'+(oldy-1)+'px;"></div>'); //Make an upward rectangle
                 else if(y<oldy) vertical_divs.push('<div class="graph-antialias" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(oldy-y+2)+'px; bottom:'+(y-1)+'px;"></div>'); //or make a downward rectangle
                 else vertical_divs.push('<div class="graph-antialias" style="background-color:'+spectrum.color+'; left:'+x+'px; height:3px; bottom:'+(y-1)+'px;"></div>'); //or make a horizontal rectangle
-                */
+                
                 if(y>oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(y-oldy)+'px; bottom:'+oldy+'px;"></div>'); //Make an upward rectangle
                 else if(y<oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(oldy-y)+'px; bottom:'+y+'px;"></div>'); //or make a downward rectangle
                 else vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:1px; bottom:'+y+'px;"></div>'); //or make a horizontal rectangle
@@ -88,7 +83,7 @@ $('#compare_button').click(function() {
             document.body.style.cursor="default";
         });
     };
-    $.ajax({ url: '/api', success: got_results });
+    $.post('/api', {action:'compare', target:'public', output:'json'}, got_results);
 });
 
 $('#browse_options').change(function() {
