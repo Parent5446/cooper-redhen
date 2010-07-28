@@ -48,12 +48,7 @@ $('#compare_button').click(function() {
         var vertical_divs = Array(); //Prepare the lines on the screen
         $.each(spectra, function(i, spectrum) { //For each spectrum to be graphed
             for(var x=0; x<$('#graph').width(); x++) { //For each point in the spectrum
-                var y = spectrum.data[x]; if(x>0) var oldy = spectrum.data[x-1]; else var oldy = y; //get the y data
-                
-                if(y>oldy) vertical_divs.push('<div class="graph-antialias" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(y-oldy+2)+'px; bottom:'+(oldy-1)+'px;"></div>'); //Make an upward rectangle
-                else if(y<oldy) vertical_divs.push('<div class="graph-antialias" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(oldy-y+2)+'px; bottom:'+(y-1)+'px;"></div>'); //or make a downward rectangle
-                else vertical_divs.push('<div class="graph-antialias" style="background-color:'+spectrum.color+'; left:'+x+'px; height:3px; bottom:'+(y-1)+'px;"></div>'); //or make a horizontal rectangle
-                
+                var y = Math.floor(spectrum.data[x]); if(x>0) var oldy = Math.floor(spectrum.data[x-1]); else var oldy = y; //get the y data
                 if(y>oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(y-oldy)+'px; bottom:'+oldy+'px;"></div>'); //Make an upward rectangle
                 else if(y<oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(oldy-y)+'px; bottom:'+y+'px;"></div>'); //or make a downward rectangle
                 else vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:1px; bottom:'+y+'px;"></div>'); //or make a horizontal rectangle

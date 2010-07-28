@@ -83,7 +83,12 @@ class ApiHandler(webapp.RequestHandler):
         user = users.get_current_user()
         response = []
         
-        spectra = [open('infrared/iodobenzene1.jdx').read()] # Just for testing
+        spectra = [open('iodobenzene1.jdx').read()] # Just for testing
+        #[db.delete(m) for m in backend.Matcher.all()]
+        #[db.delete(s) for s in backend.Spectrum.all()]
+        #memcache.flush_all()
+        #backend.add(spectra[0], 'public', False)
+        
         
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
