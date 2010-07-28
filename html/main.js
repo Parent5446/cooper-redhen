@@ -3,7 +3,7 @@ $(document).ready(function() {
 });
 
 function unload(file) {
-    $('#checkbox_'+file).css('display', 'none');
+    $('#checkbox_'+file).hide();
     var action = function(response) { alert('Deleted '+file+' from server.'); };
     $.ajax({ url: '/api', success: action });
 }
@@ -12,18 +12,18 @@ function add_to_list(s) {
     if( !s ) return;
     var id = String(s).replace('.','_');
     $('#loaded_list').html('<div id="checkbox_'+id+'"><input type="checkbox" checked="yes" onclick="unload(\''+id+'\');" />'+s+'</div>');
-    $('#loaded_list').css('display', 'block');
+    $('#loaded_list').show();
 }
  
 function combobox_clicked(text) {
     $('#combobox_text').val(text);
-    $('#combobox_dropdown').css('display', 'none');
+    $('#combobox_dropdown').hide();
     $('#combobox_text').focus();
 }
 
 $('#browse_button').click(function() {
     var selected = $('#browse_options option:selected').val();
-    $('#browse_dialog').css('display', 'block');
+    $('#browse_dialog').show();
     $('#combobox_text').focus();
 });
 
@@ -34,11 +34,11 @@ function Spectrum(name, data, color) //Spectrum class
 
 $('#compare_button').click(function() {
     var selected = $('#compare_options option:selected').val();
-    $('#loaded_list').css('display', 'none');
+    $('#loaded_list').hide();
     $('body').css('padding', '0px');
     $('#results').html('Getting results...');
-    $('#graph').css('display', 'block');
-    $('#results').css('display', 'block');
+    $('#graph').show();
+    $('#results').show();
     var got_results = function(response) { //Once the server has responded
         $('#results').html(response); //List the spectra in the results bar
         var spectra = Array(); //Hold data
@@ -72,10 +72,10 @@ $('#compare_button').click(function() {
             $('#floatybar').css('left', x);
             $('#floatybar').css('bottom', spectra[selected].data[x]);
             $('#floatybar').html(x+', '+spectra[selected].data[x]);
-            $('#floatybar').css('display', 'block');
+            $('#floatybar').show();
             $('#tracepoint').css('left', x-2);
             $('#tracepoint').css('bottom', spectra[selected].data[x]-2);
-            $('#tracepoint').css('display', 'block');
+            $('#tracepoint').show();
         });
         $('#graph').click( function(e) {
             var x = Math.floor(e.pageX - $('#graph').position().left);
@@ -83,8 +83,8 @@ $('#compare_button').click(function() {
             for(var i in spectra) if(Math.abs(spectra[i].data[x]-y)<15) { selected=i; break; }
         });
         $('#graph').mouseout( function(e) {
-            $('#floatybar').css('display', 'none');
-            $('#tracepoint').css('display', 'none');
+            $('#floatybar').hide();
+            $('#tracepoint').hide();
             document.body.style.cursor="default";
         });
     };
@@ -94,14 +94,14 @@ $('#compare_button').click(function() {
 $('#browse_options').change(function() {
     //Make file upload frame go away when not selected
     var selected = $('#browse_options option:selected').val();
-    $('#file_frame').css('display', (selected=='my computer')?'block':'none');
+    if(selected=='my computer') $('#file_frame').show(); else $('#file_frame').hide();
 });
 
 $('#done_button').click(function() {
-    $('#browse_dialog').css('display', 'none');
+    $('#browse_dialog').hide();
     add_to_list($('#combobox_text').val());
     $('#combobox_text').val('');
-    $('#combobox_dropdown').css('display', 'none');
+    $('#combobox_dropdown').hide();
     $('#combobox_dropdown').html('');
 });
 
@@ -110,5 +110,5 @@ $('#combobox_text').keyup(function(key) {
     if(unicode==13) $('#done_button').click();
     if($('#combobox_text').val().length<4) return;
     $('#combobox_dropdown').load( '/api', $('#combobox_text').val() )
-    $('#combobox_dropdown').css('display', 'block');
+    $('#combobox_dropdown').show();
 });
