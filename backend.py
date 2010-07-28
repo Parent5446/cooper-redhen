@@ -10,6 +10,9 @@ various methods of database searching.
 import re # re.finditer (regex searches)
 import bisect # bisect.bisect (binary search of a list)
 import operator # operator.attrgetter, operator.itemgetter
+import struct
+import array
+import StringIO
 
 from google.appengine.ext import db # import database
 from google.appengine.api import memcache, users # import memory cache and user
@@ -294,25 +297,100 @@ class Spectrum(db.Model):
         '''
         self.contents = contents
         self.spectrum_type = 'infrared' # Later this will be variable
-        if (self.contents[0] == '\0'):
-             print "gabe" + 5 + poop
+        
+        
+        '''
+        The following block of code interprets GRAMS file types
+        This block of code will only run if the GRAMS file is in old format or new, LSB format
+        ***WHEN FILE EXTENSION SUPPORT IS ADDED IT SHOULD BE USED.  GRAMS FILES ARE .SPC.***
+        Until then, this code block runs if and only if the file starts with "\0K" or "\0L"
+        That's not the best way to do this, so it should be changed ASAP.  Fortunately, JCAMP files
+        will never start with a null byte, and multi-file support hasn't been added, so it won't cause problems.
+        This code block requires imports of StringIO, array, and struct
+        '''
+        f = StringIO.StringIO()
+        f.write(contents)
+        f.seek(0)
+        ftflgs = f.read(1) 
+        fversn = f.read(1)
+        GRAMS = false
+        if(ftflgs == '\0'):
+            #ftflgs == null means that the data is single-file, and is stored with evenly spaced x data
+            if(fversn == 'K'):
+                GRAMS = true
+                fexper = f.read(1)
+                #fexper tells the program what type of spectrum this is.
+                #Below is a quote of the SPC.h header file defining fexper values.
+                '''
+                #define SPCGEN	0	/* General SPC (could be anything) */
+                #define SPCGC	1	/* Gas Chromatogram */
+                #define SPCCGM	2	/* General Chromatogram (same as SPCGEN with TCGRAM) */
+                #define SPCHPLC 3	/* HPLC Chromatogram */
+                #define SPCFTIR 4	/* FT-IR, FT-NIR, FT-Raman Spectrum or Igram (Can also be used for scanning IR.) */
+                #define SPCNIR	5	/* NIR Spectrum (Usually multi-spectral data sets for calibration.) */
+                #define SPCUV	7	/* UV-VIS Spectrum (Can be used for single scanning UV-VIS-NIR.) */
+                #define SPCXRY	8	/* X-ray Diffraction Spectrum */
+                #define SPCMS	9	/* Mass Spectrum  (Can be single, GC-MS, Continuum, Centroid or TOF.) */
+                #define SPCNMR	10	/* NMR Spectrum or FID */
+                #define SPCRMN	11	/* Raman Spectrum (Usually Diode Array, CCD, etc. use SPCFTIR for FT-Raman.) */
+                #define SPCFLR	12	/* Fluorescence Spectrum */
+                #define SPCATM	13	/* Atomic Spectrum */
+                #define SPCDAD	14	/* Chromatography Diode Array Spectra */
+                '''
+                #Code executing here is for "LSB 1st" and "new format" files
+                f.seek(1,1)
+                (numpoints,) = struct.unpack('l',f.read(4))
+                (firstx,) = struct.unpack('d',f.read(8))
+                (lastx,) = struct.unpack('d',f.read(8))
+                f.seek(544,0) #Skip the next 544 bytes, as they are the rest of the header
+                a = array.array('f')
+                a.fromstring(f.read(numpoints * 4))
+                
+            elif(fversn == 'L'):
+                fexper = contents[2]
+                #Code executing here is for GRAMS files that are "MSB 1st" and "new format".
+                #There are no MSB files to test, and I don't know what MSB means.
+            else:
+                GRAMS = true
+                #Code executing here is for GRAMS files that are in the "old format"
+                #This code is UNTESTED
+                f.seek(2,1)
+                (numpoints,) = struct.unpack('f',f.read(4))
+                (firstx,) = struct.unpack('f',f.read(4))
+                (lastx,) = struct.unpack('f',f.read(4))
+                f.seek(288,0) #Skip the next 288 bytes, as they are the rest of the header
+                a = array.array('f')
+                a.fromstring(f.read(numpoints * 4))
+        else:
+            #The GRAMS file is multi-file or something like that.
+            #Until we add file-extension support, multi-file GRAMS will throw errors!!
+
 			
         x = float(self.get_field('##FIRSTX=')) # The first x-value
-        delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
-        x_factor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
-        y_factor = float(self.get_field('##YFACTOR=')) # some very small number, but if not use this instead
+        if GRAMS:
+            delta_x = (lastx - firstx)/(numpoints - 1)
+            x_factor = 1
+            y_factor = 1
+        else:
+            delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
+            x_factor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
+            y_factor = float(self.get_field('##YFACTOR=')) # some very small number, but if not use this instead
         xy = []
         # Process the XY data from JCAMP's (X++(Y..Y)) format.
-        raw_xy = self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]
-        pattern = re.compile(r'(\D+)([\d.-]+)')
-        for match in re.finditer(pattern, raw_xy):
-            if '\n' in match.group(1):
-                # Number is the first on the line and is an x-value
-                x = float(match.group(2)) * x_factor
-            else:
-                # Number is a relative y-value.
-                xy.append((x, float(match.group(2)) * y_factor))
-                x += delta_x
+        if GRAMS:
+            for i in range(0, numpoints -1 ):
+                xy.append((i * deltax + firstx), a[i])
+        else:
+            raw_xy = self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]
+            pattern = re.compile(r'(\D+)([\d.-]+)')
+            for match in re.finditer(pattern, raw_xy):
+                if '\n' in match.group(1):
+                    # Number is the first on the line and is an x-value
+                    x = float(match.group(2)) * x_factor
+                else:
+                    # Number is a relative y-value.
+                    xy.append((x, float(match.group(2)) * y_factor))
+                    x += delta_x
         # Keep the data in ascending order. It will be descending in the file
         # if our delta X is negative.
         if delta_x < 0:
@@ -348,7 +426,9 @@ class Spectrum(db.Model):
         self.yvalues = data
         self.chemical_type = 'Unknown' # We will find this later
         # FIXME: Assumes chemical name is in TITLE label.
-        self.chemical_name = self.get_field('##TITLE=')
+        if GRAMS:
+        else:
+            self.chemical_name = self.get_field('##TITLE=')
         # Reference: http://www.jcamp-dx.org/
     
 	
