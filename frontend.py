@@ -44,6 +44,7 @@ Comparing Options:
 from google.appengine.api import users, memcache
 from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.api import quota
 
 import appengine_utilities.sessions
 import common
@@ -51,6 +52,8 @@ import backend
 
 class ApiHandler(webapp.RequestHandler):
     """Handle any API requests and return a JSON response."""
+    
+    CPU_LIMIT = 50000 # We need to determine a reasonable number to put here.
     
     def get(self):
         if self.request.get("action") in ("update", "projects", "data", "browse"):
@@ -68,6 +71,8 @@ class ApiHandler(webapp.RequestHandler):
         @raise common.InputError: If no search targets are given in the target
         POST variable or if an invalid action is given.
         """
+        cpu_start = quota.get_request_cpu_usage()
+        
         action = self.request.get("action")
         target = self.request.get("target", "public")
         spectra = self.request.get_all("spectrum") #Some of these will be in session data
@@ -80,6 +85,10 @@ class ApiHandler(webapp.RequestHandler):
         session = appengine_utilities.sessions.Session()
         user = users.get_current_user()
         response = []
+        
+        # First check if the user has gone over quota.
+        if session.get("cpu_usage") > self.CPU_LIMIT:
+            raise common.ServerError("User has gone over quota.")
         
         spectra = [open('iodobenzene1.jdx').read()] # Just for testing
         #[db.delete(m) for m in backend.Matcher.all()]
@@ -143,6 +152,10 @@ class ApiHandler(webapp.RequestHandler):
             raise common.InputError(action, "Invalid API action.")
         # Pass it on to self.output for processing.
         self.output(response)
+        
+        # Add on the request's CPU usage to the session quota.
+        cpu_end = quota.get_request_cpu_usage()
+        session['cpu_usage'] = session.get('cpu_usage') + cpu_end - cpu_start
     
     def output(self, response):
         """
