@@ -58,7 +58,7 @@ def search(spectrum_data, algorithm="bove"):
     if algorithm == "bove":
         algorithm = Matcher.bove
     elif algorithm == "leastsquares":
-        algorithm = Matcher.leastsquares
+        algorithm = Matcher.least_squares
     else:
         raise common.InputError(algorithm, "Invalid algorithm.")
     for candidate in candidates:
