@@ -42,7 +42,7 @@ def search(spectrum_data, algorithm="bove"):
     spectrum = Spectrum()
     try:
         spectrum.parse_string(spectrum_data)
-    except AttributeError:
+    except NameError:
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Check cache for the Matcher. If not, get from database.
     matcher = memcache.get(spectrum.spectrum_type+'_matcher')
@@ -86,7 +86,7 @@ def compare(dataList, algorithm="bove"):
             spectrum = Spectrum()
             try:
                 spectrum.parse_string(spectrum_data)
-            except AttributeError:
+            except NameError:
                 raise common.InputError(spectrum_data, "Invalid spectrum data.")
             spectra.append(spectrum)
     # Start comparing
@@ -149,7 +149,7 @@ def add(spectrum_data, target="public", preprocessed=False):
         spectrum = Spectrum()
         try:
             spectrum.parse_string(spectrum_data)
-        except AttributeError:
+        except NameError:
             raise common.InputError(spectrum_data, "Invalid spectrum data.")
     else:
         import urllib
@@ -286,7 +286,7 @@ class Spectrum(db.Model):
     '''The chemical type of the substance the spectrum represents
     @type: C{str}'''
 
-    spectrum_type = db.StringProperty(choices=["infrared", "raman"])
+    spectrum_type = db.StringProperty()
     '''The spectrum type of the substance the spectrum represents
     @type: C{str}'''
     
@@ -329,7 +329,8 @@ class Spectrum(db.Model):
         ftflgs = f.read(1) #ftflgs == null means that the data is single-file, and is stored with evenly spaced x data
         fversn = f.read(1) #fversn determines if the file is MSB 1st, LSB 1st, or 'old-format' (L, K, M respectively)
         GRAMS = False #Is it a grams file?
-		spectra_types = ["General Spectra", "Gas Chromatogram", "Chromatogram", "HPLC", "FT-IR/FT-Raman", "NIR", "UV-VIS", "X-ray Diffraction", "Mass Spec", "NMR", "Raman Spectrum", "Fluorescence", "Atomic", "Chromatography Diode"]
+        
+        spectra_types = "General Spectra", "Gas Chromatogram", "Chromatogram", "HPLC", "FT-IR/FT-Raman", "NIR", "UV-VIS", "X-ray Diffraction", "Mass Spec", "NMR", "Raman Spectrum", "Fluorescence", "Atomic", "Chromatography Diode"
         if(ftflgs == '\0'):
             if(fversn == 'K'):
                 GRAMS = True
@@ -390,18 +391,18 @@ class Spectrum(db.Model):
             x_factor = 1
             y_factor = 1
         else:
-			self.spectrum_type = self.get_field("##DATA TYPE=") #Get the spectrum type
-			x = float(self.get_field('##FIRSTX=')) # The first x-value
+            self.spectrum_type = self.get_field("##DATA TYPE=") #Get the spectrum type
+            x = float(self.get_field('##FIRSTX=')) # The first x-value
             delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
             x_factor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
             y_factor = float(self.get_field('##YFACTOR=')) # some very small number, but if not use this instead
-		
-		if self.spectrum_type.upper.find("IR") >= 0 or self.spectrum_type.upper.find("INFRARED") >= 0 #If IR or infrared are in the spectrum type name, then
-			self.spectrum_type = "infrared"
-		elif self.spectrum_type.upper.find("RAMAN") >= 0: #if "raman" is included in the spectrum type
-			self.spectrum_type = "raman"
+        
+        if self.spectrum_type.upper().find("IR") >= 0 or self.spectrum_type.upper().find("INFRARED") >= 0: #If IR or infrared are in the spectrum type name, then
+            self.spectrum_type = "infrared"
+        elif self.spectrum_type.upper().find("RAMAN") >= 0: #if "raman" is included in the spectrum type
+            self.spectrum_type = "raman"
 
-	    xy = []
+        xy = []
         # Process the XY data from JCAMP's (X++(Y..Y)) format.
         if GRAMS:
             for i in range(0, numpoints -1 ):
@@ -418,11 +419,11 @@ class Spectrum(db.Model):
                     x += delta_x
         if delta_x < 0: xy.reverse() # Keep the points in ascending x order
         # Integrate xy numerically over a fixed range.
-	
-		if self.spectrum_type == "infrared":
-			x_range = (700.0, 3900.0) #Set the range
-		elif self.spectrum_type == "raman":
-			x_range = (300.0, 2000.0)
+    
+        if self.spectrum_type == "infrared":
+            x_range = (700.0, 3900.0) #Set the range
+        elif self.spectrum_type == "raman":
+            x_range = (300.0, 2000.0)
         data = [0.0 for i in xrange(512)] #Initialize data
         interval = (x_range[1] - x_range[0]) / len(data) #Find width of each integral
         start = bisect.bisect_right(xy, (x_range[0], 0))  # Find index in xy where integrals start, by bisection
