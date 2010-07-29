@@ -69,7 +69,10 @@ function got_results(response) { //Once the server has responded
         var spectra = []; //Hold spectra
         var colors = ['red', 'blue', 'green', 'orange', 'purple', 'gray', 'brown', 'pink', 'cyan'];
         $.each(response, function(i, spectrum) {
-            results_bar.push('<tr style="color:'+colors[i]+'"><td><input type="checkbox" checked="yes" /></td><td>'+spectrum[1]+'</td><td>'+String(100/Math.pow((spectrum[2]+1), 0.1)).slice(0,4)+'%</td></tr>');
+            results_bar.push(
+                '<tr style="color:' + colors[i] + '"><td><input type="checkbox" checked="yes" /></td><td>' +
+                 spectrum[1] + '</td><td>' + String(100 / Math.pow((spectrum[2] + 1), 0.1)).slice(0,4) + '%</td></tr>'
+            );
             spectra.push(new Spectrum(spectrum[1], spectrum[3], colors[i]));
         });
         $('#results').html(results_bar.join(' '));
@@ -77,45 +80,79 @@ function got_results(response) { //Once the server has responded
         var vertical_divs = Array(); //Prepare the lines on the screen
         $.each(spectra, function(i, spectrum) { //For each spectrum to be graphed
             for(var x=0; x<$('#graph').width(); x++) { //For each point in the spectrum
-                var y = Math.floor(spectrum.data[x]); if(x>0) var oldy = Math.floor(spectrum.data[x-1]); else var oldy = y; //get the y data
-                if(y>oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(y-oldy)+'px; bottom:'+oldy+'px;"></div>'); //Make an upward rectangle
-                else if(y<oldy) vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:'+(oldy-y)+'px; bottom:'+y+'px;"></div>'); //or make a downward rectangle
-                else vertical_divs.push('<div class="graph-line" style="background-color:'+spectrum.color+'; left:'+x+'px; height:1px; bottom:'+y+'px;"></div>'); //or make a horizontal rectangle
-            }}); //Done processing spectra
+                var y = Math.floor(spectrum.data[x]);
+                if(x>0) {
+                    var oldy = Math.floor(spectrum.data[x-1]);
+                } else {
+                    var oldy = y; //get the y data
+                }
+                
+                if(y > oldy) {
+                    vertical_divs.push(
+                        '<div class="graph-line" style="background-color:' +
+                        spectrum.color +'; left:' + x + 'px; height:' +
+                        (y - oldy) + 'px; bottom:' + oldy + 'px;"></div>'
+                    ); //Make an upward rectangle
+                } else if(y < oldy) {
+                    vertical_divs.push(
+                        '<div class="graph-line" style="background-color:' +
+                        spectrum.color + '; left:' + x + 'px; height:' +
+                        (oldy - y) + 'px; bottom:' + y + 'px;"></div>'
+                    ); //or make a downward rectangle
+                } else {
+                    vertical_divs.push(
+                        '<div class="graph-line" style="background-color:' +
+                        spectrum.color + '; left:' + x + 'px; height:1px; bottom:' +
+                        y + 'px;"></div>'
+                    ); //or make a horizontal rectangle
+                }
+            }
+        }); //Done processing spectra
+        
         vertical_divs.push('<div id="floatybar" class="graph-floatybar">0,0</div>'); //Make floating sign
         vertical_divs.push('<div id="tracepoint" class="graph-trace"></div>'); //Make trace point
         $('#graph').html(vertical_divs.join('')); //Put it all in the graph
-        $('#graph').mousemove( function(e) { //Add functions to the graph
+        $('#graph').mousemove(function(e) { //Add functions to the graph
             document.body.style.cursor="crosshair";
             var x = Math.floor(e.pageX - $('#graph').position().left);
             $('#floatybar').css('left', x);
             $('#floatybar').css('bottom', spectra[selected].data[x]);
-            $('#floatybar').html(x+', '+spectra[selected].data[x]);
+            $('#floatybar').html(x + ', ' + spectra[selected].data[x]);
             $('#floatybar').show();
-            $('#tracepoint').css('left', x-2);
-            $('#tracepoint').css('bottom', spectra[selected].data[x]-2);
+            $('#tracepoint').css('left', x - 2);
+            $('#tracepoint').css('bottom', spectra[selected].data[x] - 2);
             $('#tracepoint').show();
         });
-        $('#graph').click( function(e) {
+        $('#graph').click(function(e) {
             var x = Math.floor(e.pageX - $('#graph').position().left);
-            var y = 300+$('#graph').position().top-e.pageY;
-            for(var i in spectra) if(Math.abs(spectra[i].data[x]-y)<15) { selected=i; break; }
+            var y = 300 + $('#graph').position().top - e.pageY;
+            for(var i in spectra) {
+                if(Math.abs(spectra[i].data[x] - y) < 15) {
+                    selected = i;
+                    break;
+                }
+            }
         });
         $('#graph').mouseout( function(e) {
             $('#floatybar').hide();
             $('#tracepoint').hide();
-            document.body.style.cursor="default";
+            document.body.style.cursor = "default";
         });
 };
 
 function unload(file) {
-    $('#checkbox_'+file).remove();
-    $('#file'+file).remove();
+    $('#checkbox_' + file).remove();
+    $('#file' + file).remove();
 }
 
 function add_to_list(s, id) {
-    if( !s ) return;
-    $('#loaded_list').append('<div id="checkbox_'+id+'"><input type="checkbox" checked="yes" onclick="unload(\''+id+'\');" />'+s+'</div>');
+    if( !s ) {
+        return;
+    }
+    $('#loaded_list').append(
+        '<div id="checkbox_' + id + '"><input type="checkbox" checked="yes" onclick="unload(\'' +
+         id + '\');" />' + s + '</div>'
+    );
     $('#loaded_list').show();
 }
  
@@ -131,9 +168,11 @@ $('#browse_button').click(function() {
     $('#combobox_text').focus();
 });
 
-function Spectrum(name, data, color) //Spectrum class
+function Spectrum(spectrum_name, data, color) //Spectrum class
 {
-    this.name = name; this.data = data; this.color = color;
+    this.name = spectrum_name;
+    this.data = data;
+    this.color = color;
 }
 
 $('#compare_button').click(function() {
@@ -152,7 +191,11 @@ $('#compare_button').click(function() {
 $('#browse_options').change(function() {
     //Make file upload frame go away when not selected
     var selected = $('#browse_options option:selected').val();
-    if(selected=='my computer') $('#file'+current_file).show(); else $('#file'+current_file).hide();
+    if(selected == 'my computer') {
+        $('#file' + current_file).show();
+    } else {
+        $('#file'+current_file).hide();
+    }
 });
 
 $('#done_button').click(function() {
@@ -165,8 +208,12 @@ $('#done_button').click(function() {
 
 $('#combobox_text').keyup(function(key) {
     var unicode = key.keyCode ? key.keyCode : key.charCode;
-    if(unicode==13) $('#done_button').click();
-    if($('#combobox_text').val().length<4) return;
+    if(unicode==13) {
+        $('#done_button').click();
+    }
+    if($('#combobox_text').val().length<4) {
+        return;
+    }
     $('#combobox_dropdown').load( '/api', $('#combobox_text').val() )
     $('#combobox_dropdown').show();
 });
@@ -178,7 +225,7 @@ function onchange_file() {
         add_to_list(this.value.match('[^\\\\]+$'), current_file);
         $(this).hide();
         current_file++;
-        $("#upload_form").append("<input type='file' class='invisible-frame' id='file"+current_file+"' name='spectrum' />")
+        $("#upload_form").append("<input type='file' class='invisible-frame' id='file" + current_file + "' name='spectrum' />")
         $("#file"+current_file).change(onchange_file);
         $("#file"+current_file).show()
     }
