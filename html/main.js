@@ -41,9 +41,10 @@ $('#compare_button').click(function() {
     $('#results').show();
     var got_results = function(response) { //Once the server has responded
         response = $.parseJSON(response);
-        $('#results').html(response[0]); //List the spectra in the results bar
+        $('#results').html(response[0][1]); //List the spectra in the results bar
         var spectra = Array(); //Hold data
-        spectra.push(new Spectrum('methanol', response[1], 'red'));
+        var colors = ['red', 'blue', 'green', 'orange', 'purple'];
+        $.each(response, function(i, spectrum) { spectra.push(new Spectrum(spectrum[1], spectrum[3], colors[i])); });
         var selected = 0;
         var vertical_divs = Array(); //Prepare the lines on the screen
         $.each(spectra, function(i, spectrum) { //For each spectrum to be graphed

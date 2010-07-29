@@ -91,10 +91,10 @@ class ApiHandler(webapp.RequestHandler):
             raise common.ServerError("User has gone over quota.")
         
         spectra = [open('iodobenzene1.jdx').read()] # Just for testing
-        #[db.delete(m) for m in backend.Matcher.all()]
-        #[db.delete(s) for s in backend.Spectrum.all()]
-        #memcache.flush_all()
-        #backend.add(spectra[0], 'public', False)
+        [db.delete(m) for m in backend.Matcher.all()]
+        [db.delete(s) for s in backend.Spectrum.all()]
+        memcache.flush_all()
+        backend.add(spectra[0], 'public', False)
         
         
         # If not operating on the main project, try getting the private one.
@@ -110,11 +110,7 @@ class ApiHandler(webapp.RequestHandler):
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                response.append(data)
-                info = [(str(i.key()), i.chemical_name, i.error,
-                        [k * 300 / max(i.data) for k in i.data])
-                        for i in result]
-                response.append(info)
+                response = [(str(i.key()), i.chemical_name, i.error, i.graph_data) for i in result]
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
             response.append(backend.compare(spectra, algorithm))
@@ -154,8 +150,8 @@ class ApiHandler(webapp.RequestHandler):
         self.output(response)
         
         # Add on the request's CPU usage to the session quota.
-        cpu_end = quota.get_request_cpu_usage()
-        session['cpu_usage'] = session.get('cpu_usage') + cpu_end - cpu_start
+        #cpu_end = quota.get_request_cpu_usage()
+        #session['cpu_usage'] = session.get('cpu_usage') + cpu_end - cpu_start
     
     def output(self, response):
         """

@@ -268,11 +268,11 @@ class Spectrum(db.Model):
     @type: C{str}'''
     
     data = db.ListProperty(float, indexed=False)
-    '''A list of integrated Y points for the spectrum's graph
+    '''A list of integrated y values for comparisons
     @type: C{list}'''
     
-    data = db.ListProperty(float, indexed=False)
-    '''A list of integrated Y points for the spectrum's graph
+    graph_data = db.ListProperty(float, indexed=False)
+    '''A list of y points for the spectrum's graph
     @type: C{list}'''
     
     notes = db.StringProperty(indexed=False)
@@ -386,7 +386,7 @@ class Spectrum(db.Model):
         if delta_x < 0: xy.reverse() # Keep the points in ascending x order
         # Integrate xy numerically over a fixed range.
         x_range = (700.0, 3900.0) #Set the range
-        data = [0.0 for i in xrange(500)] #Initialize data
+        data = [0.0 for i in xrange(512)] #Initialize data
         interval = (x_range[1] - x_range[0]) / len(data) #Find width of each integral
         start = bisect.bisect_right(xy, (x_range[0], 0))  # Find index in xy where integrals start, by bisection
         
@@ -408,6 +408,8 @@ class Spectrum(db.Model):
                 break #If finished, break
             old_x, old_y = x, y #Otherwise keep going
         self.data = data
+        scale = 300/max(data)
+        self.graph_data = [d*scale for d in data]
         self.xy = xy
         self.chemical_type = 'Unknown' # We will find this later (maybe)
         # FIXME: Assumes chemical name is in TITLE label.
@@ -452,11 +454,12 @@ class Spectrum(db.Model):
         @return: The heavyside index
         @rtype: C{int}
         '''
-        key, left_edge, width = 0, 0, len(self.xy) # Initialize variables
+        key, left_edge, width = 0, 0, len(self.data) # Initialize variables
+
         for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS):
-            left = sum([i[1] for i in self.xy[left_edge:left_edge + width / 2]])
-            right = sum([i[1] for i in self.xy[left_edge + width / 2:left_edge + width]])
-            if left_edge + width == len(self.xy):
+            left = sum(self.data[left_edge:left_edge + width / 2])
+            right = sum(self.data[left_edge + width / 2:left_edge + width])
+            if left_edge + width == len(self.data):
                 left_edge = 0
                 width = width / 2 #Adjust boundaries
             else:
