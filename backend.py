@@ -39,11 +39,14 @@ def search(spectrum_data, algorithm="bove"):
     if not (isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode)):
         raise common.ServerError("Backend was given invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
-    spectrum = Spectrum()
-    try:
-        spectrum.parse_string(spectrum_data)
-    except NameError:
-        raise common.InputError(spectrum_data, "Invalid spectrum data.")
+    if spectrum_data[0:3] == "db:":
+        spectrum = Spectrum.get(spectrum_data[3:])
+    else:
+        spectrum = Spectrum()
+        try:
+            spectrum.parse_string(spectrum_data)
+        except NameError:
+            raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Check cache for the Matcher. If not, get from database.
     matcher = memcache.get(spectrum.spectrum_type + '_matcher')
     if matcher is None:
@@ -99,7 +102,7 @@ def compare(dataList, algorithm="bove"):
             raise common.InputError(algo, "Invalid algorithm selection.")
     return spectra
     
-def browse(target="public", limit=10, offset=0, guess="", type=""):
+def browse(target="public", limit=10, offset=0, guess=False, spectrum_type="infrared"):
     '''
     Get a list of spectrum for browsing.
     
@@ -119,10 +122,10 @@ def browse(target="public", limit=10, offset=0, guess="", type=""):
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
     if guess:
         # Check cache for the Matcher. If not, get from database.
-        matcher = memcache.get(spectrum.spectrum_type + '_matcher')
+        matcher = memcache.get(spectrum_type + '_matcher')
         if matcher is None:
-            matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
-            memcache.set(spectrum.spectrum_type + '_matcher', matcher)
+            matcher = Matcher.get_by_key_name(spectrum_type + '_matcher')
+            memcache.set(spectrum_type + '_matcher', matcher)
         return matcher.browse(guess)
     else:
         target = Project.get_or_insert(target)
@@ -455,8 +458,8 @@ class Spectrum(db.Model):
         # FIXME: Assumes chemical name is in TITLE label.
         if GRAMS: self.chemical_name = 'Unknown'
         else:
-            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ \+\-%,\d]*$', self.get_field('##TITLE=') )
-            self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
+            match = re.search(r'([^a-zA-Z]*)([a-zA-Z]+)([ \+\-%,\d]*)$', self.get_field('##TITLE=') )
+            self.chemical_name = match.group(1) + match.group(2).lower() + match.group(3)
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):

@@ -85,6 +85,7 @@ class ApiHandler(webapp.RequestHandler):
         # Just for testing
         #[db.delete(m) for m in backend.Matcher.all(keys_only=True)]
         #[db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
+        #[db.delete(s) for s in backend.Project.all(keys_only=True)]
         #memcache.flush_all()
         #import os
         #for s in os.listdir('infrared'):
@@ -113,7 +114,7 @@ class ApiHandler(webapp.RequestHandler):
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
-            results = [(str(spectrum.key()), spectrum.chemical_name, spectrum.chemical_type)
+            results = [[str(spectrum.key()), spectrum.chemical_name, spectrum.chemical_type]
                        for spectrum in backend.browse(target, limit, offset, guess, spectrum_type)]
             response.extend(results)
         elif action == "add":

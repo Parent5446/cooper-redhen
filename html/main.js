@@ -170,18 +170,18 @@ function combobox_clicked(text) {
     $('#combobox_text').focus();
 }
 
-$('#browse_button').click(function() {
-    var selected = $('#browse_options option:selected').val();
-    $('#browse_dialog').show();
-    $('#combobox_text').focus();
-});
-
 function Spectrum(spectrum_name, data, color) //Spectrum class
 {
     this.name = spectrum_name;
     this.data = data;
     this.color = color;
 }
+
+$('#browse_button').click(function() {
+    var selected = $('#browse_options option:selected').val();
+    $('#browse_dialog').show();
+    $('#combobox_text').focus();
+});
 
 $('#compare_button').click(function() {
     var selected = $('#compare_options option:selected').val();
@@ -202,27 +202,49 @@ $('#browse_options').change(function() {
     if(selected == 'my computer') {
         $('#file' + current_file).show();
     } else {
-        $('#file'+current_file).hide();
+        $('#file' + current_file).hide();
     }
-});
-
-$('#done_button').click(function() {
-    $('#browse_dialog').hide();
-    add_to_list($('#combobox_text').val());
-    $('#combobox_text').val('');
-    $('#combobox_dropdown').hide();
-    $('#combobox_dropdown').html('');
 });
 
 $('#combobox_text').keyup(function(key) {
     var unicode = key.keyCode ? key.keyCode : key.charCode;
     if(unicode==13) {
-        $('#done_button').click();
+        $($('.guess')[0]).click();
     }
     if($('#combobox_text').val().length<4) {
         return;
     }
-    $('#combobox_dropdown').load( '/api', $('#combobox_text').val() )
+    $.get(
+        '/api',
+        {
+            action: 'browse',
+            type: 'infrared',
+            guess: $('#combobox_text').val(),
+            output: 'json'
+        },
+        function(data) {
+            var guesses = "";
+            $.each(data, function(i, guess) {
+                guesses += '<div id="' + guess[0] + '" class="guess">' + guess[1] + '</div>';
+            });
+            $('#combobox_dropdown').html(guesses);
+            $(".guess").each(function(i, guess) {
+                $(guess).click(function() {
+                    $("#upload_form").append(
+                        "<input type='hidden' id='file" + current_file +
+                        "' name='spectrum' value='db:" + $(guess).attr('id') + "' />"
+                    );
+                    add_to_list($(this).html(), current_file);
+                    $('#browse_dialog').hide();
+                    // Move the file upload box to the next id.
+                    file_upload = $("#file" + current_file);
+                    current_file++;
+                    file_upload.attr('id', 'file' + current_file);
+                });
+            });
+        },
+        'json'
+    );
     $('#combobox_dropdown').show();
 });
 
@@ -234,8 +256,8 @@ function onchange_file() {
         $(this).hide();
         current_file++;
         $("#upload_form").append("<input type='file' class='invisible-frame' id='file" + current_file + "' name='spectrum' />")
-        $("#file"+current_file).change(onchange_file);
-        $("#file"+current_file).show()
+        $("#file" + current_file).change(onchange_file);
+        $("#file" + current_file).show()
     }
 };
 
