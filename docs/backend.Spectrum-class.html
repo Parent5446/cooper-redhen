@@ -60,18 +60,17 @@
 <h1 class="epydoc">Class Spectrum</h1><p class="nomargin-top"><span class="codelink"><a href="backend-pysrc.html#Spectrum">source&nbsp;code</a></span></p>
 <center>
 <center>  <map id="uml_class_diagram_for_backend__3" name="uml_class_diagram_for_backend__3">
-<area shape="rect" href="backend.Spectrum-class.html#chemical_name" title="The chemical name associated with the spectrum" alt="" coords="17,28,300,47"/>
-<area shape="rect" href="backend.Spectrum-class.html#chemical_type" title="The chemical type of the substance the spectrum represents" alt="" coords="17,47,300,65"/>
-<area shape="rect" href="backend.Spectrum-class.html#spectrum_type" title="The spectrum type of the substance the spectrum represents" alt="" coords="17,65,300,84"/>
-<area shape="rect" href="backend.Spectrum-class.html#xvalues" title="A list of X points for the spectrum&#39;s graph" alt="" coords="17,84,300,103"/>
-<area shape="rect" href="backend.Spectrum-class.html#yvalues" title="A list of integrated Y points for the spectrum&#39;s graph" alt="" coords="17,103,300,121"/>
-<area shape="rect" href="backend.Spectrum-class.html#project" title="The project this spectrum belongs to." alt="" coords="17,121,300,140"/>
-<area shape="rect" href="backend.Spectrum-class.html#notes" title="Notes on the spectrum if in a private database" alt="" coords="17,140,300,159"/>
-<area shape="rect" href="backend.Spectrum-class.html#parse_string" title="Parse a string of JCAMP file data and extract all needed data." alt="" coords="17,161,300,180"/>
-<area shape="rect" href="backend.Spectrum-class.html#get_field" title="Get a specific data label from the file." alt="" coords="17,180,300,199"/>
-<area shape="rect" href="backend.Spectrum-class.html#calculate_peaks" title="Calculate the peaks for a spectrum." alt="" coords="17,199,300,217"/>
-<area shape="rect" href="backend.Spectrum-class.html#calculate_heavyside" title="Calculate the heavyside index for a spectrum." alt="" coords="17,217,300,236"/>
-<area shape="rect" href="backend.Spectrum-class.html" title="Store a spectrum, its related data, and any algorithms necessary to compare the spectrum to the DataStore." alt="" coords="16,11,301,237"/>
+<area shape="rect" href="backend.Spectrum-class.html#chemical_name" title="The chemical name associated with the spectrum" alt="" coords="17,28,215,47"/>
+<area shape="rect" href="backend.Spectrum-class.html#chemical_type" title="The chemical type of the substance the spectrum represents" alt="" coords="17,47,215,65"/>
+<area shape="rect" href="backend.Spectrum-class.html#data" title="A list of integrated y values for comparisons (&#39;H&#39; = unsigned short)" alt="" coords="17,65,215,84"/>
+<area shape="rect" href="backend.Spectrum-class.html#data_y_max" title="backend.Spectrum.data_y_max" alt="" coords="17,84,215,103"/>
+<area shape="rect" href="backend.Spectrum-class.html#notes" title="Notes on the spectrum if in a private database" alt="" coords="17,103,215,121"/>
+<area shape="rect" href="backend.Spectrum-class.html#spectrum_type" title="#define SPCGEN &#160;&#160;&#160;0 &#160;&#160;&#160;/* General SPC (could be anything) */ #define SPCGC 1 &#160;&#160;&#160;/* Gas Chromatogram */ #define SPCCGM &#160;&#160;&#160;2 &#160;&#160;&#160;/* General Chromatogram &#160;(same as SPCGEN with TCGRAM) */ #define SPCHPLC 3 &#160;&#160;&#160;/* HPLC Chromatogram &#160;*/ #define SPCFTIR 4 &#160;&#160;&#160;/* FT&#45;IR, FT&#45;NIR, FT&#45;Raman Spectrum or Igram (Can &#160;also be used for scanning IR.) */ #define SPCNIR &#160;&#160;&#160;5 &#160;&#160;&#160;/* NIR Spectrum &#160;(Usually multi&#45;spectral data sets for calibration.) */ #define SPCUV &#160;&#160;&#160;7 /* UV&#45;VIS Spectrum (Can be used for single scanning UV&#45;VIS&#45;NIR.) */ #define SPCXRY &#160;&#160;&#160;8 &#160;&#160;&#160;/* X&#45;ray Diffraction Spectrum */ #define SPCMS &#160;&#160;&#160;9 &#160;&#160;&#160;/* &#160;Mass Spectrum &#160;(Can be single, GC&#45;MS, Continuum, Centroid or TOF.) */ &#160;/* Raman Spectrum (Usually Diode Array, CCD, etc." alt="" coords="17,121,215,140"/>
+<area shape="rect" href="backend.Spectrum-class.html#parse_string" title="Parse a string of JCAMP file data and extract all needed data." alt="" coords="17,143,215,161"/>
+<area shape="rect" href="backend.Spectrum-class.html#get_field" title="Get a specific data field from the file." alt="" coords="17,161,215,180"/>
+<area shape="rect" href="backend.Spectrum-class.html#calculate_peaks" title="Calculate the peaks for a spectrum." alt="" coords="17,180,215,199"/>
+<area shape="rect" href="backend.Spectrum-class.html#calculate_heavyside" title="Calculate the heavyside index for a spectrum." alt="" coords="17,199,215,217"/>
+<area shape="rect" href="backend.Spectrum-class.html" title="Store a spectrum, its related data, and any algorithms necessary to compare the spectrum to the DataStore." alt="" coords="16,11,216,219"/>
 </map>
   <img src="uml_class_diagram_for_backend__3.gif" alt='' usemap="#uml_class_diagram_for_backend__3" ismap="ismap" class="graph-without-title" />
 </center>
@@ -123,7 +122,7 @@
         <tr>
           <td><span class="summary-sig"><a href="backend.Spectrum-class.html#get_field" class="summary-sig-name">get_field</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">name</span>)</span><br />
-      Get a specific data label from the file.</td>
+      Get a specific data field from the file.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#Spectrum.get_field">source&nbsp;code</a></span>
             
@@ -204,42 +203,62 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>str</code></span>
-    </td><td class="summary">
-        <a name="spectrum_type"></a><span class="summary-name">spectrum_type</span> = <code title="db.StringProperty()">db.StringProperty()</code><br />
-      The spectrum type of the substance the spectrum represents
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><code>list</code></span>
     </td><td class="summary">
-        <a name="xvalues"></a><span class="summary-name">xvalues</span> = <code title="db.ListProperty(int, indexed= False)">db.ListProperty(int, indexed= False)</code><br />
-      A list of X points for the spectrum's graph
+        <a name="data"></a><span class="summary-name">data</span> = <code title="common.ArrayProperty('H')">common.ArrayProperty('H')</code><br />
+      A list of integrated y values for comparisons ('H' = unsigned short)
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>list</code></span>
+      <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="yvalues"></a><span class="summary-name">yvalues</span> = <code title="db.ListProperty(float, indexed= False)">db.ListProperty(float, indexed= False)</code><br />
-      A list of integrated Y points for the spectrum's graph
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code class="link">google.appengine.db.ReferenceProperty</code></span>
-    </td><td class="summary">
-        <a name="project"></a><span class="summary-name">project</span> = <code title="db.ReferenceProperty(Project)">db.ReferenceProperty(Project)</code><br />
-      The project this spectrum belongs to.
+        <a name="data_y_max"></a><span class="summary-name">data_y_max</span> = <code title="65535">65535</code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type"><code>str</code></span>
     </td><td class="summary">
-        <a name="notes"></a><span class="summary-name">notes</span> = <code title="db.StringProperty()">db.StringProperty()</code><br />
+        <a name="notes"></a><span class="summary-name">notes</span> = <code title="db.StringProperty(indexed= False)">db.StringProperty(indexed= False)</code><br />
       Notes on the spectrum if in a private database
+    </td>
+  </tr>
+</table>
+<!-- ==================== INSTANCE VARIABLES ==================== -->
+<a name="section-InstanceVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="backend.Spectrum-class.html#spectrum_type" class="summary-name">spectrum_type</a><br />
+      #define SPCGEN    0    /* General SPC (could be anything) */ #define 
+      SPCGC    1    /* Gas Chromatogram */ #define SPCCGM    2    /* 
+      General Chromatogram (same as SPCGEN with TCGRAM) */ #define SPCHPLC 
+      3    /* HPLC Chromatogram */ #define SPCFTIR 4    /* FT-IR, FT-NIR, 
+      FT-Raman Spectrum or Igram (Can also be used for scanning IR.) */ 
+      #define SPCNIR    5    /* NIR Spectrum (Usually multi-spectral data 
+      sets for calibration.) */ #define SPCUV    7    /* UV-VIS Spectrum 
+      (Can be used for single scanning UV-VIS-NIR.) */ #define SPCXRY    8
+      /* X-ray Diffraction Spectrum */ #define SPCMS    9    /* Mass 
+      Spectrum  (Can be single, GC-MS, Continuum, Centroid or TOF.) */ 
+      #define SPCNMR    10    /* NMR Spectrum or FID */ #define SPCRMN    
+      11    /* Raman Spectrum (Usually Diode Array, CCD, etc.
     </td>
   </tr>
 </table>
@@ -306,19 +325,16 @@
     </td>
   </tr></table>
   
-  <p>Get a specific data label from the file.</p>
+  <p>Get a specific data field from the file.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>name</code></strong> (<code>str</code>) - Name of data label to retrieve</li>
+        <li><strong class="pname"><code>name</code></strong> (<code>str</code>) - Name of the field to retrieve</li>
     </ul></dd>
     <dt>Returns: <code>str</code></dt>
-        <dd>Value of the data label</dd>
+        <dd>Value of the field</dd>
   </dl>
-<div class="fields">      <p><strong>Warning:</strong>
-        Does not support Windows-style line breaks.
-      </p>
-</div></td></tr></table>
+</td></tr></table>
 </div>
 <a name="calculate_peaks"></a>
 <div>
@@ -368,6 +384,49 @@
 </td></tr></table>
 </div>
 <br />
+<!-- ==================== INSTANCE VARIABLE DETAILS ==================== -->
+<a name="section-InstanceVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="spectrum_type"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">spectrum_type</h3>
+  <p>#define SPCGEN    0    /* General SPC (could be anything) */ #define 
+  SPCGC    1    /* Gas Chromatogram */ #define SPCCGM    2    /* General 
+  Chromatogram (same as SPCGEN with TCGRAM) */ #define SPCHPLC 3    /* HPLC
+  Chromatogram */ #define SPCFTIR 4    /* FT-IR, FT-NIR, FT-Raman Spectrum 
+  or Igram (Can also be used for scanning IR.) */ #define SPCNIR    5    /*
+  NIR Spectrum (Usually multi-spectral data sets for calibration.) */ 
+  #define SPCUV    7    /* UV-VIS Spectrum (Can be used for single scanning
+  UV-VIS-NIR.) */ #define SPCXRY    8    /* X-ray Diffraction Spectrum */ 
+  #define SPCMS    9    /* Mass Spectrum  (Can be single, GC-MS, Continuum,
+  Centroid or TOF.) */ #define SPCNMR    10    /* NMR Spectrum or FID */ 
+  #define SPCRMN    11    /* Raman Spectrum (Usually Diode Array, CCD, etc.
+  use SPCFTIR for FT-Raman.) */ #define SPCFLR    12    /* Fluorescence 
+  Spectrum */ #define SPCATM    13    /* Atomic Spectrum */ #define SPCDAD
+  14    /* Chromatography Diode Array Spectra */</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
        bgcolor="#a0c0ff" cellspacing="0">
@@ -397,7 +456,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jul 24 19:34:46 2010</a>
+    3.0.1 on Thu Jul 29 17:45:43 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

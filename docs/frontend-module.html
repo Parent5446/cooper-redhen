@@ -57,12 +57,13 @@
 </table>
 <!-- ==================== MODULE DESCRIPTION ==================== -->
 <h1 class="epydoc">Module frontend</h1><p class="nomargin-top"><span class="codelink"><a href="frontend-pysrc.html">source&nbsp;code</a></span></p>
-<p>Take a POST request with JSON data and process it. If it contains a 
-  spectrum file, send it to the back end to search the database.</p>
-  <p>All request must be POST requests. Any GET requests will just print 
-  these instructions, and all others will be ignored. The POST variables 
-  below may be passed. If uploading files, make sure to set enctype to 
-  multipart/form-data, or they will not be processed properly.</p>
+<p>RedHen API v0.2</p>
+  <p>Any request that requires a file upload must be a POST request. Only 
+  the update, projects, data, and browse actions are allowed in a GET 
+  request. The GET/POST variables below may be passed. If uploading files, 
+  make sure to set enctype to multipart/form-data, or they will not be 
+  processed properly.</p>
+  <p>General Options:</p>
   <ul>
     <li>
       action (required):
@@ -72,42 +73,79 @@
           upload or database.
         </li>
         <li>
-          &quot;analyze&quot; - Does the same as compare, except instead of
-          taking two targets, it takes one and searches the database in an 
-          attempt to find the other (good for unknown spectra).
+          &quot;add&quot; - Add a spectrum to a project or the public 
+          database.
         </li>
         <li>
-          &quot;browse&quot;  - Browse the database.
+          &quot;delete&quot; - Add a spectrum to a project or the public 
+          database.
+        </li>
+        <li>
+          &quot;update&quot; - Clear all heuristic data and rebuild the 
+          Matcher (admin-only).
+        </li>
+        <li>
+          &quot;browse&quot; - Browse either the public database or a 
+          specific project.
+        </li>
+        <li>
+          &quot;projects&quot; - List all projects the user can access.
+        </li>
+        <li>
+          &quot;bulkadd&quot; - Add a mass amount of spectra to the 
+          database as once.
         </li>
       </ul>
     </li>
     <li>
-      target (required):
+      spectrum (required for some actions): The spectrum (either file or 
+      database key) to do the action on. Depending on the action, multiple 
+      spectra can be uploaded here.
+    </li>
+    <li>
+      target (optional, defaults to &quot;public&quot;):
       <ul>
         <li>
-          When action is &quot;search&quot; or &quot;compare&quot;: Can be 
-          either the text from a JCAMP file or &quot;db:key&quot;, where 
-          key is the database key for a Spectrum object.
+          When action is &quot;compare&quot;: Can be either 
+          &quot;public&quot; to search the spectrum against the public 
+          database or it can be another file upload if comparing two 
+          spectra against each other.
         </li>
         <li>
           When action is &quot;browse&quot;: Can be either 
-          &quot;public&quot; for browsing the public library or 
-          &quot;private&quot; for browsing your own private library.
+          &quot;public&quot; for browsing the public library or a database 
+          key referring to the project being browsed.
         </li>
       </ul>
     </li>
     <li>
-      limit (optional, used only when action is &quot;browse&quot;): How 
-      many spectra to get when browsing (maximum is 50).
+      output (optional, defaults to &quot;pickle&quot;): Can be 
+      &quot;xml&quot;, &quot;json&quot;, &quot;python&quot;, or 
+      &quot;pickle&quot; depending on what output format you want.
+    </li>
+  </ul>
+  <p>Browsing Options:</p>
+  <ul>
+    <li>
+      limit: How many spectra to get when browsing (maximum is 50).
     </li>
     <li>
-      offset (optional, used only when action is &quot;browse&quot;): Where
-      to start listing spectra from (used for pagination).
+      offset: Where to start listing spectra from (used for pagination).
     </li>
     <li>
-      output (optional): Can be &quot;xml&quot;, &quot;json&quot;, 
-      &quot;python&quot;, or &quot;pickle&quot; depending on what output 
-      format you want. Default is &quot;pickle&quot;.
+      type (used for search suggestions): What type of spectrum (infrared 
+      or raman)
+    </li>
+    <li>
+      guess (used only search suggestions): What the user has typed already
+      and what we are giving suggestions for.
+    </li>
+  </ul>
+  <p>Comparing Options:</p>
+  <ul>
+    <li>
+      algorithm (defaults to &quot;bove&quot;): Which linear algorithm to 
+      compare spectra with
     </li>
   </ul>
 
@@ -210,8 +248,11 @@
 <p class="indent-wrapped-lines"><b>Imports:</b>
   <span title="google.appengine.api.users">users</span>,
   <span title="google.appengine.api.memcache">memcache</span>,
+  <span title="google.appengine.api.quota">quota</span>,
   <span title="google.appengine.ext.webapp">webapp</span>,
+  <span title="google.appengine.ext.db">db</span>,
   <span title="google.appengine.ext.webapp.util.run_wsgi_app">run_wsgi_app</span>,
+  <span title="google.appengine.runtime.apiproxy_errors.CapabilityDisabledError">CapabilityDisabledError</span>,
   <a href="common-module.html" title="common">common</a>,
   <a href="backend-module.html" title="backend">backend</a>
 </p><br />
@@ -281,7 +322,7 @@ webapp.WSGIApplication([('/api', ApiHandler)], debug= True)
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jul 24 19:34:46 2010</a>
+    3.0.1 on Thu Jul 29 17:45:43 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

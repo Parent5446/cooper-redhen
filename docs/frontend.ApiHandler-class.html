@@ -60,10 +60,10 @@
 <h1 class="epydoc">Class ApiHandler</h1><p class="nomargin-top"><span class="codelink"><a href="frontend-pysrc.html#ApiHandler">source&nbsp;code</a></span></p>
 <center>
 <center>  <map id="uml_class_diagram_for_frontend" name="uml_class_diagram_for_frontend">
-<area shape="rect" href="frontend.ApiHandler-class.html#get" title="Handle a GET request to the API." alt="" coords="17,36,297,55"/>
+<area shape="rect" href="frontend.ApiHandler-class.html#get" title="frontend.ApiHandler.get" alt="" coords="17,36,297,55"/>
 <area shape="rect" href="frontend.ApiHandler-class.html#post" title="Handle a POST request to the API." alt="" coords="17,55,297,73"/>
-<area shape="rect" href="frontend.ApiHandler-class.html#output" title="Take a response from the script and process it for returning to the user." alt="" coords="17,73,297,92"/>
-<area shape="rect" href="frontend.ApiHandler-class.html#handle_exception" title="Handle any exceptions raised by the handler." alt="" coords="17,92,297,111"/>
+<area shape="rect" href="frontend.ApiHandler-class.html#handle_exception" title="Handle any exceptions raised by the handler." alt="" coords="17,73,297,92"/>
+<area shape="rect" href="frontend.ApiHandler-class.html#help" title="Print help information for the API." alt="" coords="17,92,297,111"/>
 <area shape="rect" href="frontend.ApiHandler-class.html" title="Handle any API requests and return a JSON response." alt="" coords="16,11,299,112"/>
 </map>
   <img src="uml_class_diagram_for_frontend.gif" alt='' usemap="#uml_class_diagram_for_frontend" ismap="ismap" class="graph-without-title" />
@@ -95,8 +95,7 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="frontend.ApiHandler-class.html#get" class="summary-sig-name">get</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Handle a GET request to the API.</td>
+          <td><span class="summary-sig"><a name="get"></a><span class="summary-sig-name">get</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="frontend-pysrc.html#ApiHandler.get">source&nbsp;code</a></span>
             
@@ -123,18 +122,18 @@
       
     </td>
   </tr>
-<tr>
+<tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="frontend.ApiHandler-class.html#output" class="summary-sig-name">output</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a href="frontend.ApiHandler-class.html#_output" class="summary-sig-name" onclick="show_private();">_output</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">response</span>)</span><br />
       Take a response from the script and process it for returning to the 
       user.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="frontend-pysrc.html#ApiHandler.output">source&nbsp;code</a></span>
+            <span class="codelink"><a href="frontend-pysrc.html#ApiHandler._output">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -154,6 +153,23 @@
       Handle any exceptions raised by the handler.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="frontend-pysrc.html#ApiHandler.handle_exception">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="help"></a><span class="summary-sig-name">help</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Print help information for the API.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="frontend-pysrc.html#ApiHandler.help">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -216,26 +232,6 @@
   </td>
 </tr>
 </table>
-<a name="get"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">get</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="frontend-pysrc.html#ApiHandler.get">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Handle a GET request to the API. Print instructions on how to use the 
-  API.</p>
-  <dl class="fields">
-  </dl>
-</td></tr></table>
-</div>
 <a name="post"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -262,18 +258,18 @@
   </dl>
 </td></tr></table>
 </div>
-<a name="output"></a>
-<div>
+<a name="_output"></a>
+<div class="private">
 <table class="details" border="1" cellpadding="3"
        cellspacing="0" width="100%" bgcolor="white">
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">output</span>(<span class="sig-arg">self</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_output</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">response</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="frontend-pysrc.html#ApiHandler.output">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="frontend-pysrc.html#ApiHandler._output">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -409,7 +405,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jul 24 19:34:47 2010</a>
+    3.0.1 on Thu Jul 29 17:45:43 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

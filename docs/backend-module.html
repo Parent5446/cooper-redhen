@@ -92,16 +92,18 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="backend.Project-class.html" class="summary-name">Project</a>
+        <a href="backend.Spectrum-class.html" class="summary-name">Spectrum</a><br />
+      Store a spectrum, its related data, and any algorithms necessary to 
+      compare the spectrum to the DataStore.
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="backend.Spectrum-class.html" class="summary-name">Spectrum</a><br />
-      Store a spectrum, its related data, and any algorithms necessary to 
-      compare the spectrum to the DataStore.
+        <a href="backend.Project-class.html" class="summary-name">Project</a><br />
+      Store a user's spectrum project, where different users have different
+      access levels and spectra are stored within the project.
     </td>
   </tr>
 <tr>
@@ -138,7 +140,8 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="backend-module.html#search" class="summary-sig-name">search</a>(<span class="summary-sig-arg">spectrum_data</span>)</span><br />
+          <td><span class="summary-sig"><a href="backend-module.html#search" class="summary-sig-name">search</a>(<span class="summary-sig-arg">spectrum_data</span>,
+        <span class="summary-sig-arg">algorithm</span>=<span class="summary-sig-default">&quot;bove&quot;</span>)</span><br />
       Search for a spectrum based on a given file descriptor.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#search">source&nbsp;code</a></span>
@@ -155,10 +158,9 @@
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="backend-module.html#compare" class="summary-sig-name">compare</a>(<span class="summary-sig-arg">data1</span>,
-        <span class="summary-sig-arg">data2</span>,
+          <td><span class="summary-sig"><a href="backend-module.html#compare" class="summary-sig-name">compare</a>(<span class="summary-sig-arg">dataList</span>,
         <span class="summary-sig-arg">algorithm</span>=<span class="summary-sig-default">&quot;bove&quot;</span>)</span><br />
-      Compare two spectra using the given algorithm.</td>
+      Compare multiple spectra using the given algorithm.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#compare">source&nbsp;code</a></span>
             
@@ -177,7 +179,9 @@
         <tr>
           <td><span class="summary-sig"><a href="backend-module.html#browse" class="summary-sig-name">browse</a>(<span class="summary-sig-arg">target</span>=<span class="summary-sig-default">&quot;public&quot;</span>,
         <span class="summary-sig-arg">limit</span>=<span class="summary-sig-default">10</span>,
-        <span class="summary-sig-arg">offset</span>=<span class="summary-sig-default">0</span>)</span><br />
+        <span class="summary-sig-arg">offset</span>=<span class="summary-sig-default">0</span>,
+        <span class="summary-sig-arg">guess</span>=<span class="summary-sig-default">&quot;&quot;</span>,
+        <span class="summary-sig-arg">type</span>=<span class="summary-sig-default">&quot;&quot;</span>)</span><br />
       Get a list of spectrum for browsing.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#browse">source&nbsp;code</a></span>
@@ -195,7 +199,8 @@
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="backend-module.html#add" class="summary-sig-name">add</a>(<span class="summary-sig-arg">spectrum_data</span>,
-        <span class="summary-sig-arg">target</span>=<span class="summary-sig-default">&quot;public&quot;</span>)</span><br />
+        <span class="summary-sig-arg">target</span>=<span class="summary-sig-default">&quot;public&quot;</span>,
+        <span class="summary-sig-arg">preprocessed</span>=<span class="summary-sig-default">False</span>)</span><br />
       Add a new spectrum to the database from a given file descriptor.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#add">source&nbsp;code</a></span>
@@ -217,6 +222,24 @@
       Delete a spectrum from the database and Matcher.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#delete">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="backend-module.html#update" class="summary-sig-name">update</a>()</span><br />
+      Purge the Matcher class and trigger a complete regeneration of 
+      heuristic data.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="backend-pysrc.html#update">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -248,6 +271,9 @@
   <span title="re">re</span>,
   <span title="bisect">bisect</span>,
   <span title="operator">operator</span>,
+  <span title="struct">struct</span>,
+  <span title="array">array</span>,
+  <span title="StringIO">StringIO</span>,
   <span title="google.appengine.ext.db">db</span>,
   <span title="google.appengine.api.memcache">memcache</span>,
   <span title="google.appengine.api.users">users</span>,
@@ -278,7 +304,8 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">search</span>(<span class="sig-arg">spectrum_data</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">search</span>(<span class="sig-arg">spectrum_data</span>,
+        <span class="sig-arg">algorithm</span>=<span class="sig-default">&quot;bove&quot;</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="backend-pysrc.html#search">source&nbsp;code</a></span>&nbsp;
@@ -286,21 +313,23 @@
   </tr></table>
   
   <p>Search for a spectrum based on a given file descriptor.</p>
-  <p>Parse the given file and create a Spectrum object for it. Use the 
-  Matcher object to find candidates for similar spectra in the database and
-  compare all candidates to the original spectrum using linear comparison 
+  <p>object to find candidates for similar spectra in the database and 
+  compare Parse the given file and create a Spectrum object for it. Use the
+  Matcher all candidates to the original spectrum using linear comparison 
   algorithms.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>spectrum_data</code></strong> (<code>str</code>) - String containing spectrum information</li>
+        <li><strong class="pname"><code>algorithm</code></strong> (&quot;bove&quot; or &quot;leastsquares&quot;) - Algorithm to do one-to-one comparisons with</li>
     </ul></dd>
     <dt>Returns: <code>list</code> of <a href="backend.Spectrum-class.html" 
       class="link">backend.Spectrum</a></dt>
         <dd>List of candidates similar to the input spectrum</dd>
     <dt>Raises:</dt>
     <dd><ul class="nomargin-top">
-        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If a non-string is given as spectrum_data</li>
+        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If a non-string is given as spectrum_data or if an invalid 
+        algorithm is given</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -312,8 +341,7 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">compare</span>(<span class="sig-arg">data1</span>,
-        <span class="sig-arg">data2</span>,
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">compare</span>(<span class="sig-arg">dataList</span>,
         <span class="sig-arg">algorithm</span>=<span class="sig-default">&quot;bove&quot;</span>)</span>
   </h3>
   </td><td align="right" valign="top"
@@ -321,12 +349,11 @@
     </td>
   </tr></table>
   
-  <p>Compare two spectra using the given algorithm.</p>
+  <p>Compare multiple spectra using the given algorithm.</p>
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>data1</code></strong> (<code>str</code>) - String containing spectrum information</li>
-        <li><strong class="pname"><code>data2</code></strong> (<code>str</code>) - String containing spectrum information</li>
+        <li><strong class="pname"><code>dataList</code></strong> ([<code>str</code>]) - A list of spectra strings to compare</li>
     </ul></dd>
     <dt>Returns: <code>int</code></dt>
         <dd>Calculated error between the two spectra</dd>
@@ -347,7 +374,9 @@
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">browse</span>(<span class="sig-arg">target</span>=<span class="sig-default">&quot;public&quot;</span>,
         <span class="sig-arg">limit</span>=<span class="sig-default">10</span>,
-        <span class="sig-arg">offset</span>=<span class="sig-default">0</span>)</span>
+        <span class="sig-arg">offset</span>=<span class="sig-default">0</span>,
+        <span class="sig-arg">guess</span>=<span class="sig-default">&quot;&quot;</span>,
+        <span class="sig-arg">type</span>=<span class="sig-default">&quot;&quot;</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="backend-pysrc.html#browse">source&nbsp;code</a></span>&nbsp;
@@ -384,7 +413,8 @@
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">add</span>(<span class="sig-arg">spectrum_data</span>,
-        <span class="sig-arg">target</span>=<span class="sig-default">&quot;public&quot;</span>)</span>
+        <span class="sig-arg">target</span>=<span class="sig-default">&quot;public&quot;</span>,
+        <span class="sig-arg">preprocessed</span>=<span class="sig-default">False</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="backend-pysrc.html#add">source&nbsp;code</a></span>&nbsp;
@@ -400,12 +430,8 @@
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
         <li><strong class="pname"><code>spectrum_data</code></strong> (<code>str</code>) - String containing spectrum information</li>
-        <li><strong class="pname"><code>target</code></strong> (<code>&quot;public&quot;</code> or <code 
-          class="link">google.appengine.api.users.User</code>) - Where to store the spectrum</li>
-    </ul></dd>
-    <dt>Raises:</dt>
-    <dd><ul class="nomargin-top">
-        <li><code><strong class='fraise'><a href="common.InputError-class.html">common.InputError</a></strong></code> - If a non-string is given as spectrum_data</li>
+        <li><strong class="pname"><code>target</code></strong> (&quot;public&quot; or a db key) - Where to store the spectrum</li>
+        <li><strong class="pname"><code>preprocessed</code></strong> (<code>bool</code>) - Whether spectrum_data is already integrated or not</li>
     </ul></dd>
   </dl>
 </td></tr></table>
@@ -439,6 +465,27 @@
         <li><code><strong class='fraise'><a href="common.AuthError-class.html">common.AuthError</a></strong></code> - If a user tries to delete a spectrum outside of his or her 
         projects.</li>
     </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="update"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">update</span>()</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="backend-pysrc.html#update">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Purge the Matcher class and trigger a complete regeneration of 
+  heuristic data. This should only be used when fixing a corrupt 
+  database.</p>
+  <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
@@ -505,7 +552,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Sat Jul 24 19:34:46 2010</a>
+    3.0.1 on Thu Jul 29 17:45:42 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

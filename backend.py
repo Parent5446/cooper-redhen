@@ -45,10 +45,10 @@ def search(spectrum_data, algorithm="bove"):
     except NameError:
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Check cache for the Matcher. If not, get from database.
-    matcher = memcache.get(spectrum.spectrum_type+'_matcher')
+    matcher = memcache.get(spectrum.spectrum_type + '_matcher')
     if matcher is None:
-        matcher = Matcher.get_by_key_name(spectrum.spectrum_type+'_matcher')
-    matcher = Matcher.all().get() #Debugging
+        matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
+        memcache.set(spectrum.spectrum_type + '_matcher', matcher)
     # Get the candidates for similar spectra.
     candidates = matcher.get(spectrum)
     # Do one-to-one on candidates and sort by error
@@ -119,9 +119,10 @@ def browse(target="public", limit=10, offset=0, guess="", type=""):
         raise common.InputError(limit, "Number of spectra to retrieve is too big.")
     if guess:
         # Check cache for the Matcher. If not, get from database.
-        matcher = memcache.get(type + '_matcher')
+        matcher = memcache.get(spectrum.spectrum_type + '_matcher')
         if matcher is None:
-            matcher = Matcher.get_by_key_name(type)
+            matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
+            memcache.set(spectrum.spectrum_type + '_matcher', matcher)
         return matcher.browse(guess)
     else:
         target = Project.get_or_insert(target)
@@ -163,7 +164,8 @@ def add(spectrum_data, target="public", preprocessed=False):
         # not there, make a new one.
         matcher = memcache.get(spectrum.spectrum_type + '_matcher')
         if matcher is None:
-            matcher = Matcher.get_by_key_name(spectrum.spectrum_type)
+            matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
+            memcache.set(spectrum.spectrum_type + '_matcher', matcher)
         if not matcher:
             matcher = Matcher(key_name=spectrum.spectrum_type)
         matcher.add(spectrum)
@@ -190,7 +192,8 @@ def delete(spectrum_data, target="public"):
         # not there, make a new one.
         matcher = memcache.get(spectrum.spectrum_type + '_matcher')
         if matcher is None:
-            matcher = Matcher.get_by_key_name(spectrum.spectrum_type)
+            matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
+            memcache.set(spectrum.spectrum_type + '_matcher', matcher)
         if not matcher:
             matcher = Matcher(key_name=spectrum.spectrum_type)
         matcher.delete(spectrum)
