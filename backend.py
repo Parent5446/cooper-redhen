@@ -306,7 +306,7 @@ class Spectrum(db.Model):
         @type  contents: C{unicode} or C{str}
         '''
         self.contents = contents
-        self.spectrum_type = 'infrared' # Later this will be variable
+        self.spectrum_type = 'Infrared' # Later this will be variable
         
         '''
         The following block of code interprets GRAMS file types
@@ -327,7 +327,9 @@ class Spectrum(db.Model):
             if(fversn == 'K'):
                 GRAMS = True
                 fexper = f.read(1)
-                #fexper tells the program what type of spectrum this is.
+				spectra_types = ["General Spectra", "Gas Chromatogram", "Chromatogram", "HPLC", "FT-IR/FT-Raman", "NIR", "UV-VIS", "X-ray Diffraction", "Mass Spec", "NMR", "Raman", "Fluorescence", "Atomic", "Chromatography Diode"]
+                self.spectrum_type = spectra_types[fexper]
+				#fexper tells the program what type of spectrum this is.
                 #Below is a quote of the SPC.h header file defining fexper values.
                 '''
                 #define SPCGEN    0    /* General SPC (could be anything) */
@@ -355,20 +357,22 @@ class Spectrum(db.Model):
                 a.fromstring(f.read(numpoints * 4))
                 
             elif(fversn == 'L'):
-                fexper = contents[2]
+                fexper = f.read(1)
                 #Code executing here is for GRAMS files that are "MSB 1st" and "new format".
                 #There are no MSB files to test, and I don't know what MSB means.
             else:
-                GRAMS = True
+				pass #This code can be added back in once file extension support is added
+                '''GRAMS = True
                 #Code executing here is for GRAMS files that are in the "old format"
                 #This code is UNTESTED
+				self.spectrum_type = "Infrared" # Old format GRAMS files are always infrared
                 f.seek(2,1)
                 (numpoints,) = struct.unpack('f',f.read(4))
                 (firstx,) = struct.unpack('f',f.read(4))
                 (lastx,) = struct.unpack('f',f.read(4))
                 f.seek(288,0) #Skip the next 288 bytes, as they are the rest of the header
                 a = array.array('f')
-                a.fromstring(f.read(numpoints * 4))
+                a.fromstring(f.read(numpoints * 4))'''
         else:
             pass
             #The GRAMS file is multi-file or something like that.
