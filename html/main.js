@@ -109,14 +109,12 @@ function got_results(response) { //Once the server has responded
 };
 
 function unload(file) {
-    $('#checkbox_'+file).hide();
-    var action = function(response) { alert('Deleted '+file+' from server.'); };
-    $.ajax({ url: '/api', success: action });
+    $('#checkbox_'+file).remove();
+    $('#file'+file).remove();
 }
 
-function add_to_list(s) {
+function add_to_list(s, id) {
     if( !s ) return;
-    var id = String(s).replace('.','_');
     $('#loaded_list').append('<div id="checkbox_'+id+'"><input type="checkbox" checked="yes" onclick="unload(\''+id+'\');" />'+s+'</div>');
     $('#loaded_list').show();
 }
@@ -151,7 +149,7 @@ $('#compare_button').click(function() {
 $('#browse_options').change(function() {
     //Make file upload frame go away when not selected
     var selected = $('#browse_options option:selected').val();
-    if(selected=='my computer') $('#file'+currfile).show(); else $('#file'+currfile).hide();
+    if(selected=='my computer') $('#file'+current_file).show(); else $('#file'+current_file).hide();
 });
 
 $('#done_button').click(function() {
@@ -170,16 +168,16 @@ $('#combobox_text').keyup(function(key) {
     $('#combobox_dropdown').show();
 });
 
-var currfile = 1;
+var current_file = 1;
 function onchange_file() {
     if(this.value) {
         $(this).unbind("change");
-        add_to_list(this.value.match('[^\\\\]+$'));
+        add_to_list(this.value.match('[^\\\\]+$'), current_file);
         $(this).hide();
-        currfile++;
-        $("#upload_form").append("<input type='file' class='invisible-frame' id='file"+currfile+"' name='spectrum' />")
-        $("#file"+currfile).change(onchange_file);
-        $("#file"+currfile).show()
+        current_file++;
+        $("#upload_form").append("<input type='file' class='invisible-frame' id='file"+current_file+"' name='spectrum' />")
+        $("#file"+current_file).change(onchange_file);
+        $("#file"+current_file).show()
     }
 };
 
