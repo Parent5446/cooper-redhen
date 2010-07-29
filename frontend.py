@@ -90,13 +90,8 @@ class ApiHandler(webapp.RequestHandler):
         if session.get("cpu_usage") > self.CPU_LIMIT:
             raise common.ServerError("User has gone over quota.")
         
-        spectra = [open('iodobenzene1.jdx').read()] # Just for testing
-        [db.delete(m) for m in backend.Matcher.all()]
-        [db.delete(s) for s in backend.Spectrum.all()]
-        memcache.flush_all()
-        backend.add(spectra[0], 'public', False)
-        
-        
+        spectra = [open('jcamp-test.jdx').read()] # Just for testing
+
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
         if target and target != "public":
