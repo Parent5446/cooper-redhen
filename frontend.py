@@ -112,7 +112,7 @@ class ApiHandler(webapp.RequestHandler):
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                response = [(str(i.key()), i.chemical_name, i.error, i.graph_data) for i in result]
+                response = [(str(i.key()), i.chemical_name, i.error, i.data) for i in result]
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
             response.append(backend.compare(spectra, algorithm))

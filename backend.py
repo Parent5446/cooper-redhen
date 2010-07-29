@@ -281,13 +281,10 @@ class Spectrum(db.Model):
     '''The spectrum type of the substance the spectrum represents
     @type: C{str}'''
     
-    data = db.ListProperty(float, indexed=False)
-    '''A list of integrated y values for comparisons
+    data = common.ArrayProperty('H')
+    '''A list of integrated y values for comparisons ('H' = unsigned short)
     @type: C{list}'''
-    
-    graph_data = db.ListProperty(float, indexed=False)
-    '''A list of y points for the spectrum's graph
-    @type: C{list}'''
+    data_y_max = 65535
     
     notes = db.StringProperty(indexed=False)
     '''Notes on the spectrum if in a private database
@@ -425,9 +422,8 @@ class Spectrum(db.Model):
             if x > x_range[1]:
                 break #If finished, break
             old_x, old_y = x, y #Otherwise keep going
-        self.data = data
-        scale = 300/max(data)
-        self.graph_data = [d*scale for d in data]
+        max = max(data)
+        self.data = array.fromlist( [round((d/max)*data_y_max) for d in data] )
         self.xy = xy
         self.chemical_type = 'Unknown' # We will find this later (maybe)
         # FIXME: Assumes chemical name is in TITLE label.
