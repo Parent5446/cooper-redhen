@@ -37,10 +37,10 @@ def search(spectrum_data):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
-    try:
-        spectrum.parse_string(spectrum_data)
-    except:
-        raise common.InputError(spectrum_data, "Invalid spectrum data.")
+    #try:
+    spectrum.parse_string(spectrum_data)
+    #except:
+    #    raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Check cache for the Matcher. If not, get from database.
     matcher = memcache.get(spectrum.spectrum_type+'_matcher')
     if matcher is None:
@@ -77,7 +77,7 @@ def compare(dataList, algorithm="bove"):
             spectrum = Spectrum()
             try:
                 spectrum.parse_string(spectrum_data)
-            except:
+            except AttributeError:
                 raise common.InputError(spectrum_data, "Invalid spectrum data.")
             spectra.append(spectrum)
     # Start comparing
@@ -140,7 +140,7 @@ def add(spectrum_data, target="public", preprocessed=False):
         spectrum = Spectrum()
         try:
             spectrum.parse_string(spectrum_data)
-        except:
+        except AttributeError:
             raise common.InputError(spectrum_data, "Invalid spectrum data.")
     else:
         import urllib
@@ -303,7 +303,7 @@ class Spectrum(db.Model):
         @type  contents: C{unicode} or C{str}
         '''
         self.contents = contents
-        self.spectrum_type = 'Infrared' # Later this will be variable
+        self.spectrum_type = 'infrared' # Later this will be variable
         
         '''
         The following block of code interprets GRAMS file types
@@ -324,9 +324,9 @@ class Spectrum(db.Model):
             if(fversn == 'K'):
                 GRAMS = True
                 fexper = f.read(1)
-				spectra_types = ["General Spectra", "Gas Chromatogram", "Chromatogram", "HPLC", "FT-IR/FT-Raman", "NIR", "UV-VIS", "X-ray Diffraction", "Mass Spec", "NMR", "Raman", "Fluorescence", "Atomic", "Chromatography Diode"]
+                spectra_types = ["General Spectra", "Gas Chromatogram", "Chromatogram", "HPLC", "FT-IR/FT-Raman", "NIR", "UV-VIS", "X-ray Diffraction", "Mass Spec", "NMR", "Raman", "Fluorescence", "Atomic", "Chromatography Diode"]
                 self.spectrum_type = spectra_types[fexper]
-				#fexper tells the program what type of spectrum this is.
+                #fexper tells the program what type of spectrum this is.
                 #Below is a quote of the SPC.h header file defining fexper values.
                 '''
                 #define SPCGEN    0    /* General SPC (could be anything) */
@@ -358,11 +358,11 @@ class Spectrum(db.Model):
                 #Code executing here is for GRAMS files that are "MSB 1st" and "new format".
                 #There are no MSB files to test, and I don't know what MSB means.
             else:
-				pass #This code can be added back in once file extension support is added
+                pass #This code can be added back in once file extension support is added
                 '''GRAMS = True
                 #Code executing here is for GRAMS files that are in the "old format"
                 #This code is UNTESTED
-				self.spectrum_type = "Infrared" # Old format GRAMS files are always infrared
+                self.spectrum_type = "Infrared" # Old format GRAMS files are always infrared
                 f.seek(2,1)
                 (numpoints,) = struct.unpack('f',f.read(4))
                 (firstx,) = struct.unpack('f',f.read(4))
@@ -422,8 +422,8 @@ class Spectrum(db.Model):
             if x > x_range[1]:
                 break #If finished, break
             old_x, old_y = x, y #Otherwise keep going
-        max = max(data)
-        self.data = array.fromlist( [round((d/max)*data_y_max) for d in data] )
+        this_max = max(data)
+        self.data = array.array('H', [round((d/this_max)*Spectrum.data_y_max) for d in data])
         self.xy = xy
         self.chemical_type = 'Unknown' # We will find this later (maybe)
         # FIXME: Assumes chemical name is in TITLE label.

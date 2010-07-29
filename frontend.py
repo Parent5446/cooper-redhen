@@ -91,8 +91,8 @@ class ApiHandler(webapp.RequestHandler):
             raise common.ServerError("User has gone over quota.")
         
         # Just for testing
-        [db.delete(m) for m in backend.Matcher.all()]
-        [db.delete(s) for s in backend.Spectrum.all()]
+        [db.delete(m) for m in backend.Matcher.all(keys_only=True)]
+        [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
         memcache.flush_all()
         import os
         for s in os.listdir('infrared'):
@@ -112,7 +112,7 @@ class ApiHandler(webapp.RequestHandler):
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                response = [(str(i.key()), i.chemical_name, i.error, i.data) for i in result]
+                response = [(str(spec.key()), spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result]
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
             response.append(backend.compare(spectra, algorithm))
