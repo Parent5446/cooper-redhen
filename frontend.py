@@ -97,7 +97,7 @@ class ApiHandler(webapp.RequestHandler):
         import os
         for s in os.listdir('infrared'):
             if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)   
-        spectra = [ open('infrared/iodobenzene1.jdx').read() ]
+        #spectra = [ open('infrared/iodobenzene1.jdx').read() ]
 
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
