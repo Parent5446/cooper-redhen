@@ -41,10 +41,10 @@ Comparing Options:
 @license: http://opensource.org/licenses/lgpl-3.0.html GNU Lesser General Public License v3.0
 @copyright: Copyright (c) 2010, Cooper Union (Some Right Reserved)
 """
-from google.appengine.api import users, memcache
+from google.appengine.api import users, memcache, quota
 from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.api import quota
+from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
 import appengine_utilities.sessions
 import common
@@ -203,9 +203,14 @@ class ApiHandler(webapp.RequestHandler):
             self.error(400)
             self.output(["InputError", exception.expr, exception.msg])
         elif isinstance(exception, common.AuthError):
+            # Authorization error: the user tried to do something disallowed.
             self.error(401)
             url = users.create_login_url("/")
             self.output(["AuthError", exception.expr, exception.msg, url])
+        elif isinstance(exception, CapabilityDisabledError):
+            # Maintenance error: AppEngine is down for maintenance.
+            self.error(503)
+            self.output(["AppEngine is down for maintenance."])
         else:
             # Send all else to Google.
             super(ApiHandler, self).handle_exception(exception, True)

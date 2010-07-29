@@ -195,13 +195,18 @@ def update():
     '''
     # Delete all matcher classes then re-add everything
     [db.delete(matcher) for matcher in Matcher.all()]
+    # Clear all spectra from the project.
+    project = Project.get_by_key_name("public")
+    project.spectra = []
     # Regenerate heuristics data.
     matchers = {}
     for spectrum in Spectrum.all():
         if not matchers.get(spectrum.spectrum_type):
             matchers[spectrum.spectrum_type] = Matcher.get_or_insert(spectrum.spectrum_type)
         matchers[spectrum.spectrum_type].add(spectrum)
-    # Put Matchers back in database.
+        project.spectra.append(spectrum.key())
+    # Put Matchers and project back in database.
+    project.put()
     [matcher.put() for matcher in matchers.itervalues()]
     [memcache.set(key + '_matcher', value) for key, value in matchers.iteritems()]
 
