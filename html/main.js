@@ -1,4 +1,4 @@
-/*global jQuery */
+﻿/*global jQuery */
 /*jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, strict: true */
 /**
  * jQuery plugin for posting form including file inputs.
@@ -59,7 +59,10 @@
 function got_results(response) { //Once the server has responded
         response = $.parseJSON(response);
         if(response[0] == "InputError") {
-            alert("Invalid Input.")
+            alert("Invalid Input.\n"+"Why: "+response[2])
+            return
+        } else if(response[0] == "ServerError") {
+            alert("Server Error.\n"+"Why: "+response[1])
             return
         }
         var results_bar = Array(); //List the spectra in the results bar
@@ -114,7 +117,7 @@ function unload(file) {
 function add_to_list(s) {
     if( !s ) return;
     var id = String(s).replace('.','_');
-    $('#loaded_list').html('<div id="checkbox_'+id+'"><input type="checkbox" checked="yes" onclick="unload(\''+id+'\');" />'+s+'</div>');
+    $('#loaded_list').append('<div id="checkbox_'+id+'"><input type="checkbox" checked="yes" onclick="unload(\''+id+'\');" />'+s+'</div>');
     $('#loaded_list').show();
 }
  
@@ -148,7 +151,7 @@ $('#compare_button').click(function() {
 $('#browse_options').change(function() {
     //Make file upload frame go away when not selected
     var selected = $('#browse_options option:selected').val();
-    if(selected=='my computer') $('#file').show(); else $('#file').hide();
+    if(selected=='my computer') $('#file'+currfile).show(); else $('#file'+currfile).hide();
 });
 
 $('#done_button').click(function() {
@@ -167,17 +170,23 @@ $('#combobox_text').keyup(function(key) {
     $('#combobox_dropdown').show();
 });
 
-$('#file').change(function() {
+var currfile = 1;
+function onchange_file() {
     if(this.value) {
-        $('#file').unbind('mouseout')
-        $('#file').unbind('change')
+        $(this).unbind("change");
         add_to_list(this.value.match('[^\\\\]+$'));
+        $(this).hide();
+        currfile++;
+        $("#upload_form").append("<input type='file' class='invisible-frame' id='file"+currfile+"' name='spectrum' />")
+        $("#file"+currfile).change(onchange_file);
+        $("#file"+currfile).show()
     }
-});
+};
 
 $(document).ready(function() {
-    session_id = Math.floor(Math.random()*1e12)+(new Date()).getTime(); //Unique ID so the server can distinguish clients
     $('#upload_form').iframePostForm({
         complete: got_results
     });
+    $("#upload_form").append("<input type='file' class='invisible-frame' id='file1' name='spectrum' />")
+    $("#file1").change(onchange_file);
 });

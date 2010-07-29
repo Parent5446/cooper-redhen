@@ -34,13 +34,13 @@ def search(spectrum_data):
     @raise common.InputError: If a non-string is given as spectrum_data
     '''
     if not (isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode)):
-        raise common.InputError(spectrum_data, "Invalid spectrum data.")
+        raise common.ServerError("Backend was given invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
-    #try:
-    spectrum.parse_string(spectrum_data)
-    #except:
-    #    raise common.InputError(spectrum_data, "Invalid spectrum data.")
+    try:
+        spectrum.parse_string(spectrum_data)
+    except AttributeError:
+        raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Check cache for the Matcher. If not, get from database.
     matcher = memcache.get(spectrum.spectrum_type+'_matcher')
     if matcher is None:
@@ -70,15 +70,15 @@ def compare(dataList, algorithm="bove"):
     spectra = []
     for data in dataList:
         if not isinstance(data1, str) or isinstance(spectrum_data, unicode):
-            raise common.InputError(data, "Invalid spectrum data.")
+            raise common.ServerError("Backend was given invalid spectrum data.")
         if data[0:3] == "db:":
             spectrum1 = Spectrum.get(data[3:])
         else:
             spectrum = Spectrum()
-            #try:
-            spectrum.parse_string(spectrum_data)
-            #except AttributeError:
-            #    raise common.InputError(spectrum_data, "Invalid spectrum data.")
+            try:
+                spectrum.parse_string(spectrum_data)
+            except AttributeError:
+                raise common.InputError(spectrum_data, "Invalid spectrum data.")
             spectra.append(spectrum)
     # Start comparing
     for spectrum in spectra:
@@ -138,10 +138,10 @@ def add(spectrum_data, target="public", preprocessed=False):
     # Load the user's spectrum into a Spectrum object.
     if not preprocessed:
         spectrum = Spectrum()
-        #try:
-        spectrum.parse_string(spectrum_data)
-        #except AttributeError:
-        #    raise common.InputError(spectrum_data, "Invalid spectrum data.")
+        try:
+            spectrum.parse_string(spectrum_data)
+        except AttributeError:
+            raise common.InputError(spectrum_data, "Invalid spectrum data.")
     else:
         import urllib
         data = eval(urllib.unquote(spectrum_data))
@@ -390,7 +390,8 @@ class Spectrum(db.Model):
             for i in range(0, numpoints -1 ):
                 xy.append((i * deltax + firstx), a[i])
         else:
-            for match in re.finditer(r'(\D+)([\d.-]+)', self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]):
+            regex = re.compile(r'(\D+)([\d.-]+)')
+            for match in re.finditer(regex, self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]):
                 if '\n' in match.group(1):
                     # Number is the first on the line and is an x-value
                     x = float(match.group(2)) * x_factor

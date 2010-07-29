@@ -46,14 +46,11 @@ from google.appengine.ext import webapp, db
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
-import appengine_utilities.sessions
 import common
 import backend
 
 class ApiHandler(webapp.RequestHandler):
     """Handle any API requests and return a JSON response."""
-    
-    CPU_LIMIT = 50000 # We need to determine a reasonable number to put here.
     
     def get(self):
         if self.request.get("action") in ("update", "projects", "data", "browse"):
@@ -75,28 +72,23 @@ class ApiHandler(webapp.RequestHandler):
         
         action = self.request.get("action")
         target = self.request.get("target", "public")
-        spectra = self.request.get_all("spectrum") #Some of these will be in session data
+        spectra = self.request.get_all("spectrum")
         limit = self.request.get("limit", 10)
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
         guess = self.request.get("guess")
         spectrum_type = self.request.get("type")
         raw = self.request.get("raw", False)
-        session = appengine_utilities.sessions.Session()
         user = users.get_current_user()
         response = []
         
-        # First check if the user has gone over quota.
-        if session.get("cpu_usage") > self.CPU_LIMIT:
-            raise common.ServerError("User has gone over quota.")
-        
         # Just for testing
-        [db.delete(m) for m in backend.Matcher.all(keys_only=True)]
-        [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
-        memcache.flush_all()
-        import os
-        for s in os.listdir('infrared'):
-            if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)   
+        #[db.delete(m) for m in backend.Matcher.all(keys_only=True)]
+        #[db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
+        #memcache.flush_all()
+        #import os
+        #for s in os.listdir('infrared'):
+        #    if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)   
         #spectra = [ open('infrared/iodobenzene1.jdx').read() ]
 
         # If not operating on the main project, try getting the private one.
@@ -109,10 +101,12 @@ class ApiHandler(webapp.RequestHandler):
         if action == "compare" and target == "public":
             # Search the database for something.
             for spectrum in spectra:
+                if not spectrum:
+                    continue
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                response = [(str(spec.key()), spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result]
+                response.extend([(str(spec.key()), spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result])
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
             response.append(backend.compare(spectra, algorithm))
@@ -130,8 +124,6 @@ class ApiHandler(webapp.RequestHandler):
                 backend.add(spectrum_data, target, False)
         elif action == "bulkadd":
             # Add a new spectrum to the database. Supports multiple spectra.
-            if session.key().name() != "uploader":
-                raise common.AuthError(user, "Only the uploader can bulkadd.")
             for spectrum_data in spectra:
                 backend.add(spectrum_data, target, True)
         elif action == "delete":
@@ -150,10 +142,6 @@ class ApiHandler(webapp.RequestHandler):
             raise common.InputError(action, "Invalid API action.")
         # Pass it on to self.output for processing.
         self._output(response)
-        
-        # Add on the request's CPU usage to the session quota.
-        #cpu_end = quota.get_request_cpu_usage()
-        #session['cpu_usage'] = session.get('cpu_usage') + cpu_end - cpu_start
     
     def _output(self, response):
         """
