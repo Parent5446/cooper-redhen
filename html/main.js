@@ -3,7 +3,10 @@ function got_results(response) { //Once the server has responded
         var results_bar = Array(); //List the spectra in the results bar
         var spectra = Array(); //Hold data
         var colors = ['red', 'blue', 'green', 'orange', 'purple'];
-        $.each(response, function(i, spectrum) { results_bar.push('<div style="color:'+colors[i]+'">'+spectrum[1]+'</div>'); spectra.push(new Spectrum(spectrum[1], spectrum[3], colors[i])); });
+        $.each(response, function(i, spectrum) {
+            results_bar.push('<div style="color:'+colors[i]+'">'+spectrum[1]+'</div>');
+            spectra.push(new Spectrum(spectrum[1], spectrum[3], colors[i]));
+        });
         $('#results').html(results_bar.join(' '));
         var selected = 0;
         var vertical_divs = Array(); //Prepare the lines on the screen

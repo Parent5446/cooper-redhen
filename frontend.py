@@ -91,12 +91,12 @@ class ApiHandler(webapp.RequestHandler):
             raise common.ServerError("User has gone over quota.")
         
         # Just for testing
-        [db.delete(m) for m in backend.Matcher.all()]
-        [db.delete(s) for s in backend.Spectrum.all()]
-        memcache.flush_all()
-        import os
-        for s in os.listdir('infrared'): backend.add( open('infrared/'+s).read(), 'public', False)   
-        spectra = [ open('infrared/iodobenzene1.jdx').read() ]
+        #[db.delete(m) for m in backend.Matcher.all()]
+        #[db.delete(s) for s in backend.Spectrum.all()]
+        #memcache.flush_all()
+        #import os
+        #for s in os.listdir('infrared'): backend.add( open('infrared/'+s).read(), 'public', False)   
+        #spectra = [ open('infrared/iodobenzene1.jdx').read() ]
 
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
