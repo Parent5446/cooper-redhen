@@ -420,7 +420,7 @@ class Spectrum(db.Model):
         # FIXME: Assumes chemical name is in TITLE label.
         if GRAMS: self.chemical_name = 'Unknown'
         else:
-            self.chemical_name = self.get_field('##TITLE=')
+            self.chemical_name = self.get_field('##TITLE=').rstrip(' 123456789%,')
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):
