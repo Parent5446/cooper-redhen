@@ -65,21 +65,30 @@ function got_results(response) { //Once the server has responded
             alert("Server Error.\n"+"Why: "+response[1])
             return
         }
-        var results_bar = []; //List the spectra in the results bar
+
         var spectra = []; //Hold spectra
         var colors = ['red', 'blue', 'green', 'orange', 'purple', 'gray', 'brown', 'pink', 'cyan'];
         $.each(response, function(i, spectrum) {
-            results_bar.push(
-                '<tr style="color:' + colors[i] + '"><td><input type="checkbox" checked="yes" /></td><td>' +
-                 spectrum[1] + '</td><td>' + String(100 / Math.pow((spectrum[2] + 1), 0.1)).slice(0,4) + '%</td></tr>'
+            $('#results').append(
+                '<tr style="color:' + colors[i] + '"><td><input type="checkbox" checked="yes" id="graph_check' + i +
+                 '" /></td><td><label for="graph_check' + i + '">' + spectrum[1] + '</label></td><td>' +
+                 String(100 / Math.pow((spectrum[2] + 1), 0.1)).slice(0,4) + '%</td></tr>'
             );
+            $('#graph_check' + i).click(function() {
+                i = this.id.substring(11)
+                hidden = $(".graph" + i).css("display") == 'none';
+                if(hidden) {
+                    $(".graph" + i).show()
+                } else {
+                    $(".graph" + i).hide()
+                }
+            });
             spectra.push(new Spectrum(spectrum[1], spectrum[3], colors[i]));
         });
-        $('#results').html(results_bar.join(' '));
+
         var selected = 0;
-        var vertical_divs = Array(); //Prepare the lines on the screen
         $.each(spectra, function(i, spectrum) { //For each spectrum to be graphed
-            for(var x=0; x<$('#graph').width(); x++) { //For each point in the spectrum
+            for(var x = 0; x < $('#graph').width(); x++) { //For each point in the spectrum
                 var y = Math.floor(spectrum.data[x]);
                 if(x>0) {
                     var oldy = Math.floor(spectrum.data[x-1]);
@@ -88,20 +97,20 @@ function got_results(response) { //Once the server has responded
                 }
                 
                 if(y > oldy) {
-                    vertical_divs.push(
-                        '<div class="graph-line" style="background-color:' +
+                    $('#graph').append(
+                        '<div class="graph-line graph' + i + '" style="background-color:' +
                         spectrum.color +'; left:' + x + 'px; height:' +
                         (y - oldy) + 'px; bottom:' + oldy + 'px;"></div>'
                     ); //Make an upward rectangle
                 } else if(y < oldy) {
-                    vertical_divs.push(
-                        '<div class="graph-line" style="background-color:' +
+                    $('#graph').append(
+                        '<div class="graph-line graph' + i + '" style="background-color:' +
                         spectrum.color + '; left:' + x + 'px; height:' +
                         (oldy - y) + 'px; bottom:' + y + 'px;"></div>'
                     ); //or make a downward rectangle
                 } else {
-                    vertical_divs.push(
-                        '<div class="graph-line" style="background-color:' +
+                    $('#graph').append(
+                        '<div class="graph-line graph' + i + '" style="background-color:' +
                         spectrum.color + '; left:' + x + 'px; height:1px; bottom:' +
                         y + 'px;"></div>'
                     ); //or make a horizontal rectangle
@@ -109,9 +118,8 @@ function got_results(response) { //Once the server has responded
             }
         }); //Done processing spectra
         
-        vertical_divs.push('<div id="floatybar" class="graph-floatybar">0,0</div>'); //Make floating sign
-        vertical_divs.push('<div id="tracepoint" class="graph-trace"></div>'); //Make trace point
-        $('#graph').html(vertical_divs.join('')); //Put it all in the graph
+        $('#graph').append('<div id="floatybar" class="graph-floatybar">0,0</div>'); //Make floating sign
+        $('#graph').append('<div id="tracepoint" class="graph-trace"></div>'); //Make trace point
         $('#graph').mousemove(function(e) { //Add functions to the graph
             document.body.style.cursor="crosshair";
             var x = Math.floor(e.pageX - $('#graph').position().left);
