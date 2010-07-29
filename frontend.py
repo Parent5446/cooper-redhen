@@ -14,8 +14,6 @@ General Options:
      - "update" - Clear all heuristic data and rebuild the Matcher (admin-only).
      - "browse" - Browse either the public database or a specific project.
      - "projects" - List all projects the user can access.
-     - "data" - Get the X,Y data for a spectrum graph. NOTE: This gives a list
-       with the first x value, delta x, and then the y values.
      - "bulkadd" - Add a mass amount of spectra to the database as once.
  - spectrum (required for some actions): The spectrum (either file or database
    key) to do the action on. Depending on the action, multiple spectra can be
@@ -77,7 +75,7 @@ class ApiHandler(webapp.RequestHandler):
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
         guess = self.request.get("guess")
-        type = self.request.get("type")
+        spectrum_type = self.request.get("type")
         raw = self.request.get("raw", False)
         session = appengine_utilities.sessions.Session()
         user = users.get_current_user()
@@ -103,7 +101,10 @@ class ApiHandler(webapp.RequestHandler):
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum)
                 # Extract relevant information and add to the response.
-                info = [(str(i.key()), i.chemical_name, i.error) for i in result]
+                response.append(data)
+                info = [(str(i.key()), i.chemical_name, i.error,
+                        [k * 300 / max(i.data) for k in i.data])
+                        for i in result]
                 response.append(info)
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
@@ -112,9 +113,8 @@ class ApiHandler(webapp.RequestHandler):
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
-            results = [(str(spectrum.key()), spectrum.chemical_name,
-                        spectrum.chemical_type)
-                       for spectrum in backend.browse(target, limit, offset, guess, type)]
+            results = [(str(spectrum.key()), spectrum.chemical_name, spectrum.chemical_type)
+                       for spectrum in backend.browse(target, limit, offset, guess, spectrum_type)]
             response.extend(results)
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
@@ -138,11 +138,6 @@ class ApiHandler(webapp.RequestHandler):
         elif action == "projects":
             query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
             response.extend([(proj.key(), proj.name) for proj in Project.gql(query, user)])
-        elif action == "data":
-            spectra = backend.Spectrum.get(spectra)
-            for spectrum in spectra:
-                data = [ i*scale for i in spectrum.data ]
-                response.append(data)
         else:
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
