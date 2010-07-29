@@ -67,7 +67,7 @@ function got_results(response) { //Once the server has responded
         }
         var results_bar = Array(); //List the spectra in the results bar
         var spectra = Array(); //Hold data
-        var colors = ['red', 'blue', 'green', 'orange', 'purple'];
+        var colors = ['red', 'blue', 'green', 'orange', 'purple', 'gray', 'brown', 'pink', 'cyan'];
         $.each(response, function(i, spectrum) {
             results_bar.push('<div style="color:'+colors[i]+'">'+spectrum[1]+'</div>');
             spectra.push(new Spectrum(spectrum[1], spectrum[3], colors[i]));
