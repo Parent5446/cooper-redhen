@@ -94,7 +94,7 @@ def compare(dataList, algorithm="bove"):
         if algorithm == "bove":
             spectrum.error = Matcher.bove(spectra[0], spectrum)
         elif algorithm == "leastsquares":
-            spectrum.error = Matcher.leastsquares(spectra[0], spectrum)
+            spectrum.error = Matcher.least_squares(spectra[0], spectrum)
         else:
             raise common.InputError(algo, "Invalid algorithm selection.")
     return spectra

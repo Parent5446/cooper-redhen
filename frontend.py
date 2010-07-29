@@ -72,7 +72,7 @@ class ApiHandler(webapp.RequestHandler):
         
         action = self.request.get("action")
         target = self.request.get("targt", "public")
-        spectra = self.request.get_all("spectrum")
+        spectra = filter(lambda x: x, self.request.get_all("spectrum"))
         limit = self.request.get("limit", 10)
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
@@ -101,15 +101,14 @@ class ApiHandler(webapp.RequestHandler):
         if action == "compare" and target == "public":
             # Search the database for something.
             for spectrum in spectra:
-                if not spectrum:
-                    continue
                 # User wants to commit a new search with a file upload.
                 result = backend.search(spectrum, algorithm)
                 # Extract relevant information and add to the response.
                 response.extend([(str(spec.key()), spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result])
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
-            response.append(backend.compare(spectra, algorithm))
+            result = backend.compare(spectra, algorithm)
+            response.extend([("NULL", spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result])
         elif action == "browse":
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
