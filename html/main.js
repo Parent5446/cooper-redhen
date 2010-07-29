@@ -138,6 +138,9 @@ function Spectrum(name, data, color) //Spectrum class
 
 $('#compare_button').click(function() {
     var selected = $('#compare_options option:selected').val();
+    if(selected == "to each other") {
+        $("#api_target").val("others")
+    }
     $('#loaded_list').hide();
     $('body').css('padding', '0px');
     $('#results').html('Getting results...');

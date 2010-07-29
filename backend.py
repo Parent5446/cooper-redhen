@@ -19,7 +19,7 @@ from google.appengine.api import memcache, users # import memory cache and user
 
 import common
 
-def search(spectrum_data):
+def search(spectrum_data, algorithm="bove"):
     '''
     Search for a spectrum based on a given file descriptor.
     
@@ -29,9 +29,12 @@ def search(spectrum_data):
     
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
+    @param algorithm: Algorithm to do one-to-one comparisons with
+    @type  algorithm: "bove" or "leastsquares"
     @return: List of candidates similar to the input spectrum
     @rtype: C{list} of L{backend.Spectrum}
-    @raise common.InputError: If a non-string is given as spectrum_data
+    @raise common.InputError: If a non-string is given as spectrum_data or if
+    an invalid algorithm is given
     '''
     if not (isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode)):
         raise common.ServerError("Backend was given invalid spectrum data.")
@@ -49,8 +52,14 @@ def search(spectrum_data):
     # Get the candidates for similar spectra.
     candidates = matcher.get(spectrum)
     # Do one-to-one on candidates and sort by error
+    if algorithm == "bove":
+        algorithm = Matcher.bove
+    elif algorithm == "leastsquares":
+        algorithm = Matcher.leastsquares
+    else:
+        raise common.InputError(algorithm, "Invalid algorithm.")
     for candidate in candidates:
-        candidate.error = Matcher.bove(spectrum, candidate)
+        candidate.error = algorithm(spectrum, candidate)
     candidates.sort(key=operator.attrgetter('error'))
     # Let frontend do the rest
     return candidates
@@ -68,11 +77,11 @@ def compare(dataList, algorithm="bove"):
     '''
     # First check for invalid spectrum data (if they are not strings).
     spectra = []
-    for data in dataList:
-        if not isinstance(data1, str) or isinstance(spectrum_data, unicode):
+    for spectrum_data in dataList:
+        if not (isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode)):
             raise common.ServerError("Backend was given invalid spectrum data.")
-        if data[0:3] == "db:":
-            spectrum1 = Spectrum.get(data[3:])
+        if spectrum_data[0:3] == "db:":
+            spectra.append(Spectrum.get(spectrum_data[3:]))
         else:
             spectrum = Spectrum()
             try:

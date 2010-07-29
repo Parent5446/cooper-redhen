@@ -71,7 +71,7 @@ class ApiHandler(webapp.RequestHandler):
         cpu_start = quota.get_request_cpu_usage()
         
         action = self.request.get("action")
-        target = self.request.get("target", "public")
+        target = self.request.get("targt", "public")
         spectra = self.request.get_all("spectrum")
         limit = self.request.get("limit", 10)
         offset = self.request.get("offset", 0)
@@ -93,7 +93,7 @@ class ApiHandler(webapp.RequestHandler):
 
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
-        if target and target != "public":
+        if target and target != "public" and target != "others":
             target = backend.Project.get(target)
             if target is None:
                 raise common.InputError(targets, "Invalid project ID.")
@@ -104,7 +104,7 @@ class ApiHandler(webapp.RequestHandler):
                 if not spectrum:
                     continue
                 # User wants to commit a new search with a file upload.
-                result = backend.search(spectrum)
+                result = backend.search(spectrum, algorithm)
                 # Extract relevant information and add to the response.
                 response.extend([(str(spec.key()), spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result])
         elif action == "compare":
