@@ -65,11 +65,11 @@ function got_results(response) { //Once the server has responded
             alert("Server Error.\n"+"Why: "+response[1])
             return
         }
-        var results_bar = Array(); //List the spectra in the results bar
-        var spectra = Array(); //Hold data
+        var results_bar = []; //List the spectra in the results bar
+        var spectra = []; //Hold spectra
         var colors = ['red', 'blue', 'green', 'orange', 'purple', 'gray', 'brown', 'pink', 'cyan'];
         $.each(response, function(i, spectrum) {
-            results_bar.push('<div style="color:'+colors[i]+'">'+spectrum[1]+'</div>');
+            results_bar.push('<tr style="color:'+colors[i]+'"><td><input type="checkbox" checked="yes" /></td><td>'+spectrum[1]+'</td><td>'+String(100/Math.pow((spectrum[2]+1), 0.1)).slice(0,4)+'%</td></tr>');
             spectra.push(new Spectrum(spectrum[1], spectrum[3], colors[i]));
         });
         $('#results').html(results_bar.join(' '));

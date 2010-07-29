@@ -83,12 +83,12 @@ class ApiHandler(webapp.RequestHandler):
         response = []
         
         # Just for testing
-        [db.delete(m) for m in backend.Matcher.all(keys_only=True)]
-        [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
-        memcache.flush_all()
-        import os
-        for s in os.listdir('infrared'):
-            if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)   
+        #[db.delete(m) for m in backend.Matcher.all(keys_only=True)]
+        #[db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
+        #memcache.flush_all()
+        #import os
+        #for s in os.listdir('infrared'):
+        #    if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)   
         #spectra = [ open('infrared/iodobenzene1.jdx').read() ]
 
         # If not operating on the main project, try getting the private one.
