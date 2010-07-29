@@ -33,7 +33,7 @@ def search(spectrum_data):
     @rtype: C{list} of L{backend.Spectrum}
     @raise common.InputError: If a non-string is given as spectrum_data
     '''
-    if not isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode):
+    if not (isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode)):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
@@ -75,10 +75,10 @@ def compare(dataList, algorithm="bove"):
             spectrum1 = Spectrum.get(data[3:])
         else:
             spectrum = Spectrum()
-            try:
-                spectrum.parse_string(spectrum_data)
-            except AttributeError:
-                raise common.InputError(spectrum_data, "Invalid spectrum data.")
+            #try:
+            spectrum.parse_string(spectrum_data)
+            #except AttributeError:
+            #    raise common.InputError(spectrum_data, "Invalid spectrum data.")
             spectra.append(spectrum)
     # Start comparing
     for spectrum in spectra:
@@ -138,10 +138,10 @@ def add(spectrum_data, target="public", preprocessed=False):
     # Load the user's spectrum into a Spectrum object.
     if not preprocessed:
         spectrum = Spectrum()
-        try:
-            spectrum.parse_string(spectrum_data)
-        except AttributeError:
-            raise common.InputError(spectrum_data, "Invalid spectrum data.")
+        #try:
+        spectrum.parse_string(spectrum_data)
+        #except AttributeError:
+        #    raise common.InputError(spectrum_data, "Invalid spectrum data.")
     else:
         import urllib
         data = eval(urllib.unquote(spectrum_data))
@@ -429,7 +429,8 @@ class Spectrum(db.Model):
         # FIXME: Assumes chemical name is in TITLE label.
         if GRAMS: self.chemical_name = 'Unknown'
         else:
-            self.chemical_name = self.get_field('##TITLE=').rstrip(' 123456789%,')
+            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\d]*$', self.get_field('##TITLE=') )
+            self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):
