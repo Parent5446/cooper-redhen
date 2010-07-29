@@ -37,7 +37,10 @@ def search(spectrum_data):
         raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Load the user's spectrum into a Spectrum object.
     spectrum = Spectrum()
-    spectrum.parse_string(spectrum_data)
+    try:
+        spectrum.parse_string(spectrum_data)
+    except:
+        raise common.InputError(spectrum_data, "Invalid spectrum data.")
     # Check cache for the Matcher. If not, get from database.
     matcher = memcache.get(spectrum.spectrum_type+'_matcher')
     if matcher is None:
@@ -72,7 +75,10 @@ def compare(dataList, algorithm="bove"):
             spectrum1 = Spectrum.get(data[3:])
         else:
             spectrum = Spectrum()
-            spectrum.parse_string(data)
+            try:
+                spectrum.parse_string(spectrum_data)
+            except:
+                raise common.InputError(spectrum_data, "Invalid spectrum data.")
             spectra.append(spectrum)
     # Start comparing
     for spectrum in spectra:
@@ -83,7 +89,7 @@ def compare(dataList, algorithm="bove"):
         else:
             raise common.InputError(algo, "Invalid algorithm selection.")
     return spectra
-
+    
 def browse(target="public", limit=10, offset=0, guess="", type=""):
     '''
     Get a list of spectrum for browsing.
@@ -132,7 +138,10 @@ def add(spectrum_data, target="public", preprocessed=False):
     # Load the user's spectrum into a Spectrum object.
     if not preprocessed:
         spectrum = Spectrum()
-        spectrum.parse_string(spectrum_data)
+        try:
+            spectrum.parse_string(spectrum_data)
+        except:
+            raise common.InputError(spectrum_data, "Invalid spectrum data.")
     else:
         import urllib
         data = eval(urllib.unquote(spectrum_data))

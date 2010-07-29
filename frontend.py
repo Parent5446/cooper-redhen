@@ -149,13 +149,13 @@ class ApiHandler(webapp.RequestHandler):
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
         # Pass it on to self.output for processing.
-        self.output(response)
+        self._output(response)
         
         # Add on the request's CPU usage to the session quota.
         #cpu_end = quota.get_request_cpu_usage()
         #session['cpu_usage'] = session.get('cpu_usage') + cpu_end - cpu_start
     
-    def output(self, response):
+    def _output(self, response):
         """
         Take a response from the script and process it for returning to the
         user. Output formats include a serialized pickle object, JSON, XML,
@@ -198,21 +198,21 @@ class ApiHandler(webapp.RequestHandler):
         if isinstance(exception, common.ServerError):
             # Server error: notify user.
             self.error(500)
-            self.output(["ServerError", exception.msg])
+            self._output(["ServerError", exception.msg])
         elif isinstance(exception, common.InputError):
             # Input error: in normal cases, Google would send a 500 error code
             # for all exception, but we want a 400 for an invalid request.
             self.error(400)
-            self.output(["InputError", exception.expr, exception.msg])
+            self._output(["InputError", exception.expr, exception.msg])
         elif isinstance(exception, common.AuthError):
             # Authorization error: the user tried to do something disallowed.
             self.error(401)
             url = users.create_login_url("/")
-            self.output(["AuthError", exception.expr, exception.msg, url])
+            self._output(["AuthError", exception.expr, exception.msg, url])
         elif isinstance(exception, CapabilityDisabledError):
             # Maintenance error: AppEngine is down for maintenance.
             self.error(503)
-            self.output(["AppEngine is down for maintenance."])
+            self._output(["AppEngine is down for maintenance."])
         else:
             # Send all else to Google.
             super(ApiHandler, self).handle_exception(exception, True)

@@ -58,6 +58,10 @@
 
 function got_results(response) { //Once the server has responded
         response = $.parseJSON(response);
+        if(response[0] == "InputError") {
+            alert("Invalid Input.")
+            return
+        }
         var results_bar = Array(); //List the spectra in the results bar
         var spectra = Array(); //Hold data
         var colors = ['red', 'blue', 'green', 'orange', 'purple'];
