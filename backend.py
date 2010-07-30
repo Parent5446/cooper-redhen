@@ -646,8 +646,7 @@ class Matcher(db.Model):
         return Spectrum.get([k[0] for k in keys])
     
     def browse(self, chemical_name):
-        keys = [key for name, key in self.chemical_names if name.lower().startswith(chemical_name.lower())]
-        return Spectrum.get(keys)
+        return [ (str(key), name) for name, key in self.chemical_names if name.lower().startswith(chemical_name.lower())]
     
     @staticmethod # Make a static method for faster execution
     def bove(a, b):
