@@ -80,7 +80,6 @@ class ApiHandler(webapp.RequestHandler):
         spectrum_type = self.request.get("type")
         raw = self.request.get("raw", False)
         user = users.get_current_user()
-        response = []
         
         # Just for testing
         #[db.delete(m) for m in backend.Matcher.all(keys_only=True)]
@@ -101,41 +100,34 @@ class ApiHandler(webapp.RequestHandler):
         # Start doing the request
         if action == "compare" and target == "public":
             # Search the database for something.
-            for spectrum in spectra:
-                # User wants to commit a new search with a file upload.
-                result = backend.search(spectrum, algorithm)
-                # Extract relevant information and add to the response.
-                response.extend([(str(spec.key()), spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result])
+            result = backend.search(spectra, algorithm)
+            response = ([(str(spec.key()), spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result])
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
             result = backend.compare(spectra, algorithm)
-            response.extend([("NULL", spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result])
+            response = [("NULL", spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result]
         elif action == "browse":
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
-            results = backend.browse(target, limit, offset, guess, spectrum_type) #a list of names and keys
-            response.extend(results)
+            response = backend.browse(target, limit, offset, guess, spectrum_type) #a list of names and keys
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
             backend.auth(user, target, "spectrum")
-            for spectrum_data in spectra:
-                backend.add(spectrum_data, target, False)
+            backend.add(spectra, target, False)
         elif action == "bulkadd":
             # Add a new spectrum to the database. Supports multiple spectra.
-            for spectrum_data in spectra:
-                backend.add(spectrum_data, target, True)
+            backend.add(spectra, target, True)
         elif action == "delete":
             # Delete a spectrum from the database.
             backend.auth(user, target, "spectrum")
-            for spectrum_data in spectra:
-                backend.delete(spectrum_data, target)
+            backend.delete(spectra, target)
         elif action == "update":
             backend.auth(user, "public", "spectrum")
             backend.update()
         elif action == "projects":
             query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
-            response.extend([(proj.key(), proj.name) for proj in Project.gql(query, user)])
+            response = [(proj.key(), proj.name) for proj in Project.gql(query, user)]
         else:
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")

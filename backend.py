@@ -19,7 +19,7 @@ from google.appengine.api import memcache, users # import memory cache and user
 
 import common
 
-def search(spectrum_data, algorithm="bove"):
+def search(spectra_data, algorithm="bove"):
     '''
     Search for a spectrum based on a given file descriptor.
     
@@ -36,38 +36,47 @@ def search(spectrum_data, algorithm="bove"):
     @raise common.InputError: If a non-string is given as spectrum_data or if
     an invalid algorithm is given
     '''
-    if not (isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode)):
-        raise common.ServerError("Backend was given invalid spectrum data.")
-    # Load the user's spectrum into a Spectrum object.
-    if spectrum_data[0:3] == "db:":
-        spectrum = Spectrum.get(spectrum_data[3:])
-    else:
-        spectrum = Spectrum()
-        try:
-            spectrum.parse_string(spectrum_data)
-        except NameError:
-            raise common.InputError(spectrum_data, "Invalid spectrum data.")
-    # Check cache for the Matcher. If not, get from database.
-    matcher = memcache.get(spectrum.spectrum_type + '_matcher')
-    if matcher is None:
-        matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
-        memcache.set(spectrum.spectrum_type + '_matcher', matcher)
-    # Get the candidates for similar spectra.
-    candidates = matcher.get(spectrum)
-    # Do one-to-one on candidates and sort by error
+    if not isinstance(spectra_data, list):
+        spectra_data = [spectra_data]
+
     if algorithm == "bove":
         algorithm = Matcher.bove
     elif algorithm == "leastsquares":
         algorithm = Matcher.least_squares
     else:
         raise common.InputError(algorithm, "Invalid algorithm.")
-    for candidate in candidates:
-        candidate.error = algorithm(spectrum, candidate)
+    
+    candidates = []
+    matchers = {}
+    for spectrum_data in spectra_data:
+        # Load the user's spectrum into a Spectrum object.
+        if spectrum_data[0:3] == "db:":
+            spectrum = Spectrum.get(spectrum_data[3:])
+        else:
+            spectrum = Spectrum()
+            try:
+                spectrum.parse_string(spectrum_data)
+            except NameError:
+                raise common.InputError(spectrum_data, "Invalid spectrum data.")
+        # Check cache for the Matcher. If not, get from database.
+        matcher = matchers.get(spectrum.spectrum_type, False)
+        if not matcher:
+            matcher = memcache.get(spectrum.spectrum_type + '_matcher')
+            if matcher is None:
+                matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
+                memcache.set(spectrum.spectrum_type + '_matcher', matcher)
+            matchers[spectrum.spectrum_type] = matcher
+        # Get the candidates for similar spectra.
+        tmp_candidates = matcher.get(spectrum)
+        # Do one-to-one on candidates and sort by error
+        for candidate in tmp_candidates:
+            candidate.error = algorithm(spectrum, candidate)
+        candidates.extend(tmp_candidates)
     candidates.sort(key=operator.attrgetter('error'))
     # Let frontend do the rest
     return candidates
 
-def compare(dataList, algorithm="bove"):
+def compare(data_list, algorithm="bove"):
     '''
     Compare multiple spectra using the given algorithm.
     
@@ -80,7 +89,7 @@ def compare(dataList, algorithm="bove"):
     '''
     # First check for invalid spectrum data (if they are not strings).
     spectra = []
-    for spectrum_data in dataList:
+    for spectrum_data in data_list:
         if not (isinstance(spectrum_data, str) or isinstance(spectrum_data, unicode)):
             raise common.ServerError("Backend was given invalid spectrum data.")
         if spectrum_data[0:3] == "db:":
@@ -93,13 +102,15 @@ def compare(dataList, algorithm="bove"):
                 raise common.InputError(spectrum_data, "Invalid spectrum data.")
             spectra.append(spectrum)
     # Start comparing
+    if algorithm == "bove":
+       algorithm = Matcher.bove
+    elif algorithm == "leastsquares":
+        algorithm = Matcher.least_squares
+    else:
+        raise common.InputError(algo, "Invalid algorithm selection.")
     for spectrum in spectra:
-        if algorithm == "bove":
-            spectrum.error = Matcher.bove(spectra[0], spectrum)
-        elif algorithm == "leastsquares":
-            spectrum.error = Matcher.least_squares(spectra[0], spectrum)
-        else:
-            raise common.InputError(algo, "Invalid algorithm selection.")
+            spectrum.error = algorithm(spectra[0], spectrum)
+
     return spectra
     
 def browse(target="public", limit=10, offset=0, guess=False, spectrum_type="infrared"):
@@ -129,9 +140,10 @@ def browse(target="public", limit=10, offset=0, guess=False, spectrum_type="infr
         return matcher.browse(guess)
     else:
         target = Project.get_or_insert(target)
-        return Spectrum.get(target.spectra[offset:offset + limit])
+        return [(str(spectrum.key()), spectrum.chemical_name)
+               for spectrum in Spectrum.get(target.spectra[offset:offset + limit])]
 
-def add(spectrum_data, target="public", preprocessed=False):
+def add(spectra_data, target="public", preprocessed=False):
     '''
     Add a new spectrum to the database from a given file descriptor.
     
@@ -146,37 +158,47 @@ def add(spectrum_data, target="public", preprocessed=False):
     @param preprocessed: Whether spectrum_data is already integrated or not
     @type  preprocessed: C{bool}
     '''
-    # If project does not exist, make a new one.
+    if not isinstance(spectra_data, list):
+        spectra_data = [spectra_data]    
+    
+    matchers = {}
     project = Project.get_or_insert(target)
-    # Load the user's spectrum into a Spectrum object.
-    if not preprocessed:
-        spectrum = Spectrum()
-        try:
-            spectrum.parse_string(spectrum_data)
-        except NameError:
-            raise common.InputError(spectrum_data, "Invalid spectrum data.")
-    else:
-        import urllib
-        data = eval(urllib.unquote(spectrum_data))
-        spectrum = Spectrum(**data)
-    spectrum.put()
-    project.spectra.append(spectrum.key())
+    for spectrum_data in spectra_data:
+        # If project does not exist, make a new one.
+        # Load the user's spectrum into a Spectrum object.
+        if not preprocessed:
+            spectrum = Spectrum()
+            try:
+                spectrum.parse_string(spectrum_data)
+            except NameError:
+                raise common.InputError(spectrum_data, "Invalid spectrum data.")
+        else:
+            if urllib is None:
+                import urllib
+            data = eval(urllib.unquote(spectrum_data))
+            spectrum = Spectrum(**data)
+        spectrum.put()
+        project.spectra.append(spectrum.key())
+        if target == "public":
+            # Check cache for the Matcher. If not, get from database. If it's
+            # not there, make a new one.
+            spectrum_type = spectrum.spectrum_type
+            matcher = matchers.get(spectrum_type, False)
+            if not matcher:
+                matcher = memcache.get(spectrum_type + '_matcher')
+                if matcher is None:
+                    matcher = Matcher.get_by_key_name(spectrum_type + '_matcher')
+                    if not matcher:
+                        matcher = Matcher(key_name=spectrum_type)
+                matchers[spectrum_type] = matcher
+            matcher.add(spectrum)
+    # Update the Matcher to the database and the cache.
     project.put()
-    if target == "public":
-        # Check cache for the Matcher. If not, get from database. If it's
-        # not there, make a new one.
-        matcher = memcache.get(spectrum.spectrum_type + '_matcher')
-        if matcher is None:
-            matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
-            memcache.set(spectrum.spectrum_type + '_matcher', matcher)
-        if not matcher:
-            matcher = Matcher(key_name=spectrum.spectrum_type)
-        matcher.add(spectrum)
-        # Update the Matcher to the database and the cache.
-        matcher.put()
-        memcache.set(spectrum.spectrum_type + '_matcher', matcher)
+    put, memcache_set = db.put, memcache.set
+    map(put, matchers.itervalues())
+    [memcache_set(key + '_matcher', value) for key, value in matchers.iteritems()]
 
-def delete(spectrum_data, target="public"):
+def delete(spectra_data, target="public"):
     '''
     Delete a spectrum from the database and Matcher.
     
@@ -187,30 +209,36 @@ def delete(spectrum_data, target="public"):
     @raise common.AuthError: If a user tries to delete a spectrum outside
     of his or her projects.
     '''
-    # Load the spectrum into a Spectrum object.
-    spectrum = Spectrum.get(spectrum_data)
-    # Remove it from the Matcher if in a public database.
-    if target == "public":
-        # Check cache for the Matcher. If not, get from database. If it's
-        # not there, make a new one.
-        matcher = memcache.get(spectrum.spectrum_type + '_matcher')
-        if matcher is None:
-            matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
-            memcache.set(spectrum.spectrum_type + '_matcher', matcher)
-        if not matcher:
-            matcher = Matcher(key_name=spectrum.spectrum_type)
-        matcher.delete(spectrum)
-        # Update the Matcher to the database and the cache.
-        matcher.put()
-        memcache.set(spectrum.spectrum_type + '_matcher', matcher)
-    else:
-        # If private, check if it is indeed the user's database.
-        if not spectrum.project == target:
-            raise common.AuthError(target, "Spectrum does not belong to targeted project.")
-    # Delete the spectrum from the database.
-    [matcher.spectrum.remove(spectrum.key())
-      for matcher in Matcher.gql("WHERE :1 in spectra", spectrum.key())]
-    spectrum.delete()
+    if not isinstance(spectra_data, list):
+        spectra_data = [spectra_data]    
+    
+    matchers = {}
+    project = Project.get_or_insert(target)
+    for spectrum_data in spectra_data:
+        # Load the spectrum into a Spectrum object.
+        spectrum = Spectrum.get(spectrum_data)
+        # Remove it from the Matcher if in a public database.
+        if target == "public":
+            # Check cache for the Matcher. If not, get from database. If it's
+            # not there, make a new one.
+            spectrum_type = spectrum.spectrum_type
+            matcher = matchers.get(spectrum_type, False)
+            if not matcher:
+                matcher = memcache.get(spectrum_type + '_matcher')
+                if matcher is None:
+                    matcher = Matcher.get_by_key_name(spectrum_type + '_matcher')
+                    if not matcher:
+                        matcher = Matcher(key_name=spectrum_type)
+                matchers[spectrum_type] = matcher
+            matcher.delete(spectrum)
+        else:
+            # If private, check if it is indeed the user's database.
+            if not spectrum.project == target:
+                raise common.AuthError(target, "Spectrum does not belong to targeted project.")
+        project.spectra.remove(spectrum.key())
+        spectrum.delete()
+    map(put, matchers.itervalues())
+    [memcache_set(key + '_matcher', value) for key, value in matchers.iteritems()]
 
 def update():
     '''
@@ -218,7 +246,8 @@ def update():
     data. This should only be used when fixing a corrupt database.
     '''
     # Delete all matcher classes then re-add everything
-    [db.delete(matcher) for matcher in Matcher.all()]
+    put, delete, memcache_set = db.put, db.delete, memcache.set
+    map(delete, Matcher.all(keys_only=True))
     # Clear all spectra from the project.
     project = Project.get_by_key_name("public")
     project.spectra = []
@@ -231,8 +260,8 @@ def update():
         project.spectra.append(spectrum.key())
     # Put Matchers and project back in database.
     project.put()
-    [matcher.put() for matcher in matchers.itervalues()]
-    [memcache.set(key + '_matcher', value) for key, value in matchers.iteritems()]
+    map(put, matchers.itervalues())
+    [memcache_set(key + '_matcher', value) for key, value in matchers.iteritems()]
 
 def auth(user, project, action):
     '''
@@ -411,8 +440,7 @@ class Spectrum(db.Model):
         xy = []
         # Process the XY data from JCAMP's (X++(Y..Y)) format.
         if GRAMS:
-            for i in range(0, numpoints -1 ):
-                xy.append((i * deltax + firstx), a[i])
+            xy.extend([((i * deltax + firstx), a[i]) for i in xrange(0, numpoints - 1)])
         else:
             regex = re.compile(r'(\D+)([\d.-]+)')
             for match in re.finditer(regex, self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]):
@@ -601,7 +629,8 @@ class Matcher(db.Model):
         @type  spectrum: L{backend.Spectrum}
         '''
         # Remove it from the heavyside keys and peak lists.
-        [key.discard(spectrum) for spectrum in self.flat_heavyside]
+        for spectrum in self.flat_heavyside:
+            key.discard(spectrum)
         [self.flat_heavyside.remove(peak) for peak in self.peak_list if x[1] == spectrum]
     
     def get(self, spectrum):
@@ -632,7 +661,7 @@ class Matcher(db.Model):
         # peaks in either direction, give it votes depending on how close it is
         index = bisect.bisect(self.peak_list, peak)
         
-        for offset in xrange(-5,5):
+        for offset in xrange(-5, 5):
             if index + offset < 0 or index + offset >= len(self.peak_list):
                 # If bisect gives us an index near the beginning or end of list
                 continue
@@ -646,7 +675,7 @@ class Matcher(db.Model):
         return Spectrum.get([k[0] for k in keys])
     
     def browse(self, chemical_name):
-        return [ (str(key), name) for name, key in self.chemical_names if name.lower().startswith(chemical_name.lower())]
+        return [(str(key), name) for name, key in self.chemical_names if name.lower().startswith(chemical_name.lower())]
     
     @staticmethod # Make a static method for faster execution
     def bove(a, b):
