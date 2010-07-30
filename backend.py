@@ -397,7 +397,7 @@ class Spectrum(db.Model):
             x_factor = 1
             y_factor = 1
         else:
-            self.spectrum_type = self.get_field("##DATA TYPE=") #Get the spectrum type
+            self.spectrum_type = self.get_field("##DATA ?TYPE=") #Get the spectrum type
             x = float(self.get_field('##FIRSTX=')) # The first x-value
             delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
             x_factor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
@@ -466,7 +466,7 @@ class Spectrum(db.Model):
         '''
         Get a specific data field from the file.
         
-        @param name: Name of the field to retrieve
+        @param name: Name of the field to retrieve (regex syntax allowed)
         @type  name: C{str}
         @return: Value of the field
         @rtype: C{str}
