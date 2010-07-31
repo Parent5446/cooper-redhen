@@ -63,7 +63,7 @@ def search(spectra_data, algorithm="bove"):
         if not matcher:
             matcher = memcache.get(spectrum.spectrum_type + '_matcher')
             if matcher is None:
-                matcher = Matcher.get_by_key_name(spectrum.spectrum_type + '_matcher')
+                matcher = Matcher.get_by_key_name(spectrum.spectrum_type)
                 memcache.set(spectrum.spectrum_type + '_matcher', matcher)
             matchers[spectrum.spectrum_type] = matcher
         # Get the candidates for similar spectra.
@@ -571,19 +571,15 @@ class Matcher(db.Model):
     @type: C{int}'''
     
     flat_heavyside = common.DictProperty(indexed=False)
-    '''@ivar: List of flat-heavyside indices
-    @type: L{common.DictProperty}'''
-    
-    ordered_heavyside = common.DictProperty(indexed=False)
-    '''@ivar: List of ordered-heavyside indices
+    '''@ivar: Dictionary of flat-heavyside indices pointing to spectrum keys
     @type: L{common.DictProperty}'''
     
     peak_list = common.GenericListProperty(indexed=False)
     '''@ivar: List of x-values for peaks and their associated spectra
     @type: L{common.GenericListProperty}'''
     
-    high_low = common.DictProperty(indexed=False)
-    '''@ivar: List of high-low table indices
+    prefixes = common.DictProperty(indexed=False)
+    '''@ivar: Dictionary of chemical prefixes (eg 'iodo') pointing to full names and keys for browsing
     @type: L{common.DictProperty}'''
     
     def add(self, spectrum):
@@ -607,11 +603,11 @@ class Matcher(db.Model):
         #peak_list - positions of highest peaks:
         for peak in spectrum.calculate_peaks():
             bisect.insort(self.peak_list, (peak, spectrum.key()))
-        prefix_key = unicode(spectrum.spectrum_type+'_browse_'+spectrum.chemical_name[0:4].lower())
-        existing_names = memcache.get(prefix_key)
-        if existing_names is None: existing_names = []
-        existing_names.append((spectrum.chemical_name, spectrum.key()))
-        memcache.set(prefix_key, existing_names)
+        #prefixes for browsing:
+        prefix = spectrum.chemical_name[0:4].lower()
+        if prefix in self.prefixes: self.prefixes[prefix].append((spectrum.chemical_name, spectrum.key()))
+        else: self.prefixes[ prefix ] = [(spectrum.chemical_name, spectrum.key())]
+        memcache.set(spectrum.spectrum_type+'_browse_'+prefix, self.prefixes[prefix])
     
     def delete(self, spectrum):
         '''
@@ -668,11 +664,14 @@ class Matcher(db.Model):
     
     @staticmethod # Make a static method for faster execution
     def browse(chemical_name, spectrum_type):
-        prefix_key = spectrum_type+'_browse_'+chemical_name[0:4].lower()
-        name_options = memcache.get(prefix_key) #Get everything starting with the same 4 chars
-        if name_options is None: return []
-        return [(str(key), name) for (name, key) in name_options if (len(chemical_name)==4 or name.lower().startswith(chemical_name.lower()))]
-    
+        prefix = chemical_name[0:4].lower()
+        name_options = memcache.get(spectrum_type+'_browse_'+prefix) #Get everything starting with the same 4 chars
+        if name_options is None:
+            matcher = Matcher.get_by_key_name(spectrum_type)
+            if prefix in matcher.prefixes: name_options = matcher.prefixes[prefix]
+            memcache.set(spectrum_type+'_browse_'+prefix, name_options)
+        return [(str(key), name) for (name, key) in name_options if (len(chemical_name)==4 or name.lower().startswith(chemical_name.lower()))] if name_options is not None else []
+        
     @staticmethod # Make a static method for faster execution
     def bove(a, b):
         '''
