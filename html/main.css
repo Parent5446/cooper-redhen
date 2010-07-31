@@ -14,7 +14,7 @@
 }
 .combobox-text
 {
-    width:150px;
+    width:220px;
     margin:1px auto -1px auto;
     display:block;
     border:solid gray 1px;
@@ -22,7 +22,7 @@
 }
 .combobox-dropdown
 {
-    width:150px;
+    width:220px;
     margin:auto;
     display:none;
     border:solid gray 1px;
