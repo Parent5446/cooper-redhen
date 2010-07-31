@@ -113,7 +113,7 @@ def compare(data_list, algorithm="bove"):
 
     return spectra
     
-def browse(target="public", limit=10, offset=0, guess=False, spectrum_type="infrared"):
+def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     '''
     Get a list of spectrum for browsing.
     
@@ -129,19 +129,11 @@ def browse(target="public", limit=10, offset=0, guess=False, spectrum_type="infr
     at once, the user is not logged in and tries to access a private database,
     or if an invalid database choice is given.
     '''
-    if limit > 50:
-        raise common.InputError(limit, "Number of spectra to retrieve is too big.")
-    if guess:
-        # Check cache for the Matcher. If not, get from database.
-        matcher = memcache.get(spectrum_type + '_matcher')
-        if matcher is None:
-            matcher = Matcher.get_by_key_name(spectrum_type + '_matcher')
-            memcache.set(spectrum_type + '_matcher', matcher)
-        return matcher.browse(guess)
-    else:
+    if guess: #If the user has guessed the first 4 chars
+        return Matcher.browse(guess, spectrum_type)
+    else: #Browse the whole project
         target = Project.get_or_insert(target)
-        return [(str(spectrum.key()), spectrum.chemical_name)
-               for spectrum in Spectrum.get(target.spectra[offset:offset + limit])]
+        return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra[offset:offset + limit])]
 
 def add(spectra_data, target="public", preprocessed=False):
     '''
@@ -486,8 +478,8 @@ class Spectrum(db.Model):
         # FIXME: Assumes chemical name is in TITLE label.
         if GRAMS: self.chemical_name = 'Unknown'
         else:
-            match = re.search(r'([^a-zA-Z]*)([a-zA-Z]+)([ \+\-%,\d]*)$', self.get_field('##TITLE=') )
-            self.chemical_name = match.group(1) + match.group(2).lower() + match.group(3)
+            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\d]*$', self.get_field('##TITLE=') )
+            self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):
@@ -594,10 +586,6 @@ class Matcher(db.Model):
     '''@ivar: List of high-low table indices
     @type: L{common.DictProperty}'''
     
-    chemical_names = common.GenericListProperty(indexed=False)
-    '''@ivar: List of all spectra in this spectrum type
-    @type: L{common.DictProperty}'''
-    
     def add(self, spectrum):
         '''
         Add a new spectrum to the Matcher.
@@ -619,7 +607,11 @@ class Matcher(db.Model):
         #peak_list - positions of highest peaks:
         for peak in spectrum.calculate_peaks():
             bisect.insort(self.peak_list, (peak, spectrum.key()))
-        bisect.insort(self.chemical_names, (spectrum.chemical_name, spectrum.key()))
+        prefix_key = unicode(spectrum.spectrum_type+'_browse_'+spectrum.chemical_name[0:4].lower())
+        existing_names = memcache.get(prefix_key)
+        if existing_names is None: existing_names = []
+        existing_names.append((spectrum.chemical_name, spectrum.key()))
+        memcache.set(prefix_key, existing_names)
     
     def delete(self, spectrum):
         '''
@@ -674,8 +666,12 @@ class Matcher(db.Model):
         
         return Spectrum.get([k[0] for k in keys])
     
-    def browse(self, chemical_name):
-        return [(str(key), name) for name, key in self.chemical_names if name.lower().startswith(chemical_name.lower())]
+    @staticmethod # Make a static method for faster execution
+    def browse(chemical_name, spectrum_type):
+        prefix_key = spectrum_type+'_browse_'+chemical_name[0:4].lower()
+        name_options = memcache.get(prefix_key) #Get everything starting with the same 4 chars
+        if name_options is None: return []
+        return [(str(key), name) for (name, key) in name_options if (len(chemical_name)==4 or name.lower().startswith(chemical_name.lower()))]
     
     @staticmethod # Make a static method for faster execution
     def bove(a, b):

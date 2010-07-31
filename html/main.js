@@ -223,11 +223,9 @@ $('#combobox_text').keyup(function(key) {
             output: 'json'
         },
         function(data) {
-            var guesses = "";
-            $.each(data, function(i, guess) {
-                guesses += '<div id="' + guess[0] + '" class="guess">' + guess[1] + '</div>';
-            });
-            $('#combobox_dropdown').html(guesses);
+            var guesses = [];
+            $.each(data, function(i, guess) { guesses.push('<div id="' + guess[0] + '" class="guess">' + guess[1] + '</div>'); });
+            $('#combobox_dropdown').html(guesses.join(' '));
             $(".guess").each(function(i, guess) {
                 $(guess).click(function() {
                     $("#upload_form").append(
@@ -242,10 +240,10 @@ $('#combobox_text').keyup(function(key) {
                     file_upload.attr('id', 'file' + current_file);
                 });
             });
+            $('#combobox_dropdown').show(); //Finally, display it
         },
         'json'
     );
-    $('#combobox_dropdown').show();
 });
 
 var current_file = 1;

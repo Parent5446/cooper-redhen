@@ -28,7 +28,6 @@ General Options:
    "pickle" depending on what output format you want.
 
 Browsing Options:
- - limit: How many spectra to get when browsing (maximum is 50).
  - offset: Where to start listing spectra from (used for pagination).
  - type (used for search suggestions): What type of spectrum (infrared or raman)
  - guess (used only search suggestions): What the user has typed already and
@@ -73,7 +72,6 @@ class ApiHandler(webapp.RequestHandler):
         action = self.request.get("action")
         target = self.request.get("targt", "public")
         spectra = filter(lambda x: x, self.request.get_all("spectrum"))
-        limit = self.request.get("limit", 10)
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
         guess = self.request.get("guess")
@@ -82,14 +80,16 @@ class ApiHandler(webapp.RequestHandler):
         user = users.get_current_user()
         
         # Just for testing
-        #[db.delete(m) for m in backend.Matcher.all(keys_only=True)]
-        #[db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
-        #[db.delete(s) for s in backend.Project.all(keys_only=True)]
-        #memcache.flush_all()
-        #import os
-        #for s in os.listdir('infrared'):
-        #    if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)   
+        '''
+        [db.delete(m) for m in backend.Matcher.all(keys_only=True)]
+        [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
+        [db.delete(s) for s in backend.Project.all(keys_only=True)]
+        memcache.flush_all()
+        import os
+        for s in os.listdir('infrared'):
+            if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)   
         #spectra = [ open('infrared/iodobenzene1.jdx').read() ]
+        '''
 
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
@@ -110,7 +110,7 @@ class ApiHandler(webapp.RequestHandler):
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
-            response = backend.browse(target, limit, offset, guess, spectrum_type) #a list of names and keys
+            response = backend.browse(target, offset, guess, spectrum_type) #a list of names and keys
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
             backend.auth(user, target, "spectrum")
