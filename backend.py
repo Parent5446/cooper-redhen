@@ -21,7 +21,12 @@ import common
 
 def get_data(key, default=None):
     '''
-    Encapsulates memcache and the datastore, making them look like a hashtable
+    Encapsulates memcache and the datastore, making them look like a hashtable.
+    
+    @param key: Key which will locate the data
+    @type  key: C{str}
+    @param default: Value which will be returned if key has never been set
+    @type  key: C{object}
     '''
     data = memcache.get(key)
     if data is None:
@@ -32,7 +37,12 @@ def get_data(key, default=None):
     
 def set_data(key, data):
     '''
-    Encapsulates memcache and the datastore, making them look like a hashtable
+    Encapsulates memcache and the datastore, making them look like a hashtable.
+    
+    @param key: Key for retrieving the data later
+    @type  key: C{str}
+    @param data: Data to store
+    @type  data: C{object}
     '''
     memcache.set(key, data)
     storage = GenericData(key_name=key)
@@ -65,11 +75,8 @@ def add_public(spectrum):
     
 def search(spectra_data, algorithm="bove"):
     '''
-    Search for a spectrum based on a given file descriptor.
-    
-    object to find candidates for similar spectra in the database and compare
-    Parse the given file and create a Spectrum object for it. Use the Matcher
-    all candidates to the original spectrum using linear comparison algorithms.
+    Search for spectra in the database which are similar to the given spectra_data.
+    Use fast heuristics first, then linear comparison algorithms.
     
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
@@ -173,16 +180,13 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
         
 def add(spectra_data, target="public", preprocessed=False):
     '''
-    Add a new spectrum to the database from a given file descriptor.
-    
-    Parse the given file and create a Spectrum object for it. If the Matcher
-    object does not yet exist, create it. Then store the spectrum in the database
-    and add any necessary sorting data to the Matcher object.
+    Parse the given files and add new spectra to the database.
+    Also store the hueristic data needed for fast searching.
     
     @param spectrum_data: String containing spectrum information
     @type  spectrum_data: C{str}
     @param target: Where to store the spectrum
-    @type  target: "public" or a db key
+    @type  target: "public" or the db key for a project
     @param preprocessed: Whether spectrum_data is already integrated or not
     @type  preprocessed: C{bool}
     '''
@@ -207,7 +211,6 @@ def add(spectra_data, target="public", preprocessed=False):
         spectrum.put()
         project.spectra.append(spectrum.key())
         if target == "public": add_public(spectrum)
-    # Update the Matcher to the database and the cache.
     project.put()
 
 def delete(spectra_data, target="public"):
@@ -228,7 +231,6 @@ def delete(spectra_data, target="public"):
     for spectrum_data in spectra_data:
         # Load the spectrum into a Spectrum object.
         spectrum = Spectrum.get(spectrum_data)
-        # Remove it from the Matcher if in a public database.
         if target == "public": raise Exception('Delete is not yet supported')
         else:
             # If private, check if it is indeed the user's database.
@@ -239,18 +241,19 @@ def delete(spectra_data, target="public"):
 
 def update():
     '''
-    Purge the Matcher class and trigger a complete regeneration of heuristic
-    data. This should only be used when fixing a corrupt database.
+    Purge the heuristic data and completely regenerate it.
+    This should only be used when fixing a corrupt database.
     '''
     # Clear all spectra from the project.
     project = Project.get_by_key_name("public")
     project.spectra = []
+    memcache.flush_all()
     # Regenerate heuristics data.
     for s in GenericData.all(keys_only=True): db.delete(s)
     for spectrum in Spectrum.all():
         add_public(spectrum)
         project.spectra.append(spectrum.key())
-    # Put Matchers and project back in database.
+    # Put the project back in database
     project.put()
 
 def auth(user, project, action):

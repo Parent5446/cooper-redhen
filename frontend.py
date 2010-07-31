@@ -132,6 +132,7 @@ class ApiHandler(webapp.RequestHandler):
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
         # Pass it on to self.output for processing.
+        
         self._output(response)
     
     def _output(self, response):
