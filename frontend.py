@@ -81,7 +81,6 @@ class ApiHandler(webapp.RequestHandler):
         
         # Just for testing
         '''
-        [db.delete(m) for m in backend.Matcher.all(keys_only=True)]
         [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
         [db.delete(s) for s in backend.Project.all(keys_only=True)]
         [db.delete(s) for s in backend.GenericData.all(keys_only=True)]

@@ -47,7 +47,22 @@ class GenericData(db.Model):
     '''The data held in the datastore
     @type: C{object}'''
     
+FLAT_HEAVYSIDE_BITS = 8
+'''Number of bits in the heavyside index, should be a power of 2
+@type: C{int}'''
 
+def add_public(spectrum):
+    #Flat heavyside: hash table of heavyside keys
+    key = spectrum.spectrum_type+'_heavyside_'+str(spectrum.calculate_heavyside())
+    spectra = get_data(key, default=set())
+    spectra.add( (spectrum.peak, spectrum.key()) )
+    set_data(key, spectra)
+    #prefixes for browsing:
+    prefix_key = spectrum.spectrum_type+'_browse_'+spectrum.chemical_name[0:4].lower()
+    names = get_data(prefix_key, default=[])
+    names.append((spectrum.chemical_name, spectrum.key()))
+    set_data(prefix_key, names)
+    
 def search(spectra_data, algorithm="bove"):
     '''
     Search for a spectrum based on a given file descriptor.
@@ -69,14 +84,13 @@ def search(spectra_data, algorithm="bove"):
         spectra_data = [spectra_data]
 
     if algorithm == "bove":
-        algorithm = Matcher.bove
+        algorithm = bove
     elif algorithm == "leastsquares":
-        algorithm = Matcher.least_squares
+        algorithm = least_squares
     else:
         raise common.InputError(algorithm, "Invalid algorithm.")
     
-    candidates = []
-    matchers = {}
+    results = []
     for spectrum_data in spectra_data:
         # Load the user's spectrum into a Spectrum object.
         if spectrum_data[0:3] == "db:":
@@ -87,23 +101,14 @@ def search(spectra_data, algorithm="bove"):
                 spectrum.parse_string(spectrum_data)
             except NameError:
                 raise common.InputError(spectrum_data, "Invalid spectrum data.")
-        # Check cache for the Matcher. If not, get from database.
-        matcher = matchers.get(spectrum.spectrum_type, False)
-        if not matcher:
-            matcher = memcache.get(spectrum.spectrum_type + '_matcher')
-            if matcher is None:
-                matcher = Matcher.get_by_key_name(spectrum.spectrum_type)
-                memcache.set(spectrum.spectrum_type + '_matcher', matcher)
-            matchers[spectrum.spectrum_type] = matcher
-        # Get the candidates for similar spectra.
-        tmp_candidates = matcher.get(spectrum)
         # Do one-to-one on candidates and sort by error
-        for candidate in tmp_candidates:
+        candidates = find_similar(spectrum)
+        for candidate in candidates:
             candidate.error = algorithm(spectrum, candidate)
-        candidates.extend(tmp_candidates)
-    candidates.sort(key=operator.attrgetter('error'))
+        candidates.sort(key=operator.attrgetter('error'))
+        results.extend(candidates)
     # Let frontend do the rest
-    return candidates
+    return results
 
 def compare(data_list, algorithm="bove"):
     '''
@@ -132,9 +137,9 @@ def compare(data_list, algorithm="bove"):
             spectra.append(spectrum)
     # Start comparing
     if algorithm == "bove":
-       algorithm = Matcher.bove
+       algorithm = bove
     elif algorithm == "leastsquares":
-        algorithm = Matcher.least_squares
+        algorithm = least_squares
     else:
         raise common.InputError(algo, "Invalid algorithm selection.")
     for spectrum in spectra:
@@ -159,7 +164,9 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     or if an invalid database choice is given.
     '''
     if guess: #If the user has guessed the first 4 chars
-        return Matcher.browse(guess, spectrum_type)
+        lowercase_name = guess.lower() #Browse is not case-sensitive
+        name_options = get_data(spectrum_type+'_browse_'+lowercase_name[0:4], default=[]) #Get everything starting with the same 4 chars, default to empty list
+        return [(str(key), name) for (name, key) in name_options if (len(guess)==4 or name.lower().startswith(lowercase_name))]
     else: #Browse the whole project
         target = Project.get_or_insert(target)
         return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra[offset:offset + limit])]
@@ -182,7 +189,6 @@ def add(spectra_data, target="public", preprocessed=False):
     if not isinstance(spectra_data, list):
         spectra_data = [spectra_data]    
     
-    matchers = {}
     project = Project.get_or_insert(target)
     for spectrum_data in spectra_data:
         # If project does not exist, make a new one.
@@ -200,28 +206,13 @@ def add(spectra_data, target="public", preprocessed=False):
             spectrum = Spectrum(**data)
         spectrum.put()
         project.spectra.append(spectrum.key())
-        if target == "public":
-            # Check cache for the Matcher. If not, get from database. If it's
-            # not there, make a new one.
-            spectrum_type = spectrum.spectrum_type
-            matcher = matchers.get(spectrum_type, False)
-            if not matcher:
-                matcher = memcache.get(spectrum_type + '_matcher')
-                if matcher is None:
-                    matcher = Matcher.get_by_key_name(spectrum_type + '_matcher')
-                    if not matcher:
-                        matcher = Matcher(key_name=spectrum_type)
-                matchers[spectrum_type] = matcher
-            matcher.add(spectrum)
+        if target == "public": add_public(spectrum)
     # Update the Matcher to the database and the cache.
     project.put()
-    put, memcache_set = db.put, memcache.set
-    map(put, matchers.itervalues())
-    [memcache_set(key + '_matcher', value) for key, value in matchers.iteritems()]
 
 def delete(spectra_data, target="public"):
     '''
-    Delete a spectrum from the database and Matcher.
+    Delete a spectrum from the database
     
     @param spectrum_data: String containing database keys
     @type  spectrum_data: C{str}
@@ -233,56 +224,34 @@ def delete(spectra_data, target="public"):
     if not isinstance(spectra_data, list):
         spectra_data = [spectra_data]    
     
-    matchers = {}
     project = Project.get_or_insert(target)
     for spectrum_data in spectra_data:
         # Load the spectrum into a Spectrum object.
         spectrum = Spectrum.get(spectrum_data)
         # Remove it from the Matcher if in a public database.
-        if target == "public":
-            # Check cache for the Matcher. If not, get from database. If it's
-            # not there, make a new one.
-            spectrum_type = spectrum.spectrum_type
-            matcher = matchers.get(spectrum_type, False)
-            if not matcher:
-                matcher = memcache.get(spectrum_type + '_matcher')
-                if matcher is None:
-                    matcher = Matcher.get_by_key_name(spectrum_type + '_matcher')
-                    if not matcher:
-                        matcher = Matcher(key_name=spectrum_type)
-                matchers[spectrum_type] = matcher
-            matcher.delete(spectrum)
+        if target == "public": raise Exception('Delete is not yet supported')
         else:
             # If private, check if it is indeed the user's database.
             if not spectrum.project == target:
                 raise common.AuthError(target, "Spectrum does not belong to targeted project.")
         project.spectra.remove(spectrum.key())
         spectrum.delete()
-    map(put, matchers.itervalues())
-    [memcache_set(key + '_matcher', value) for key, value in matchers.iteritems()]
 
 def update():
     '''
     Purge the Matcher class and trigger a complete regeneration of heuristic
     data. This should only be used when fixing a corrupt database.
     '''
-    # Delete all matcher classes then re-add everything
-    put, delete, memcache_set = db.put, db.delete, memcache.set
-    map(delete, Matcher.all(keys_only=True))
     # Clear all spectra from the project.
     project = Project.get_by_key_name("public")
     project.spectra = []
     # Regenerate heuristics data.
-    matchers = {}
+    for s in GenericData.all(keys_only=True): db.delete(s)
     for spectrum in Spectrum.all():
-        if not matchers.get(spectrum.spectrum_type):
-            matchers[spectrum.spectrum_type] = Matcher.get_or_insert(spectrum.spectrum_type)
-        matchers[spectrum.spectrum_type].add(spectrum)
+        add_public(spectrum)
         project.spectra.append(spectrum.key())
     # Put Matchers and project back in database.
     project.put()
-    map(put, matchers.itervalues())
-    [memcache_set(key + '_matcher', value) for key, value in matchers.iteritems()]
 
 def auth(user, project, action):
     '''
@@ -343,8 +312,12 @@ class Spectrum(db.Model):
     @type: C{str}'''
 
     spectrum_type = db.StringProperty()
-    '''The spectrum type of the substance the spectrum represents
+    '''The spectrum type, eg infrared
     @type: C{str}'''
+    
+    peak = db.FloatProperty()
+    '''The x location of the spectrum's highest peak
+    @type: C{float}'''
     
     data = common.ArrayProperty('H')
     '''A list of integrated y values for comparisons ('H' = unsigned short)
@@ -503,6 +476,7 @@ class Spectrum(db.Model):
         this_max = max(data)
         self.data = array.array('H', [round((d/this_max)*Spectrum.data_y_max) for d in data])
         self.xy = xy
+        self.peak = max(self.xy, key=operator.itemgetter(1))[0]
         self.chemical_type = 'Unknown' # We will find this later (maybe)
         # FIXME: Assumes chemical name is in TITLE label.
         if GRAMS: self.chemical_name = 'Unknown'
@@ -522,17 +496,13 @@ class Spectrum(db.Model):
         '''
         return re.search(name+'([^\\r\\n]+)', self.contents).group(1)
      
-    def calculate_peaks(self, one=False):
+    def calculate_fuzzy_peaks(self):
         '''
-        Calculate the peaks for a spectrum.
+        Find the x values of the highest peaks (those within 95% of the absolute highest)
         
-        @param one: Whether to get all the peaks or just the first one
-        @type  one: C{bool}
-        @return: Either a list of peaks or one peak, depending on the parameter
-        @rtype: C{list} or C{float}
+        @return: A list of peaks
+        @rtype: C{list}
         '''
-        if one:
-            return max(self.xy, key=operator.itemgetter(1))[0]
         self.xy = sorted(self.xy, key=operator.itemgetter(1), reverse=True)
         peaks = []
         peaks = [x for x, y in self.xy
@@ -549,7 +519,7 @@ class Spectrum(db.Model):
         '''
         key, left_edge, width = 0, 0, len(self.data) # Initialize variables
 
-        for bit in xrange(Matcher.FLAT_HEAVYSIDE_BITS):
+        for bit in xrange(FLAT_HEAVYSIDE_BITS):
             left = sum(self.data[left_edge:left_edge + width / 2])
             right = sum(self.data[left_edge + width / 2:left_edge + width])
             if left_edge + width == len(self.data):
@@ -557,7 +527,7 @@ class Spectrum(db.Model):
                 width = width / 2 #Adjust boundaries
             else:
                 left_edge += width #for next iteration
-            key += (left < right) << (Matcher.FLAT_HEAVYSIDE_BITS - bit)
+            key += (left < right) << (FLAT_HEAVYSIDE_BITS - bit)
         return key
 
 
@@ -588,149 +558,61 @@ class Project(db.Model):
     '''Spectra included in this project.
     @type: L{backend.Spectrm}'''
 
+def find_similar(spectrum):
+    '''
+    Find spectra similar to the given one.
+    
+    Find spectra that may represent the given Spectrum object by sorting
+    the database using different heuristics, having them vote, and 
+    returning only the spectra deemed similar to the given spectrum.
+    
+    @param spectrum: The spectrum to search for
+    @type  spectrum: L{backend.Spectrum}
+    @return: List of similar spectra
+    @rtype: C{list} of L{backend.Spectrum}
+    '''
+    # Get heavyside key and peaks.
+    peaks = spectrum.calculate_fuzzy_peaks() #Get the peaks (fuzzily)
+    key = spectrum.spectrum_type+'_heavyside_'+str(spectrum.calculate_heavyside()) #Get the heavyside key
+    spectra = get_data(key, default=None) #Get the spectra that match the key
+    
+    keys = sorted(spectra, key=lambda s: min([s[0]-peak for peak in peaks]) ) #Sort by smallest distance to peaks
+    if len(keys) > 10: keys = keys[:10] 
+    
+    return Spectrum.get([k[1] for k in keys])
+    
+def bove(a, b):
+    '''
+    Calculate the difference or error between two spectra using Bove's
+    algorithm.
+    
+    @param a: Spectrum to compare
+    @type  a: L{backend.Spectrum}
+    @param b: Other Spectrum to compare
+    @type  b: L{backend.Spectrum}
+    @return: The difference or error between the spectra
+    @rtype: C{float}
+    @raise common.ServerError: If there are invalid spectra in the database
+    '''
+    length = min([len(a.data), len(b.data)])
+    if length == 0 or a.data is None or b.data is None:
+        raise common.ServerError("Invalid spectra in the database.")
+    return max([abs(a.data[i] - b.data[i]) for i in xrange(length)])
 
-class Matcher(db.Model):
+def least_squares(a, b):
     '''
-    Store spectra data necessary for searching the database, then search the
-    database for candidates that may represent a given spectrum.
+    Calculate the difference or error between two spectra using Bove's
+    algorithm.
+    
+    @param a: Spectrum to compare
+    @type  a: L{backend.Spectrum}
+    @param b: Other Spectrum to compare
+    @type  b: L{backend.Spectrum}
+    @return: The difference or error between the spectra
+    @rtype: C{float}
+    @raise common.ServerError: If there are invalid spectra in the database
     '''
-    
-    FLAT_HEAVYSIDE_BITS = 8
-    '''Number of bits in the heavyside index
-    @type: C{int}'''
-    
-    flat_heavyside = common.DictProperty(indexed=False)
-    '''@ivar: Dictionary of flat-heavyside indices pointing to spectrum keys
-    @type: L{common.DictProperty}'''
-    
-    peak_list = common.GenericListProperty(indexed=False)
-    '''@ivar: List of x-values for peaks and their associated spectra
-    @type: L{common.GenericListProperty}'''
-    
-    prefixes = common.DictProperty(indexed=False)
-    '''@ivar: Dictionary of chemical prefixes (eg 'iodo') pointing to full names and keys for browsing
-    @type: L{common.DictProperty}'''
-    
-    def add(self, spectrum):
-        '''
-        Add a new spectrum to the Matcher.
-        
-        Add new spectrum data to the various Matcher data structures. Find the
-        heavyside index, peaks, and other indices and add them to the data
-        structures.
-        
-        @param spectrum: The spectrum to add
-        @type  spectrum: L{backend.Spectrum}
-        '''
-        #Flat heavyside: hash table of heavyside keys
-        key = spectrum.calculate_heavyside()
-        if key in self.flat_heavyside:
-            self.flat_heavyside[key].add(spectrum.key())
-        else:
-            self.flat_heavyside[key] = set([spectrum.key()])
-        
-        #peak_list - positions of highest peaks:
-        for peak in spectrum.calculate_peaks():
-            bisect.insort(self.peak_list, (peak, spectrum.key()))
-        #prefixes for browsing:
-        prefix_key = spectrum.spectrum_type+'_browse_'+spectrum.chemical_name[0:4].lower()
-        names = get_data(prefix_key, default=[])
-        names.append((spectrum.chemical_name, spectrum.key()))
-        set_data(prefix_key, names)
-    
-    def delete(self, spectrum):
-        '''
-        Delete a spectrum to the Matcher.
-        
-        @param spectrum: The spectrum to add
-        @type  spectrum: L{backend.Spectrum}
-        '''
-        # Remove it from the heavyside keys and peak lists.
-        for spectrum in self.flat_heavyside:
-            key.discard(spectrum)
-        [self.flat_heavyside.remove(peak) for peak in self.peak_list if x[1] == spectrum]
-    
-    def get(self, spectrum):
-        '''
-        Find spectra similar to the given one.
-        
-        Find spectra that may represent the given Spectrum object by sorting
-        the database using different heuristics, having them vote, and 
-        returning only the spectra deemed similar to the given spectrum.
-        
-        @param spectrum: The spectrum to search for
-        @type  spectrum: L{backend.Spectrum}
-        @return: List of similar spectra
-        @rtype: C{list} of L{backend.Spectrum}
-        '''
-        # Get heavyside key and peaks.
-        flatHeavysideKey = spectrum.calculate_heavyside()
-        peak = spectrum.calculate_peaks(True)
-        
-        # Get the candidates in a hash table
-        keys = {}
-        # Give ten votes to each spectrum with the same heavyside key.
-        if flatHeavysideKey in self.flat_heavyside:
-            for key in self.flat_heavyside[flatHeavysideKey]:
-                keys[key] = keys.get(key, 0) + 10
-        
-        # If a spectrum has a peak within five indices of our given spectrum's
-        # peaks in either direction, give it votes depending on how close it is
-        index = bisect.bisect(self.peak_list, peak)
-        
-        for offset in xrange(-5, 5):
-            if index + offset < 0 or index + offset >= len(self.peak_list):
-                # If bisect gives us an index near the beginning or end of list
-                continue
-            # Give the spectrum (5 - offest) votes
-            peak_index = self.peak_list[index+offset][1]
-            keys[peak_index] = keys.get(peak_index, 0) + (5 - abs(offset))
-            
-        # Sort candidates by number of votes and return Spectrum objects.
-        keys = sorted(keys.iteritems(), key=operator.itemgetter(1), reverse=True)
-        
-        return Spectrum.get([k[0] for k in keys])
-    
-    @staticmethod # Make a static method for faster execution
-    def browse(chemical_name, spectrum_type):
-        lowercase_name = chemical_name.lower() #Browse is not case-sensitive
-        name_options = get_data(spectrum_type+'_browse_'+lowercase_name[0:4], default=[]) #Get everything starting with the same 4 chars, default to empty list
-        return [(str(key), name) for (name, key) in name_options if (len(chemical_name)==4 or name.lower().startswith(lowercase_name))]
-        
-    @staticmethod # Make a static method for faster execution
-    def bove(a, b):
-        '''
-        Calculate the difference or error between two spectra using Bove's
-        algorithm.
-        
-        @param a: Spectrum to compare
-        @type  a: L{backend.Spectrum}
-        @param b: Other Spectrum to compare
-        @type  b: L{backend.Spectrum}
-        @return: The difference or error between the spectra
-        @rtype: C{float}
-        @raise common.ServerError: If there are invalid spectra in the database
-        '''
-        length = min([len(a.data), len(b.data)])
-        if length == 0 or a.data is None or b.data is None:
-            raise common.ServerError("Invalid spectra in the database.")
-        return max([abs(a.data[i] - b.data[i]) for i in xrange(length)])
-    
-    @staticmethod # Make a static method for faster execution
-    def least_squares(a, b):
-        '''
-        Calculate the difference or error between two spectra using Bove's
-        algorithm.
-        
-        @param a: Spectrum to compare
-        @type  a: L{backend.Spectrum}
-        @param b: Other Spectrum to compare
-        @type  b: L{backend.Spectrum}
-        @return: The difference or error between the spectra
-        @rtype: C{float}
-        @raise common.ServerError: If there are invalid spectra in the database
-        '''
-        length = min([len(a.data), len(b.data)])
-        if length == 0 or a.data is None or b.data is None:
-            raise common.ServerError("Invalid spectra in the database.")
-        return sum([(a.data[i] - a.data[i])**2 for i in xrange(length)])
+    length = min([len(a.data), len(b.data)])
+    if length == 0 or a.data is None or b.data is None:
+        raise common.ServerError("Invalid spectra in the database.")
+    return sum([(a.data[i] - a.data[i])**2 for i in xrange(length)])
