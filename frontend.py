@@ -101,7 +101,7 @@ class ApiHandler(webapp.RequestHandler):
         if action == "compare" and target == "public":
             # Search the database for something.
             result = backend.search(spectra, algorithm)
-            response = ([(str(spec.key()), spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result])
+            response = ([(str(spec.key()), spec.chemical_name, spec.error, [round(d*300.0/65535) for d in spec.data]) for spec in result])
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
             result = backend.compare(spectra, algorithm)
