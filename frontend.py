@@ -84,6 +84,7 @@ class ApiHandler(webapp.RequestHandler):
         [db.delete(m) for m in backend.Matcher.all(keys_only=True)]
         [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
         [db.delete(s) for s in backend.Project.all(keys_only=True)]
+        [db.delete(s) for s in backend.GenericData.all(keys_only=True)]
         memcache.flush_all()
         import os
         for s in os.listdir('infrared'):

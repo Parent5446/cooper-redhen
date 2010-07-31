@@ -242,3 +242,52 @@ class AuthError(Error):
             self.expr = "Anonymous"
         self.msg = msg
         self.log()
+
+class GenericDataProperty(db.Property):
+    """Store arbitrary data in the datastore."""
+    
+    data_type = object
+    """Data type for this property, which is any."""
+    
+    def get_value_for_datastore(self, model_instance):
+        """
+        Use pickle to serialize for database storage.
+        
+        @param model_instance: An instance of this class
+        @type  model_instance: L{common.Data}
+        @return: The serialized data
+        @rtype: C{str}
+        """
+        value = super(GenericDataProperty, self).get_value_for_datastore(model_instance)
+        return db.Blob(pickle.dumps(value))
+    
+    def make_value_from_datastore(self, value):
+        """
+        Use pickle to deserialize data from the database.
+        
+        @param value: Database value to deserialize
+        @type  value: C{str}
+        @return: The unserialized data
+        @rtype: C{object}
+        """
+        if value is None:
+            return None
+        return pickle.loads(value)
+    
+    def default_value(self):
+        """Get the default value for the property."""
+        if self.default is None:
+            return None
+        else:
+            return super(GenericDataProperty, self).default_value().copy()
+    
+    def empty(self, value):
+        """
+        Check if the value is empty.
+        
+        @param value: Value to be checked
+        @type  value: Anything
+        @return: Whether the value is empty
+        @rtype: C{bool}
+        """
+        return value is None

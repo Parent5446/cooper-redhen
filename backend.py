@@ -19,6 +19,35 @@ from google.appengine.api import memcache, users # import memory cache and user
 
 import common
 
+def get_data(key, default=None):
+    '''
+    Encapsulates memcache and the datastore, making them look like a hashtable
+    '''
+    data = memcache.get(key)
+    if data is None:
+        storage = GenericData.get_by_key_name(key)
+        if storage is not None: data = storage.data
+        else: return default
+    return data
+    
+def set_data(key, data):
+    '''
+    Encapsulates memcache and the datastore, making them look like a hashtable
+    '''
+    memcache.set(key, data)
+    storage = GenericData(key_name=key)
+    storage.data = data
+    storage.put()
+    
+class GenericData(db.Model):
+    '''
+    Store generic data of any type (for use by get_data and set_data)
+    '''
+    data = common.GenericDataProperty()
+    '''The data held in the datastore
+    @type: C{object}'''
+    
+
 def search(spectra_data, algorithm="bove"):
     '''
     Search for a spectrum based on a given file descriptor.
@@ -134,7 +163,7 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     else: #Browse the whole project
         target = Project.get_or_insert(target)
         return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra[offset:offset + limit])]
-
+        
 def add(spectra_data, target="public", preprocessed=False):
     '''
     Add a new spectrum to the database from a given file descriptor.
@@ -604,10 +633,10 @@ class Matcher(db.Model):
         for peak in spectrum.calculate_peaks():
             bisect.insort(self.peak_list, (peak, spectrum.key()))
         #prefixes for browsing:
-        prefix = spectrum.chemical_name[0:4].lower()
-        if prefix in self.prefixes: self.prefixes[prefix].append((spectrum.chemical_name, spectrum.key()))
-        else: self.prefixes[ prefix ] = [(spectrum.chemical_name, spectrum.key())]
-        memcache.set(spectrum.spectrum_type+'_browse_'+prefix, self.prefixes[prefix])
+        prefix_key = spectrum.spectrum_type+'_browse_'+spectrum.chemical_name[0:4].lower()
+        names = get_data(prefix_key, default=[])
+        names.append((spectrum.chemical_name, spectrum.key()))
+        set_data(prefix_key, names)
     
     def delete(self, spectrum):
         '''
@@ -664,13 +693,9 @@ class Matcher(db.Model):
     
     @staticmethod # Make a static method for faster execution
     def browse(chemical_name, spectrum_type):
-        prefix = chemical_name[0:4].lower()
-        name_options = memcache.get(spectrum_type+'_browse_'+prefix) #Get everything starting with the same 4 chars
-        if name_options is None:
-            matcher = Matcher.get_by_key_name(spectrum_type)
-            if prefix in matcher.prefixes: name_options = matcher.prefixes[prefix]
-            memcache.set(spectrum_type+'_browse_'+prefix, name_options)
-        return [(str(key), name) for (name, key) in name_options if (len(chemical_name)==4 or name.lower().startswith(chemical_name.lower()))] if name_options is not None else []
+        lowercase_name = chemical_name.lower() #Browse is not case-sensitive
+        name_options = get_data(spectrum_type+'_browse_'+lowercase_name[0:4], default=[]) #Get everything starting with the same 4 chars, default to empty list
+        return [(str(key), name) for (name, key) in name_options if (len(chemical_name)==4 or name.lower().startswith(lowercase_name))]
         
     @staticmethod # Make a static method for faster execution
     def bove(a, b):
