@@ -487,7 +487,7 @@ class Spectrum(db.Model):
         # FIXME: Assumes chemical name is in TITLE label.
         if GRAMS: self.chemical_name = 'Unknown'
         else:
-            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\d]*$', self.get_field('##TITLE=') )
+            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\+\-\d]*$', self.get_field('##TITLE=') )
             self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
         # Reference: http://www.jcamp-dx.org/
     
