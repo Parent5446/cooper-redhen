@@ -1,10 +1,9 @@
 ﻿<html>
     <body>
-        <form action="http://localhost:8080/api" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="action" value="compare" />
+        <form action="http://localhost:8082/api" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="browse" />
             <input type="hidden" name="type" value='infrared' />
-            <input type="file" name="spectrum" />
-            <input type="file" name="spectrum" />
+            <input type="hidden" name="guess" value='iodo'/>
             <input type="submit" />
         </form>
     </body>

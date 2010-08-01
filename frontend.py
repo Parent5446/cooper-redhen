@@ -73,7 +73,6 @@ class ApiHandler(webapp.RequestHandler):
         target = self.request.get("targt", "public")
         spectra = filter(lambda x: x, self.request.get_all("spectrum"))
         offset = self.request.get("offset", 0)
-        limit = self.request.get("limit", 5)
         algorithm = self.request.get("algorithm", "bove")
         guess = self.request.get("guess")
         spectrum_type = self.request.get("type")
@@ -84,6 +83,7 @@ class ApiHandler(webapp.RequestHandler):
         '''
         [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
         [db.delete(s) for s in backend.Project.all(keys_only=True)]
+        [db.delete(s) for s in backend.GenericData.all(keys_only=True)]
         memcache.flush_all()
         import os
         for s in os.listdir('infrared'):
@@ -92,7 +92,9 @@ class ApiHandler(webapp.RequestHandler):
             if s[0]!='.': backend.add( open('raman/'+s).read(), 'public', False) 
         #spectra = [ open('infrared/iodobenzene1.jdx').read() ]
         '''
-
+        import time
+        TIME_TEST = time.clock()
+        
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
         if target and target != "public" and target != "others":
@@ -112,7 +114,7 @@ class ApiHandler(webapp.RequestHandler):
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
-            response = backend.browse(target, limit, offset, guess, spectrum_type) #a list of names and keys
+            response = backend.browse(target, offset, guess, spectrum_type) #a list of names and keys
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
             backend.auth(user, target, "spectrum")
@@ -128,13 +130,14 @@ class ApiHandler(webapp.RequestHandler):
             backend.auth(user, "public", "spectrum")
             backend.update()
         elif action == "projects":
-            raise Exception(user)
-            response = [(proj.key(), proj.name) for proj in
-                        backend.Project.gql("WHERE :1 IN viewers", user)]
+            query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
+            response = [(proj.key(), proj.name) for proj in Project.gql(query, user)]
         else:
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
         # Pass it on to self.output for processing.
+        
+        raise Exception( time.clock()-TIME_TEST)
         
         self._output(response)
     

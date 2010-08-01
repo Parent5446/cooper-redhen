@@ -18,6 +18,60 @@ from google.appengine.ext import db # import database
 from google.appengine.api import memcache, users # import memory cache and user
 
 import common
+
+def get_data(key, default=None):
+    '''
+    Encapsulates memcache and the datastore, making them look like a hashtable.
+    
+    @param key: Key which will locate the data
+    @type  key: C{str}
+    @param default: Value which will be returned if key has never been set
+    @type  key: C{object}
+    '''
+    data = memcache.get(key)
+    if data is None:
+        storage = GenericData.get_by_key_name(key)
+        if storage is not None: data = storage.data; memcache.set(key,data)
+        else: return default
+    return data
+    
+def set_data(key, data):
+    '''
+    Encapsulates memcache and the datastore, making them look like a hashtable.
+    
+    @param key: Key for retrieving the data later
+    @type  key: C{str}
+    @param data: Data to store
+    @type  data: C{object}
+    '''
+    memcache.set(key, data)
+    storage = GenericData(key_name=key)
+    storage.data = data
+    storage.put()
+    
+class GenericData(db.Model):
+    '''
+    Store generic data of any type (for use by get_data and set_data)
+    '''
+    data = common.GenericDataProperty()
+    '''The data held in the datastore
+    @type: C{object}'''
+    
+FLAT_HEAVYSIDE_BITS = 8
+'''Number of bits in the heavyside index, should be a power of 2
+@type: C{int}'''
+
+def add_public(spectrum):
+    #Flat heavyside: hash table of heavyside keys
+    key = spectrum.spectrum_type+'_heavyside_'+str(spectrum.calculate_heavyside())
+    spectra = get_data(key, default=set())
+    spectra.add( (spectrum.peak, spectrum.key()) )
+    set_data(key, spectra)
+    #prefixes for browsing:
+    prefix_key = spectrum.spectrum_type+'_browse_'+spectrum.chemical_name[0:4].lower()
+    names = get_data(prefix_key, default=[])
+    names.append((spectrum.chemical_name, spectrum.key()))
+    set_data(prefix_key, names)
     
 def search(spectra_data, algorithm="bove"):
     '''
@@ -55,7 +109,7 @@ def search(spectra_data, algorithm="bove"):
             except NameError:
                 raise common.InputError(spectrum_data, "Invalid spectrum data.")
         # Do one-to-one on candidates and sort by error
-        candidates = spectrum.find_similar()
+        candidates = find_similar(spectrum)
         for candidate in candidates:
             candidate.error = algorithm(spectrum, candidate)
         candidates.sort(key=operator.attrgetter('error'))
@@ -96,11 +150,11 @@ def compare(data_list, algorithm="bove"):
     else:
         raise common.InputError(algo, "Invalid algorithm selection.")
     for spectrum in spectra:
-        spectrum.error = algorithm(spectra[0], spectrum)
+            spectrum.error = algorithm(spectra[0], spectrum)
 
     return spectra
     
-def browse(target="public", limit=10, offset=0, guess=False, spectrum_type="infrared"):
+def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     '''
     Get a list of spectrum for browsing.
     
@@ -118,13 +172,11 @@ def browse(target="public", limit=10, offset=0, guess=False, spectrum_type="infr
     '''
     if guess: #If the user has guessed the first 4 chars
         lowercase_name = guess.lower() #Browse is not case-sensitive
-        target = Project.get_or_insert(target)
-        query = Spectrum.gql("WHERE chemical_name >= :1", guess)
-        return [(str(i.key()), i.chemical_name) for i in query if i.key() in target.spectra]
+        name_options = get_data(spectrum_type+'_browse_'+lowercase_name[0:4], default=[]) #Get everything starting with the same 4 chars, default to empty list
+        return [(str(key), name) for (name, key) in name_options if (len(guess)==4 or name.lower().startswith(lowercase_name))]
     else: #Browse the whole project
         target = Project.get_or_insert(target)
-        return [(str(spectrum.key()), spectrum.chemical_name)
-               for spectrum in Spectrum.get(target.spectra[offset:offset + limit])]
+        return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra)]
         
 def add(spectra_data, target="public", preprocessed=False):
     '''
@@ -156,10 +208,9 @@ def add(spectra_data, target="public", preprocessed=False):
                 import urllib
             data = eval(urllib.unquote(spectrum_data))
             spectrum = Spectrum(**data)
-        spectrum.heavyside = spectrum.calculate_heavyside()
-        spectrum.peaks = spectrum.calculate_peaks()
         spectrum.put()
         project.spectra.append(spectrum.key())
+        if target == "public": add_public(spectrum)
     project.put()
 
 def delete(spectra_data, target="public"):
@@ -267,13 +318,9 @@ class Spectrum(db.Model):
     '''The spectrum type, eg infrared
     @type: C{str}'''
     
-    peaks = db.ListProperty(float)
-    '''A list of the spectrum's peaks.
-    @type: C{list} of C{float}'''
-    
-    heavyside = db.IntegerProperty()
-    '''The heavyside index for this spectrum.
-    @type: C{int}'''
+    peak = db.FloatProperty()
+    '''The x location of the spectrum's highest peak
+    @type: C{float}'''
     
     data = common.ArrayProperty('H')
     '''A list of integrated y values for comparisons ('H' = unsigned short)
@@ -283,10 +330,6 @@ class Spectrum(db.Model):
     notes = db.StringProperty(indexed=False)
     '''Notes on the spectrum if in a private database
     @type: C{str}'''
-
-    FLAT_HEAVYSIDE_BITS = 8
-    '''Number of bits in the heavyside index, should be a power of 2
-    @type: C{int}'''
     
     def parse_string(self, contents):
         '''
@@ -436,14 +479,13 @@ class Spectrum(db.Model):
         this_max = max(data)
         self.data = array.array('H', [round((d/this_max)*Spectrum.data_y_max) for d in data])
         self.xy = xy
+        self.peak = max(self.xy, key=operator.itemgetter(1))[0]
         self.chemical_type = 'Unknown' # We will find this later (maybe)
         # FIXME: Assumes chemical name is in TITLE label.
         if GRAMS: self.chemical_name = 'Unknown'
         else:
-            match = re.search( '([^a-zA-Z]*)([a-zA-Z]+)', self.get_field('##TITLE=') )
-            if match is None:
-                raise Exception(self.get_field('##TITLE='))
-            self.chemical_name = match.group(1) + match.group(2).lower()
+            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\d]*$', self.get_field('##TITLE=') )
+            self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):
@@ -456,39 +498,18 @@ class Spectrum(db.Model):
         @rtype: C{str}
         '''
         return re.search(name+'([^\\r\\n]+)', self.contents).group(1)
-    
-    def find_similar(self):
-        '''
-        Find spectra similar to the given one.
-        
-        Find spectra that may represent the given Spectrum object by sorting
-        the database using different heuristics, having them vote, and 
-        returning only the spectra deemed similar to the given spectrum.
-        
-        @param spectrum: The spectrum to search for
-        @type  spectrum: L{backend.Spectrum}
-        @return: List of similar spectra
-        @rtype: C{list} of L{backend.Spectrum}
-        '''
-        # Get heavyside key and peaks.
-        peaks = self.calculate_peaks() #Get the peaks (fuzzily)
-        heavyside = self.calculate_heavyside()
-        query = "SELECT * FROM Spectrum WHERE heavyside = :1"
-        spectra = db.GqlQuery(query, heavyside).fetch(10)
-        spectra.sort(key=lambda s: min([s.peaks[0] - peak for peak in peaks]))
-        return spectra
-    
-    def calculate_peaks(self):
+     
+    def calculate_fuzzy_peaks(self):
         '''
         Find the x values of the highest peaks (those within 95% of the absolute highest)
         
         @return: A list of peaks
         @rtype: C{list}
         '''
-        xy = sorted(self.xy, key=operator.itemgetter(1), reverse=True)
+        self.xy = sorted(self.xy, key=operator.itemgetter(1), reverse=True)
         peaks = []
-        peaks = [x for x, y in xy
-                   if y >= xy[0][1]*0.95
+        peaks = [x for x, y in self.xy
+                   if y >= self.xy[0][1]*0.95
                    and not [peak for peak in peaks if abs(peak - x) < 1]]
         return peaks
     
@@ -501,7 +522,7 @@ class Spectrum(db.Model):
         '''
         key, left_edge, width = 0, 0, len(self.data) # Initialize variables
 
-        for bit in xrange(self.FLAT_HEAVYSIDE_BITS):
+        for bit in xrange(FLAT_HEAVYSIDE_BITS):
             left = sum(self.data[left_edge:left_edge + width / 2])
             right = sum(self.data[left_edge + width / 2:left_edge + width])
             if left_edge + width == len(self.data):
@@ -509,7 +530,7 @@ class Spectrum(db.Model):
                 width = width / 2 #Adjust boundaries
             else:
                 left_edge += width #for next iteration
-            key += (left < right) << (self.FLAT_HEAVYSIDE_BITS - bit)
+            key += (left < right) << (FLAT_HEAVYSIDE_BITS - bit)
         return key
 
 
@@ -539,6 +560,29 @@ class Project(db.Model):
     spectra = db.ListProperty(db.Key)
     '''Spectra included in this project.
     @type: L{backend.Spectrm}'''
+
+def find_similar(spectrum):
+    '''
+    Find spectra similar to the given one.
+    
+    Find spectra that may represent the given Spectrum object by sorting
+    the database using different heuristics, having them vote, and 
+    returning only the spectra deemed similar to the given spectrum.
+    
+    @param spectrum: The spectrum to search for
+    @type  spectrum: L{backend.Spectrum}
+    @return: List of similar spectra
+    @rtype: C{list} of L{backend.Spectrum}
+    '''
+    # Get heavyside key and peaks.
+    peaks = spectrum.calculate_fuzzy_peaks() #Get the peaks (fuzzily)
+    key = spectrum.spectrum_type+'_heavyside_'+str(spectrum.calculate_heavyside()) #Get the heavyside key
+    spectra = get_data(key, default=None) #Get the spectra that match the key
+    
+    keys = sorted(spectra, key=lambda s: min([s[0]-peak for peak in peaks]) ) #Sort by smallest distance to peaks
+    if len(keys) > 10: keys = keys[:10] 
+    
+    return Spectrum.get([k[1] for k in keys])
     
 def bove(a, b):
     '''
