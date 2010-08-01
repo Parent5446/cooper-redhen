@@ -81,6 +81,7 @@ class ApiHandler(webapp.RequestHandler):
         user = users.get_current_user()
         
         # Just for testing
+<<<<<<< HEAD:frontend.py
         '''
         [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
         [db.delete(s) for s in backend.Project.all(keys_only=True)]
@@ -90,6 +91,15 @@ class ApiHandler(webapp.RequestHandler):
             if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)
         for s in os.listdir('raman'):
             if s[0]!='.': backend.add( open('raman/'+s).read(), 'public', False) 
+=======
+        
+        #[db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
+        #[db.delete(s) for s in backend.Project.all(keys_only=True)]
+        #memcache.flush_all()
+        #import os
+        #for s in os.listdir('infrared'):
+        #    if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)   
+>>>>>>> Commenting out db deletion code temporarily. Also, tested the search suggestions: 145ms without memcached and then 66ms once it kicks in.:frontend.py
         #spectra = [ open('infrared/iodobenzene1.jdx').read() ]
         '''
 
