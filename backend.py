@@ -68,10 +68,11 @@ def add_public(spectrum):
     spectra.add( (spectrum.peak, spectrum.key()) )
     set_data(key, spectra)
     #prefixes for browsing:
-    prefix_key = spectrum.spectrum_type+'_browse_'+spectrum.chemical_name[0:4].lower()
-    names = get_data(prefix_key, default=[])
-    names.append((spectrum.chemical_name, spectrum.key()))
-    set_data(prefix_key, names)
+    for prefix in spectrum.prefixes:
+        prefix_key = spectrum.spectrum_type+'_browse_'+prefix
+        names = get_data(prefix_key, default=[])
+        names.append((spectrum.chemical_name, spectrum.key()))
+        set_data(prefix_key, names)
     
 def search(spectra_data, algorithm="bove"):
     '''
@@ -489,6 +490,7 @@ class Spectrum(db.Model):
         else:
             match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\+\-\d]*$', self.get_field('##TITLE=') )
             self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
+            self.prefixes = set([ self.chemical_name[:4].lower(), (match.group(2)+match.group(3))[:4].lower() ])
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):
