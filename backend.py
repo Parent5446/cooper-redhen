@@ -100,7 +100,7 @@ def compare(data_list, algorithm="bove"):
 
     return spectra
     
-def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
+def browse(target="public", limit=10, offset=0, guess=False, spectrum_type="infrared"):
     '''
     Get a list of spectrum for browsing.
     
@@ -118,11 +118,13 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     '''
     if guess: #If the user has guessed the first 4 chars
         lowercase_name = guess.lower() #Browse is not case-sensitive
-        name_options = get_data(spectrum_type+'_browse_'+lowercase_name[0:4], default=[]) #Get everything starting with the same 4 chars, default to empty list
-        return [(str(key), name) for (name, key) in name_options if (len(guess)==4 or name.lower().startswith(lowercase_name))]
+        target = Project.get_or_insert(target)
+        query = Spectrum.gql("WHERE chemical_name >= :1", guess)
+        return [(str(i.key()), i.chemical_name) for i in query if i.key() in target.spectra]
     else: #Browse the whole project
         target = Project.get_or_insert(target)
-        return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra[offset:offset + limit])]
+        return [(str(spectrum.key()), spectrum.chemical_name)
+               for spectrum in Spectrum.get(target.spectra[offset:offset + limit])]
         
 def add(spectra_data, target="public", preprocessed=False):
     '''
@@ -438,8 +440,10 @@ class Spectrum(db.Model):
         # FIXME: Assumes chemical name is in TITLE label.
         if GRAMS: self.chemical_name = 'Unknown'
         else:
-            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\d]*$', self.get_field('##TITLE=') )
-            self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
+            match = re.search( '([^a-zA-Z]*)([a-zA-Z]+)', self.get_field('##TITLE=') )
+            if match is None:
+                raise Exception(self.get_field('##TITLE='))
+            self.chemical_name = match.group(1) + match.group(2).lower()
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):

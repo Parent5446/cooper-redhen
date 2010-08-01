@@ -73,6 +73,7 @@ class ApiHandler(webapp.RequestHandler):
         target = self.request.get("targt", "public")
         spectra = filter(lambda x: x, self.request.get_all("spectrum"))
         offset = self.request.get("offset", 0)
+        limit = self.request.get("limit", 5)
         algorithm = self.request.get("algorithm", "bove")
         guess = self.request.get("guess")
         spectrum_type = self.request.get("type")
@@ -111,7 +112,7 @@ class ApiHandler(webapp.RequestHandler):
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
-            response = backend.browse(target, offset, guess, spectrum_type) #a list of names and keys
+            response = backend.browse(target, limit, offset, guess, spectrum_type) #a list of names and keys
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
             backend.auth(user, target, "spectrum")
