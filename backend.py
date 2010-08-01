@@ -455,7 +455,7 @@ class Spectrum(db.Model):
             x_range = (700.0, 3900.0) #Set the range
         elif self.spectrum_type == "raman":
             x_range = (300.0, 2000.0)
-        data = [0.0 for i in xrange(512)] #Initialize data
+        data = [0.0 for i in xrange(512)] #Initialize data (power of two, because heavyside splits in halves)
         interval = (x_range[1] - x_range[0]) / len(data) #Find width of each integral
         start = bisect.bisect_right(xy, (x_range[0], 0))  # Find index in xy where integrals start, by bisection
         
@@ -463,6 +463,8 @@ class Spectrum(db.Model):
         old_y = xy[start-1][1] + (xy[start-1][0]-old_x) * (xy[start][1] - xy[start-1][1]) / (xy[start-1][0] - xy[start][0]) #linear interpolation of corresponding y
         
         for x, y in xy[start:]: #Iterate over xy from start
+            if x > x_range[1]: #Moved from end, see if it works...
+                break #If finished, break
             newIndex = int((x - x_range[0]) / interval) #index in data for this loop
             oldIndex = int((old_x - x_range[0]) / interval) #index in data of previous loop
             if newIndex != oldIndex: # We're starting a new integral, find the x and y values at the boundary
@@ -473,8 +475,6 @@ class Spectrum(db.Model):
                     data[newIndex] += (x-boundary_x) * (y+boundary_y) / 2 #Start new integral
             else: #If not starting a new integral
                 data[newIndex] += (x-old_x)*(y+old_y) / 2 #Continue integral
-            if x > x_range[1]:
-                break #If finished, break
             old_x, old_y = x, y #Otherwise keep going
         this_max = max(data)
         self.data = array.array('H', [round((d/this_max)*Spectrum.data_y_max) for d in data])
