@@ -101,7 +101,10 @@ def search(spectra_data, algorithm="bove"):
     for spectrum_data in spectra_data:
         # Load the user's spectrum into a Spectrum object.
         if spectrum_data[0:3] == "db:":
-            spectrum = Spectrum.get(spectrum_data[3:])
+            spectrum = Spectrum.get(db.Key(spectrum_data[3:]))
+            spectrum.error = 0 #This is the original - no error
+            results.append(spectrum) #Add to results
+            continue #Don't try to parse as a file
         else:
             spectrum = Spectrum()
             try:

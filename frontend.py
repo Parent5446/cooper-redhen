@@ -92,8 +92,6 @@ class ApiHandler(webapp.RequestHandler):
             if s[0]!='.': backend.add( open('raman/'+s).read(), 'public', False) 
         #spectra = [ open('infrared/iodobenzene1.jdx').read() ]
         '''
-        import time
-        TIME_TEST = time.clock()
         
         # If not operating on the main project, try getting the private one.
         # But abort if target is not supposed to be a project.
@@ -136,8 +134,6 @@ class ApiHandler(webapp.RequestHandler):
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
         # Pass it on to self.output for processing.
-        
-        raise Exception( time.clock()-TIME_TEST)
         
         self._output(response)
     
