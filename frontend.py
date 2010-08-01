@@ -105,7 +105,7 @@ class ApiHandler(webapp.RequestHandler):
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
             result = backend.compare(spectra, algorithm)
-            response = [("NULL", spec.chemical_name, spec.error, [d*300.0/65535 for d in spec.data]) for spec in result]
+            response = ([('Not from database', spec.chemical_name, spec.error, [int(d*300.0/65535+0.5) for d in spec.data]) for spec in result])
         elif action == "browse":
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
