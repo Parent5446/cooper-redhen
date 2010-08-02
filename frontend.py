@@ -117,7 +117,7 @@ class ApiHandler(webapp.RequestHandler):
             query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
             response = [(proj.key(), proj.name) for proj in Project.gql(query, user)]
         elif action == 'regenerate':
-            if not users.is_user_current_admin():
+            if not users.is_current_user_admin():
                 raise common.AuthError(user, "Needs to be admin.")
             [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
             [db.delete(s) for s in backend.Project.all(keys_only=True)]
