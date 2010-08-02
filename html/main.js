@@ -14,7 +14,7 @@ function got_results(response) { //Once the server has responded
     $.each(response, function(i, spectrum) {
         $('#results').append(
             '<tr style="color:' + colors[i] + '"><td><input type="checkbox" checked="yes" id="graph_check' + i +
-             '" /></td><td><label for="graph_check' + i + '">' + spectrum[1] + '</label></td><td>' +
+             '" /> <label for="graph_check' + i + '">' + spectrum[1] + '</label></td><td>' +
              String(100 / Math.pow((spectrum[2] + 1), 0.1)).slice(0,4) + '%</td></tr>'
         );
         $('#graph_check' + i).click(function() {
@@ -188,12 +188,14 @@ $('#combobox_text').keyup(function(key) {
             $('#combobox_dropdown').html(guesses.join(' '));
             $(".guess").each(function(i, guess) {
                 $(guess).click(function() {
+                    $('#browse_dialog').hide();
+                    $('#combobox_dropdown').hide();
+                    $('#combobox_dropdown').html('');
                     $("#upload_form").append(
                         "<input type='hidden' id='file" + current_file +
                         "' name='spectrum' value='db:" + $(guess).attr('id') + "' />"
                     );
                     add_to_list($(this).html(), current_file);
-                    $('#browse_dialog').hide();
                     // Move the file upload box to the next id.
                     file_upload = $("#file" + current_file);
                     current_file++;
