@@ -18,14 +18,16 @@ class Thread(threading.Thread):
         body1, headers1 = self.post_multipart(sugg_data)
         body2, headers2 = self.post_multipart(search_data, search_files)
 
-        for key in xrange(250):
+        for key in xrange(100):
             conn.request("POST", "/api", body1, headers1)
             res = conn.getresponse()
+            res.read()
             print "SEARCH  ", num, " ", key, ":", res.status, res.reason
             if res.status != 200:
                 raise Exception()
             conn.request("POST", "/api", body2, headers2)
             res = conn.getresponse()
+            res.read()
             print "COMPARE ", num, " ", key, ":", res.status, res.reason
             if res.status != 200:
                 raise Exception()
@@ -48,7 +50,7 @@ class Thread(threading.Thread):
         for (key, filename, value) in files:
             L.append('--' + BOUNDARY)
             L.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, filename))
-            L.append('Content-Type: %s' % (mimetypes.guess_type(filename)[0] or 'application/octet-stream'(filename)))
+            L.append('Content-Type: %s' % 'application/octet-stream')
             L.append('')
             L.append(value)
         L.append('--' + BOUNDARY + '--')
@@ -59,5 +61,5 @@ class Thread(threading.Thread):
                           "Content-length": str(len(body))}
         return body, headers
 
-for num in xrange(8):
+for num in xrange(50):
     Thread(num).start()

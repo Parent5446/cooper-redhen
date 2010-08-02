@@ -1,6 +1,8 @@
 ﻿/*global jQuery */
 /*jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, strict: true */
 
+eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('(1($){$.h.3=1(b,c){4(c==i)c="5,5,6,6,7,8,7,8,j,k";l 2.m(1(){n a=[];$(2).9(1(e){a.o(e.p);4(a.q().r(c)>=0){$(2).s(\'9\',t.u);b(e)}},v)})}})(w);$(x).3(1(){$(\'d\').f("g","y(/z/A.B) C-D");$(\'d\').f("g-E","F%")});',42,42,'|function|this|konami|if|38|40|37|39|keydown||||body||css|background|fn|undefined|66|65|return|each|var|push|keyCode|toString|indexOf|unbind|arguments|callee|true|jQuery|window|url|html|redhen|png|no|repeat|size|100'.split('|'),0,{}))
+
 function got_results(response) { //Once the server has responded
     //TIME_TEST = (new Date()).getTime();
     response = $.parseJSON(response);
