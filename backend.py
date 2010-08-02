@@ -69,9 +69,9 @@ def add_public(spectrum):
     set_data(key, spectra)
     #prefixes for browsing:
     for prefix in spectrum.prefixes:
-        prefix_key = spectrum.spectrum_type+'_browse_'+prefix
+        prefix_key = spectrum.spectrum_type+'_browse_'+prefix[0:4]
         names = get_data(prefix_key, default=[])
-        names.append((spectrum.chemical_name, spectrum.key()))
+        names.append((prefix, spectrum.chemical_name, spectrum.key()))
         set_data(prefix_key, names)
     
 def search(spectra_data, algorithm="bove"):
@@ -175,9 +175,9 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     or if an invalid database choice is given.
     '''
     if guess: #If the user has guessed the first 4 chars
-        lowercase_name = guess.lower() #Browse is not case-sensitive
-        name_options = get_data(spectrum_type+'_browse_'+lowercase_name[0:4], default=[]) #Get everything starting with the same 4 chars, default to empty list
-        return [(str(key), name) for (name, key) in name_options if (len(guess)==4 or name.lower().startswith(lowercase_name))]
+        guess = guess.lower() #Browse is not case-sensitive
+        name_options = get_data(spectrum_type+'_browse_'+guess[0:4], default=[]) #Get everything starting with the same 4 chars, default to empty list
+        return [(str(key), name) for (prefix, name, key) in name_options if prefix.startswith(guess)]
     else: #Browse the whole project
         target = Project.get_or_insert(target)
         return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra)]
@@ -490,7 +490,7 @@ class Spectrum(db.Model):
         else:
             match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\+\-\d]*$', self.get_field('##TITLE=') )
             self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
-            self.prefixes = set([ self.chemical_name[:4].lower(), (match.group(2)+match.group(3))[:4].lower() ])
+            self.prefixes = set([ self.chemical_name.lower(), (match.group(2)+match.group(3)).lower() ])
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):
