@@ -66,17 +66,17 @@ function got_results(response) { //Once the server has responded
     $('#graph').mousemove(function(e) { //Add functions to the graph
         document.body.style.cursor="crosshair";
         var x = Math.floor(e.pageX - $('#graph').position().left);
-		if (response[3] == 'infrared')
+		if (response[4] == 'infrared')
 		{
-			var minwave = 700
-			var maxwave = 3900 //This is the xrange from backend.py for infrared
+			var minwave = 700;
+			var maxwave = 3900; //This is the xrange from backend.py for infrared
 		}
-		else if (response[3] == 'raman')
+		else if (response[4] == 'raman')
 		{
-			var minwave = 300
-			var maxwave = 2000 //this is the xrange from backend.py for raman
+			var minwave = 300;
+			var maxwave = 2000; //this is the xrange from backend.py for raman
 		}
-		var presentablex = (x/500) * (3200) + 700
+		var presentablex = (x/500) * (maxwave - minwave) + minwave;
         $('#floatybar').css('left', x);
         $('#floatybar').css('bottom', spectra[selected].data[x]);
         $('#floatybar').html(presentablex + ', ' + spectra[selected].data[x]);
