@@ -174,8 +174,7 @@ $('#combobox_text').keyup(function(key) {
         {
             action: 'browse',
             type: 'infrared',
-            guess: $('#combobox_text').val(),
-            output: 'json'
+            guess: $('#combobox_text').val()
         },
         function(data) {
             var guesses = [];

@@ -118,6 +118,7 @@ def search(spectra_data, algorithm="bove"):
             candidate.error = algorithm(spectrum, candidate)
         candidates.sort(key=operator.attrgetter('error'))
         results.extend(candidates)
+        
     # Let frontend do the rest
     return results
 
@@ -502,7 +503,9 @@ class Spectrum(db.Model):
         @return: Value of the field
         @rtype: C{str}
         '''
-        return re.search(name+'([^\\r\\n]+)', self.contents).group(1)
+        match = re.search(name+'([^\\r\\n]+)', self.contents)
+        if match is None: raise Exception(self.contents)
+        return match.group(1)
      
     def calculate_fuzzy_peaks(self):
         '''
