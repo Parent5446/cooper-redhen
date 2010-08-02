@@ -184,7 +184,9 @@ $('#combobox_text').keyup(function(key) {
         },
         function(data) {
             var guesses = [];
-            $.each(data, function(i, guess) { guesses.push('<div id="' + guess[0] + '" class="guess">' + guess[1] + '</div>'); });
+            $.each(data, function(i, guess) {
+                guesses.push('<div id="' + guess[0] + '" class="guess">' + guess[1] + '</div>');
+            });
             $('#combobox_dropdown').html(guesses.join(' '));
             $(".guess").each(function(i, guess) {
                 $(guess).click(function() {

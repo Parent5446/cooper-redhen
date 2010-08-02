@@ -18,44 +18,6 @@ from google.appengine.ext import db # import database
 from google.appengine.api import memcache, users # import memory cache and user
 
 import common
-
-def get_data(key, default=None):
-    '''
-    Encapsulates memcache and the datastore, making them look like a hashtable.
-    
-    @param key: Key which will locate the data
-    @type  key: C{str}
-    @param default: Value which will be returned if key has never been set
-    @type  key: C{object}
-    '''
-    data = memcache.get(key)
-    if data is None:
-        storage = GenericData.get_by_key_name(key)
-        if storage is not None: data = storage.data; memcache.set(key,data)
-        else: return default
-    return data
-    
-def set_data(key, data):
-    '''
-    Encapsulates memcache and the datastore, making them look like a hashtable.
-    
-    @param key: Key for retrieving the data later
-    @type  key: C{str}
-    @param data: Data to store
-    @type  data: C{object}
-    '''
-    memcache.set(key, data)
-    storage = GenericData(key_name=key)
-    storage.data = data
-    storage.put()
-    
-class GenericData(db.Model):
-    '''
-    Store generic data of any type (for use by get_data and set_data)
-    '''
-    data = common.GenericDataProperty()
-    '''The data held in the datastore
-    @type: C{object}'''
     
 def search(spectra_data, algorithm="bove"):
     '''
@@ -159,9 +121,14 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     or if an invalid database choice is given.
     '''
     if guess: #If the user has guessed the first 4 chars
-        guess = guess.lower() #Browse is not case-sensitive
-        name_options = get_data(spectrum_type+'_browse_'+guess[0:4], default=[]) #Get everything starting with the same 4 chars, default to empty list
-        return [(str(key), name) for (prefix, name, key) in name_options if prefix.startswith(guess)]
+        spectra = memcache.get(spectrum_type + '_browse_' + guess[0:4])
+        if spectra is None:
+            query = "WHERE prefixes = :1 AND spectrum_type = :2"
+            query = Spectrum.gql(query, guess, spectrum_type)
+            spectra = [(str(spectrum.key()), spectrum.chemical_name)
+                       for spectrum in query]
+            memcache.set(spectrum_type + '_browse_' + guess[0:4], spectra)
+        return spectra
     else: #Browse the whole project
         target = Project.get_or_insert(target)
         return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra)]
@@ -198,12 +165,6 @@ def add(spectra_data, target="public", preprocessed=False):
             spectrum = Spectrum(**data)
         spectrum.put()
         project.spectra.append(spectrum.key())
-        if target == "public":
-            for prefix in spectrum.prefixes:
-                prefix_key = spectrum.spectrum_type+'_browse_'+prefix[0:4]
-                names = get_data(prefix_key, default=[])
-                names.append((prefix, spectrum.chemical_name, spectrum.key()))
-                set_data(prefix_key, names)
     project.put()
 
 def delete(spectra_data, target="public"):
@@ -354,6 +315,10 @@ class Spectrum(db.Model):
     heavyside = db.IntegerProperty()
     '''The heavyside index for the spectrum.
     @type: C{float}'''
+    
+    prefixes = db.StringListProperty()
+    '''Just the non-alphabetical prefix to the chemical_name.
+    @type: C{str}'''
     
     FLAT_HEAVYSIDE_BITS = 8
     '''Number of bits in the heavyside index, should be a power of 2
@@ -543,7 +508,8 @@ class Spectrum(db.Model):
             # FIXME: Assumes chemical name is in TITLE label.
             match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\+\-\d]*$', self.get_field('##TITLE=') )
             self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
-            self.prefixes = set([ self.chemical_name.lower(), (match.group(2)+match.group(3)).lower() ])
+            self.prefixes = [self.chemical_name.lower()[0:4],
+                             "".join([match.group(2), match.group(3)]).lower()[0:4]]
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):
