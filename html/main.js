@@ -63,20 +63,26 @@ function got_results(response) { //Once the server has responded
     
     $('#graph').append('<div id="floatybar" class="graph-floatybar">0,0</div>'); //Make floating sign
     $('#graph').append('<div id="tracepoint" class="graph-trace"></div>'); //Make trace point
+    
+    if (response[0][4] == 'infrared')
+    {
+        var minwave = 700;
+        var maxwave = 3900; //This is the xrange from backend.py for infrared
+    }
+    else if (response[0][4] == 'raman')
+    {
+        var minwave = 300;
+        var maxwave = 2000; //this is the xrange from backend.py for raman
+    }
+    
+    $('#graph').append('<div style="position:absolute; top:300px; left:0px;">'+minwave+' cm<sup>-1</sup></div>');
+    $('#graph').append('<div style="position:absolute; top:300px; left:210px;"><b>Wavenumber</b></div>');
+    $('#graph').append('<div style="position:absolute; top:300px; right:0px;">'+maxwave+' cm<sup>-1</sup></div>');
+    
     $('#graph').mousemove(function(e) { //Add functions to the graph
         document.body.style.cursor="crosshair";
         var x = Math.floor(e.pageX - $('#graph').position().left);
-		if (response[4] == 'infrared')
-		{
-			var minwave = 700;
-			var maxwave = 3900; //This is the xrange from backend.py for infrared
-		}
-		else if (response[4] == 'raman')
-		{
-			var minwave = 300;
-			var maxwave = 2000; //this is the xrange from backend.py for raman
-		}
-		var presentablex = (x/500) * (maxwave - minwave) + minwave;
+		var presentablex = parseInt((x/500) * (maxwave - minwave) + minwave);
         $('#floatybar').css('left', x);
         $('#floatybar').css('bottom', spectra[selected].data[x]);
         $('#floatybar').html(presentablex + ', ' + spectra[selected].data[x]);
