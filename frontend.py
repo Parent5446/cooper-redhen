@@ -117,6 +117,8 @@ class ApiHandler(webapp.RequestHandler):
             query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
             response = [(proj.key(), proj.name) for proj in Project.gql(query, user)]
         elif action == 'regenerate':
+            if not users.is_user_current_admin():
+                raise common.AuthError(user, "Needs to be admin.")
             [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
             [db.delete(s) for s in backend.Project.all(keys_only=True)]
             memcache.flush_all()
@@ -125,7 +127,7 @@ class ApiHandler(webapp.RequestHandler):
                 if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)
             for s in os.listdir('raman'):
                 if s[0]!='.': backend.add( open('raman/'+s).read(), 'public', False) 
-            response = []
+            response = ["Success"]
         else:
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
