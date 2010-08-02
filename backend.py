@@ -57,23 +57,6 @@ class GenericData(db.Model):
     '''The data held in the datastore
     @type: C{object}'''
     
-FLAT_HEAVYSIDE_BITS = 8
-'''Number of bits in the heavyside index, should be a power of 2
-@type: C{int}'''
-
-def add_public(spectrum):
-    #Flat heavyside: hash table of heavyside keys
-    key = spectrum.spectrum_type+'_heavyside_'+str(spectrum.calculate_heavyside())
-    spectra = get_data(key, default=set())
-    spectra.add( (spectrum.peak, spectrum.key()) )
-    set_data(key, spectra)
-    #prefixes for browsing:
-    for prefix in spectrum.prefixes:
-        prefix_key = spectrum.spectrum_type+'_browse_'+prefix[0:4]
-        names = get_data(prefix_key, default=[])
-        names.append((prefix, spectrum.chemical_name, spectrum.key()))
-        set_data(prefix_key, names)
-    
 def search(spectra_data, algorithm="bove"):
     '''
     Search for spectra in the database which are similar to the given spectra_data.
@@ -113,7 +96,7 @@ def search(spectra_data, algorithm="bove"):
             except NameError:
                 raise common.InputError(spectrum_data, "Invalid spectrum data.")
         # Do one-to-one on candidates and sort by error
-        candidates = find_similar(spectrum)
+        candidates = spectrum.find_similar()
         for candidate in candidates:
             candidate.error = algorithm(spectrum, candidate)
         candidates.sort(key=operator.attrgetter('error'))
@@ -215,7 +198,12 @@ def add(spectra_data, target="public", preprocessed=False):
             spectrum = Spectrum(**data)
         spectrum.put()
         project.spectra.append(spectrum.key())
-        if target == "public": add_public(spectrum)
+        if target == "public":
+            for prefix in spectrum.prefixes:
+                prefix_key = spectrum.spectrum_type+'_browse_'+prefix[0:4]
+                names = get_data(prefix_key, default=[])
+                names.append((prefix, spectrum.chemical_name, spectrum.key()))
+                set_data(prefix_key, names)
     project.put()
 
 def delete(spectra_data, target="public"):
@@ -304,6 +292,42 @@ def auth(user, project, action):
         need = "viewer"
     raise common.AuthError(user, "Need to be %s or higher." % need)
     return False
+    
+def bove(a, b):
+    '''
+    Calculate the difference or error between two spectra using Bove's
+    algorithm.
+    
+    @param a: Spectrum to compare
+    @type  a: L{backend.Spectrum}
+    @param b: Other Spectrum to compare
+    @type  b: L{backend.Spectrum}
+    @return: The difference or error between the spectra
+    @rtype: C{float}
+    @raise common.ServerError: If there are invalid spectra in the database
+    '''
+    length = min([len(a.data), len(b.data)])
+    if length == 0 or a.data is None or b.data is None:
+        raise common.ServerError("Invalid spectra in the database.")
+    return max([abs(a.data[i] - b.data[i]) for i in xrange(length)])
+
+def least_squares(a, b):
+    '''
+    Calculate the difference or error between two spectra using Bove's
+    algorithm.
+    
+    @param a: Spectrum to compare
+    @type  a: L{backend.Spectrum}
+    @param b: Other Spectrum to compare
+    @type  b: L{backend.Spectrum}
+    @return: The difference or error between the spectra
+    @rtype: C{float}
+    @raise common.ServerError: If there are invalid spectra in the database
+    '''
+    length = min([len(a.data), len(b.data)])
+    if length == 0 or a.data is None or b.data is None:
+        raise common.ServerError("Invalid spectra in the database.")
+    return sum([(a.data[i] - a.data[i])**2 for i in xrange(length)])
 
 
 class Spectrum(db.Model):
@@ -327,9 +351,18 @@ class Spectrum(db.Model):
     '''The x location of the spectrum's highest peak
     @type: C{float}'''
     
+    heavyside = db.IntegerProperty()
+    '''The heavyside index for the spectrum.
+    @type: C{float}'''
+    
+    FLAT_HEAVYSIDE_BITS = 8
+    '''Number of bits in the heavyside index, should be a power of 2
+    @type: C{int}'''
+    
     data = common.ArrayProperty('H')
     '''A list of integrated y values for comparisons ('H' = unsigned short)
     @type: C{list}'''
+    
     data_y_max = 65535
     
     notes = db.StringProperty(indexed=False)
@@ -428,22 +461,25 @@ class Spectrum(db.Model):
             x_factor = 1
             y_factor = 1
         else:
-            self.spectrum_type = self.get_field("##DATA ?TYPE=") #Get the spectrum type
-            x = float(self.get_field('##FIRSTX=')) # The first x-value
-            delta_x = float(self.get_field('##DELTAX=')) # The Space between adjacent x values
-            x_factor = float(self.get_field('##XFACTOR=')) # for our purposes it's 1, but if not use this instead
-            y_factor = float(self.get_field('##YFACTOR=')) # some very small number, but if not use this instead
+            # Get the spectrum type and other variables.
+            self.spectrum_type = self.get_field("##DATA ?TYPE=")
+            x = float(self.get_field('##FIRSTX='))
+            delta_x = float(self.get_field('##DELTAX='))
+            x_factor = float(self.get_field('##XFACTOR='))
+            y_factor = float(self.get_field('##YFACTOR='))
         
-        if self.spectrum_type.upper().find("IR") >= 0 or self.spectrum_type.upper().find("INFRARED") >= 0: #If IR or infrared are in the spectrum type name, then
+        # Intuitively determine the spectrum type.
+        if self.spectrum_type.upper().find("IR") >= 0 or \
+           self.spectrum_type.upper().find("INFRARED") >= 0:
             self.spectrum_type = "infrared"
-        elif self.spectrum_type.upper().find("RAMAN") >= 0: #if "raman" is included in the spectrum type
+        elif self.spectrum_type.upper().find("RAMAN") >= 0:
             self.spectrum_type = "raman"
 
         xy = []
-        # Process the XY data from JCAMP's (X++(Y..Y)) format.
         if GRAMS:
             xy.extend([((i * deltax + firstx), a[i]) for i in xrange(0, numpoints - 1)])
         else:
+            # Process the XY data from JCAMP's (X++(Y..Y)) format.
             regex = re.compile(r'(\D+)([\d.-]+)')
             for match in re.finditer(regex, self.contents[self.contents.index('##XYDATA=(X++(Y..Y))') + 20:]):
                 if '\n' in match.group(1):
@@ -453,42 +489,58 @@ class Spectrum(db.Model):
                     # Number is a relative y-value.
                     xy.append((x, float(match.group(2)) * y_factor))
                     x += delta_x
-        if delta_x < 0: xy.reverse() # Keep the points in ascending x order
+        
+        # Keep the points in ascending x order.
+        if delta_x < 0:
+            xy.reverse()
+            
         # Integrate xy numerically over a fixed range.
-    
         if self.spectrum_type == "infrared":
-            x_range = (700.0, 3900.0) #Set the range
+            x_range = (700.0, 3900.0)
         elif self.spectrum_type == "raman":
             x_range = (300.0, 2000.0)
-        data = [0.0 for i in xrange(512)] #Initialize data (power of two, because heavyside splits in halves)
-        interval = (x_range[1] - x_range[0]) / len(data) #Find width of each integral
-        start = bisect.bisect_right(xy, (x_range[0], 0))  # Find index in xy where integrals start, by bisection
+        # Make a power of two number data points for use in heavyside.
+        data = [0.0 for i in xrange(512)]
+        interval = (x_range[1] - x_range[0]) / len(data)
+        start = bisect.bisect_right(xy, (x_range[0], 0))
+        # Get the start of the range (both X and Y values).
+        old_x = x_range[0]
+        old_y = (xy[start-1][1] + (xy[start-1][0]-old_x) *
+                 (xy[start][1] - xy[start-1][1]) /
+                 (xy[start-1][0] - xy[start][0]))
+        # Start integrating.
+        for x, y in xy[start:]:
+            if x > x_range[1]:
+                # We passed the range limit. We're done.
+                break
+            # Get the index in data for the past loop and this loop
+            newIndex = int((x - x_range[0]) / interval)
+            oldIndex = int((old_x - x_range[0]) / interval)
+            if newIndex != oldIndex:
+                # We're starting a new integral: find the boundary x and y.
+                boundary_x = x_range[0] + newIndex * interval
+                boundary_y = old_y + (y-old_y)*(boundary_x-old_x)/(x-old_x)
+                # Finish the old integral then start the new one.
+                data[oldIndex] += (boundary_x - old_x)*(boundary_y + old_y) / 2
+                if newIndex < len(data):
+                    data[newIndex] += (x-boundary_x) * (y+boundary_y) / 2
+            else:
+                # Continue the current integral
+                data[newIndex] += (x-old_x)*(y+old_y) / 2
+            old_x, old_y = x, y
         
-        old_x = x_range[0] #start of range
-        old_y = xy[start-1][1] + (xy[start-1][0]-old_x) * (xy[start][1] - xy[start-1][1]) / (xy[start-1][0] - xy[start][0]) #linear interpolation of corresponding y
-        
-        for x, y in xy[start:]: #Iterate over xy from start
-            if x > x_range[1]: #Moved from end, see if it works...
-                break #If finished, break
-            newIndex = int((x - x_range[0]) / interval) #index in data for this loop
-            oldIndex = int((old_x - x_range[0]) / interval) #index in data of previous loop
-            if newIndex != oldIndex: # We're starting a new integral, find the x and y values at the boundary
-                boundary_x = x_range[0] + newIndex*interval #Get x value, easy
-                boundary_y = old_y + (y-old_y)*(boundary_x-old_x)/(x-old_x) #Linear interpolation for y value
-                data[oldIndex] += (boundary_x - old_x)*(boundary_y + old_y) / 2 #Finish old integral
-                if newIndex < len(data): #If data isn't filled
-                    data[newIndex] += (x-boundary_x) * (y+boundary_y) / 2 #Start new integral
-            else: #If not starting a new integral
-                data[newIndex] += (x-old_x)*(y+old_y) / 2 #Continue integral
-            old_x, old_y = x, y #Otherwise keep going
+        # Store all the variables
         this_max = max(data)
         self.data = array.array('H', [round((d/this_max)*Spectrum.data_y_max) for d in data])
         self.xy = xy
         self.peak = max(self.xy, key=operator.itemgetter(1))[0]
+        self.heavyside = self.calculate_heavyside()
         self.chemical_type = 'Unknown' # We will find this later (maybe)
-        # FIXME: Assumes chemical name is in TITLE label.
-        if GRAMS: self.chemical_name = 'Unknown'
+        # Determine the chemical name of the substance.
+        if GRAMS:
+            self.chemical_name = 'Unknown'
         else:
+            # FIXME: Assumes chemical name is in TITLE label.
             match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\+\-\d]*$', self.get_field('##TITLE=') )
             self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
             self.prefixes = set([ self.chemical_name.lower(), (match.group(2)+match.group(3)).lower() ])
@@ -506,8 +558,38 @@ class Spectrum(db.Model):
         match = re.search(name+'([^\\r\\n]+)', self.contents)
         if match is None: raise Exception(self.contents)
         return match.group(1)
-     
-    def calculate_fuzzy_peaks(self):
+    
+    def find_similar(self, target="public"):
+        '''
+        Find spectra similar to the given one.
+        
+        Find spectra that may represent the given Spectrum object by sorting
+        the database using different heuristics, having them vote, and 
+        returning only the spectra deemed similar to the given spectrum.
+        
+        @return: List of similar spectra
+        @rtype: C{list} of L{backend.Spectrum}
+        '''
+        project = Project.get_or_insert(target)
+        # Get heavyside key and peaks.
+        peaks = self.calculate_peaks()
+        heavyside = self.calculate_heavyside()
+        # Check memcached for the data.
+        key = self.spectrum_type + '_heavyside_' + str(heavyside) #Get the heavyside key
+        spectra = memcache.get(key)
+        if spectra is None:
+            # Data is not in memcached. Check database.
+            spectra = set()
+            data = Spectrum.gql("WHERE heavyside = :1", heavyside)
+            spectra = set([(spectrum.peak, str(spectrum.key()))
+                           for spectrum in data
+                           if spectrum.key() in project.spectra])
+            memcache.set(key, spectra)
+        # Sort by smallest distance to peaks and return top 20.
+        keys = sorted(spectra, key=lambda s: min([s[0] - peak for peak in peaks]))
+        return Spectrum.get([k[1] for k in keys[:20]])
+    
+    def calculate_peaks(self):
         '''
         Find the x values of the highest peaks (those within 95% of the absolute highest)
         
@@ -530,7 +612,7 @@ class Spectrum(db.Model):
         '''
         key, left_edge, width = 0, 0, len(self.data) # Initialize variables
 
-        for bit in xrange(FLAT_HEAVYSIDE_BITS):
+        for bit in xrange(self.FLAT_HEAVYSIDE_BITS):
             left = sum(self.data[left_edge:left_edge + width / 2])
             right = sum(self.data[left_edge + width / 2:left_edge + width])
             if left_edge + width == len(self.data):
@@ -538,7 +620,7 @@ class Spectrum(db.Model):
                 width = width / 2 #Adjust boundaries
             else:
                 left_edge += width #for next iteration
-            key += (left < right) << (FLAT_HEAVYSIDE_BITS - bit)
+            key += (left < right) << (self.FLAT_HEAVYSIDE_BITS - bit)
         return key
 
 
@@ -568,60 +650,3 @@ class Project(db.Model):
     spectra = db.ListProperty(db.Key)
     '''Spectra included in this project.
     @type: L{backend.Spectrm}'''
-
-def find_similar(spectrum):
-    '''
-    Find spectra similar to the given one.
-    
-    Find spectra that may represent the given Spectrum object by sorting
-    the database using different heuristics, having them vote, and 
-    returning only the spectra deemed similar to the given spectrum.
-    
-    @param spectrum: The spectrum to search for
-    @type  spectrum: L{backend.Spectrum}
-    @return: List of similar spectra
-    @rtype: C{list} of L{backend.Spectrum}
-    '''
-    # Get heavyside key and peaks.
-    peaks = spectrum.calculate_fuzzy_peaks() #Get the peaks (fuzzily)
-    key = spectrum.spectrum_type+'_heavyside_'+str(spectrum.calculate_heavyside()) #Get the heavyside key
-    spectra = get_data(key, default=None) #Get the spectra that match the key
-    
-    keys = sorted(spectra, key=lambda s: min([s[0]-peak for peak in peaks]) ) #Sort by smallest distance to peaks
-    return Spectrum.get([k[1] for k in keys[:20]]) #Return the 20 (or fewer) closest for further examination
-    
-def bove(a, b):
-    '''
-    Calculate the difference or error between two spectra using Bove's
-    algorithm.
-    
-    @param a: Spectrum to compare
-    @type  a: L{backend.Spectrum}
-    @param b: Other Spectrum to compare
-    @type  b: L{backend.Spectrum}
-    @return: The difference or error between the spectra
-    @rtype: C{float}
-    @raise common.ServerError: If there are invalid spectra in the database
-    '''
-    length = min([len(a.data), len(b.data)])
-    if length == 0 or a.data is None or b.data is None:
-        raise common.ServerError("Invalid spectra in the database.")
-    return max([abs(a.data[i] - b.data[i]) for i in xrange(length)])
-
-def least_squares(a, b):
-    '''
-    Calculate the difference or error between two spectra using Bove's
-    algorithm.
-    
-    @param a: Spectrum to compare
-    @type  a: L{backend.Spectrum}
-    @param b: Other Spectrum to compare
-    @type  b: L{backend.Spectrum}
-    @return: The difference or error between the spectra
-    @rtype: C{float}
-    @raise common.ServerError: If there are invalid spectra in the database
-    '''
-    length = min([len(a.data), len(b.data)])
-    if length == 0 or a.data is None or b.data is None:
-        raise common.ServerError("Invalid spectra in the database.")
-    return sum([(a.data[i] - a.data[i])**2 for i in xrange(length)])
