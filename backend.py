@@ -584,7 +584,8 @@ def find_similar(spectrum):
     key = spectrum.spectrum_type+'_heavyside_'+str(spectrum.calculate_heavyside()) #Get the heavyside key
     spectra = get_data(key, default=None) #Get the spectra that match the key
     
-    return Spectrum.get([k[1] for k in keys])
+    keys = sorted(spectra, key=lambda s: min([s[0]-peak for peak in peaks]) ) #Sort by smallest distance to peaks
+    return Spectrum.get([k[1] for k in keys[:20]]) #Return the 20 (or fewer) closest for further examination
     
 def bove(a, b):
     '''
