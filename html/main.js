@@ -175,12 +175,14 @@ $('#combobox_text').keyup(function(key) {
     if($('#combobox_text').val().length<4) {
         return;
     }
+    spectrum_type = $(".spectrum_type:checked").val()
     $.get(
         '/api',
         {
             action: 'browse',
             type: 'infrared',
-            guess: $('#combobox_text').val()
+            guess: $('#combobox_text').val(),
+            type: spectrum_type
         },
         function(data) {
             var guesses = [];
