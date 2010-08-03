@@ -462,8 +462,4 @@ $(document).ready(function() {
     });
     $("#upload_form").append("<input type='file' class='invisible-frame' id='file1' name='spectrum' />")
     $("#file1").change(onchange_file);
-    var selected = $('#browse_options option:selected').val();
-    if (selected != 'my computer') {
-            $("#browse_options option[value='0']").attr('selected', 'selected');
-    }
 });
