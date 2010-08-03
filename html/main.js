@@ -462,4 +462,7 @@ $(document).ready(function() {
     });
     $("#upload_form").append("<input type='file' class='invisible-frame' id='file1' name='spectrum' />")
     $("#file1").change(onchange_file);
+    if (('#browse_options').options[0].selected != 'selected') {
+            ('#browse_options').options[0].selected = 'selected';
+    }
 });
