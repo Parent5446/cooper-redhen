@@ -146,3 +146,7 @@
     right: 10px;
     top: 5px
 }
+
+#exit_browse:hover {
+    color: red;
+}
