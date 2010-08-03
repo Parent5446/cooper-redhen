@@ -130,7 +130,7 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
             memcache.set(spectrum_type + '_browse_' + guess[0:4], spectra)
         return spectra
     else: #Browse the whole project
-        target = Project.get_or_insert(target)
+        target = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
         return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra)]
         
 def add(spectra_data, target="public", preprocessed=False):
@@ -148,7 +148,7 @@ def add(spectra_data, target="public", preprocessed=False):
     if not isinstance(spectra_data, list):
         spectra_data = [spectra_data]    
     
-    project = Project.get_or_insert(target)
+    project = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
     for spectrum_data in spectra_data:
         # If project does not exist, make a new one.
         # Load the user's spectrum into a Spectrum object.
@@ -181,7 +181,7 @@ def delete(spectra_data, target="public"):
     if not isinstance(spectra_data, list):
         spectra_data = [spectra_data]    
     
-    project = Project.get_or_insert(target)
+    project = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
     for spectrum_data in spectra_data:
         # Load the spectrum into a Spectrum object.
         spectrum = Spectrum.get(spectrum_data)
@@ -231,7 +231,10 @@ def auth(user, project, action):
     if project == "public":
         # Only app admins can change the public project.
         if action in ("spectrum", "project"):
-            return users.is_current_user_admin()
+            if users.is_current_user_admin():
+                return True
+            else:
+                raise common.AuthError(user, "Need to be app admin.")
         else:
             # Everybody can view the main project
             return True

@@ -42,6 +42,15 @@
             <input type="hidden" name="output" value="json" />
             </form>
             
+            <div class='browse-dialog' id='projects_dialog'> <!--Browse dialog, usually invisible-->
+                <div id="exit_projects"
+                     onmouseover='document.body.style.cursor="pointer";'
+                     onmouseout='document.body.style.cursor="default";'>[X]</div>
+                <div class='combobox-dropdown' id='projects_dropdown'
+                     onmouseover='document.body.style.cursor="pointer";'
+                     onmouseout='document.body.style.cursor="default";'></div>
+            </div>
+            
             <div class='browse-dialog' id='browse_dialog'> <!--Browse dialog, usually invisible-->
                 <div id="exit_browse"
                      onmouseover='document.body.style.cursor="pointer";'
@@ -54,7 +63,7 @@
                 <input type="radio" name="type" value="infrared" id="IR-radio" class="spectrum_type" checked='yes' />
                 <label for="IR-radio">Infrared</label>
                 <input type="radio" name="type" value="raman" id="raman-radio" class="spectrum_type" />
-                <label for="raman-radio">Raman</label><br /><br /><br /><br /><br /><br />
+                <label for="raman-radio">Raman</label>
             </div>
         </div> </td></tr> <!--End of main controls-->
         

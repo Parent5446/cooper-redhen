@@ -78,13 +78,7 @@ class ApiHandler(webapp.RequestHandler):
         spectrum_type = self.request.get("type")
         raw = self.request.get("raw", False)
         user = users.get_current_user()
-        
-        # If not operating on the main project, try getting the private one.
-        # But abort if target is not supposed to be a project.
-        if target and target != "public" and target != "others":
-            target = backend.Project.get(target)
-            if target is None:
-                raise common.InputError(targets, "Invalid project ID.")
+
         # Start doing the request
         if action == "compare" and target == "public":
             # Search the database for something.
@@ -114,11 +108,10 @@ class ApiHandler(webapp.RequestHandler):
             backend.auth(user, "public", "spectrum")
             backend.update()
         elif action == "projects":
-            query = "WHERE :1 IN owners OR :1 IN collaborators OR :1 in viewers"
-            response = [(proj.key(), proj.name) for proj in Project.gql(query, user)]
+            query = "WHERE owners = :1"
+            response = [(str(proj.key()), proj.name) for proj in backend.Project.gql(query, user)]
         elif action == 'regenerate':
-            #if not users.is_current_user_admin():
-            #    raise common.AuthError(user, "Needs to be admin.")
+            backend.auth(user, "public", "project")
             [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
             [db.delete(s) for s in backend.Project.all(keys_only=True)]
             memcache.flush_all()

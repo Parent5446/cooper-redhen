@@ -343,8 +343,26 @@ function Spectrum(spectrum_name, data, color) //Spectrum class
 
 $('#browse_button').click(function() {
     var selected = $('#browse_options option:selected').val();
-    $('#browse_dialog').show();
-    $('#combobox_text').focus();
+    if(selected == "my projects") {
+        $('#projects_dialog').show();
+        $.get("/api", {action: "projects", output: "json"}, function(data) {
+            var projects = [];
+            $.each(data, function(i, project) {
+                projects.push('<div id="' + project[0] + '" class="project">' + project[1] + '</div>');
+            });
+            $('#projects_dropdown').html(projects.join(' '));
+            $(".project").each(function(i, project) {
+                $(project).click(function() {
+                    target = $(this).attr("id");
+                    $('#browse_dialog').show();
+                });
+            });
+            $('#projects_dropdown').show(); //Finally, display it
+        }, 'json');
+    } else {
+        $('#browse_dialog').show();
+        $('#combobox_text').focus();
+    }
 });
 
 $('#compare_button').click(function() {
@@ -372,6 +390,7 @@ $('#browse_options').change(function() {
     }
 });
 
+var target = "public";
 $('#combobox_text').keyup(function(key) {
     var unicode = key.keyCode ? key.keyCode : key.charCode;
     if(unicode==13) {
@@ -387,7 +406,8 @@ $('#combobox_text').keyup(function(key) {
             action: 'browse',
             type: 'infrared',
             guess: $('#combobox_text').val(),
-            type: spectrum_type
+            type: spectrum_type,
+            target: target
         },
         function(data) {
             var guesses = [];
@@ -419,6 +439,10 @@ $('#combobox_text').keyup(function(key) {
 
 $('#exit_browse').click(function() {
     $("#browse_dialog").hide();
+});
+
+$('#exit_projects').click(function() {
+    $("#projects_dialog").hide();
 });
 
 var current_file = 1;

@@ -139,7 +139,7 @@
 	opacity:0;
 }
 
-#exit_browse
+#exit_browse, #exit_projects
 {
     position: absolute;
     right: 10px;
