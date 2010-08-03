@@ -506,7 +506,7 @@ class Spectrum(db.Model):
             self.chemical_name = 'Unknown'
         else:
             # FIXME: Assumes chemical name is in TITLE label.
-            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\+\-\d]*$', self.get_field('##TITLE=') )
+            match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\+\-\d]*(.jdx)?$', self.get_field('##TITLE=') )
             self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
             self.prefixes = [self.chemical_name.lower()[0:4],
                              "".join([match.group(2), match.group(3)]).lower()[0:4]]
