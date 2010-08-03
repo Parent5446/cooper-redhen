@@ -123,6 +123,7 @@ function add_to_list(s, id) {
          id + '\');" />' + s + '</div>'
     );
     $('#loaded_list').show();
+    $('#compare_button').removeAttr('disabled');
 }
  
 function combobox_clicked(text) {
