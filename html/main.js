@@ -15,7 +15,7 @@ function got_results(response) { //Once the server has responded
         $('#results').append(
             '<tr style="color:' + colors[i] + '"><td><input type="checkbox" checked="yes" id="graph_check' + i +
              '" /> <label for="graph_check' + i + '">' + spectrum[1] + '</label></td><td>' +
-             String(100 / Math.pow((spectrum[2] + 1), 0.05)).slice(0,4) + '%</td></tr>'
+             String( ((100 / Math.pow((spectrum[2]/65000 + 1), 0.3))-80)*5 ).slice(0,4) + '%</td></tr>'
         );
         $('#graph_check' + i).click(function() {
             i = this.id.substring(11)
