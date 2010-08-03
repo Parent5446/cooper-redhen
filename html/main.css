@@ -139,3 +139,10 @@
 	filter:alpha(opacity=0);
 	opacity:0;
 }
+
+#exit_browse
+{
+    position: absolute;
+    right: 10px;
+    top: 5px
+}

@@ -213,6 +213,10 @@ $('#combobox_text').keyup(function(key) {
     );
 });
 
+$('#exit_browse').click(function() {
+    $("#browse_dialog").hide();
+});
+
 var current_file = 1;
 function onchange_file() {
     if(this.value) {
