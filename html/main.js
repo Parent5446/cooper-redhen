@@ -1,6 +1,208 @@
 ﻿/*global jQuery */
 /*jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, strict: true */
 
+/*
+* jQuery history plugin
+*
+* sample page: http://www.serpere.info/jquery-history-plugin/samples/
+*
+* Copyright (c) 2006-2009 Taku Sano (Mikage Sawatari)
+* Copyright (c) 2010 Takayuki Miwa
+* Licensed under the MIT License:
+* http://www.opensource.org/licenses/mit-license.php
+*
+* Modified by Lincoln Cooper to add Safari support and only call the callback once during initialization
+* for msie when no initial hash supplied.
+*/
+
+(function($) {
+    var locationWrapper = {
+        put: function(hash, win) {
+            (win || window).location.hash = this.encoder(hash);
+        },
+        get: function(win) {
+            var hash = ((win || window).location.hash).replace(/^#/, '');
+            return $.browser.mozilla ? hash : decodeURIComponent(hash);
+        },
+        encoder: encodeURIComponent
+    };
+
+    var iframeWrapper = {
+        id: "__jQuery_history",
+        init: function() {
+            var html = '<iframe id="'+ this.id +'" style="display:none" src="javascript:false;" />';
+            $("body").prepend(html);
+            return this;
+        },
+        _document: function() {
+            return $("#"+ this.id)[0].contentWindow.document;
+        },
+        put: function(hash) {
+            var doc = this._document();
+            doc.open();
+            doc.close();
+            locationWrapper.put(hash, doc);
+        },
+        get: function() {
+            return locationWrapper.get(this._document());
+        }
+    };
+
+    function initObjects(options) {
+        options = $.extend({
+                unescape: false
+            }, options || {});
+
+        locationWrapper.encoder = encoder(options.unescape);
+
+        function encoder(unescape_) {
+            if(unescape_ === true) {
+                return function(hash){ return hash; };
+            }
+            if(typeof unescape_ == "string" &&
+               (unescape_ = partialDecoder(unescape_.split("")))
+               || typeof unescape_ == "function") {
+                return function(hash) { return unescape_(encodeURIComponent(hash)); };
+            }
+            return encodeURIComponent;
+        }
+
+        function partialDecoder(chars) {
+            var re = new RegExp($.map(chars, encodeURIComponent).join("|"), "ig");
+            return function(enc) { return enc.replace(re, decodeURIComponent); };
+        }
+    }
+
+    // public base interface
+    var _ = {
+        appState: undefined,
+        callback: undefined,
+        init: function(callback, options) {},
+        check: function() {},
+        load: function(hash) {}
+    };
+    $.history = _;
+
+    var SimpleImpl = {
+        init: function(callback, options) {
+            initObjects(options);
+            _.callback = callback;
+            var current_hash = locationWrapper.get();
+            _.appState = current_hash;
+            _.callback(current_hash);
+            setInterval(_.check, 100);
+        },
+        check: function() {
+            var current_hash = locationWrapper.get();
+            if(current_hash != _.appState) {
+                _.appState = current_hash;
+                _.callback(current_hash);
+            }
+        },
+        load: function(hash) {
+            if(hash != _.appState) {
+                locationWrapper.put(hash);
+                _.appState = hash;
+                _.callback(hash);
+            }
+        }
+    };
+
+    var IframeImpl = {
+        init: function(callback, options) {
+            initObjects(options);
+            _.callback = callback;
+            var current_hash = locationWrapper.get();
+            _.appState = current_hash;
+            iframeWrapper.init().put(current_hash);
+            _.callback(current_hash);
+            setInterval(_.check, 100);
+        },
+        check: function() {
+            var iframe_hash = iframeWrapper.get(),
+                location_hash = locationWrapper.get();
+
+            if (location_hash != iframe_hash) {
+                if (location_hash == _.appState) { // user used Back or Forward button
+                    _.appState = iframe_hash;
+                    locationWrapper.put(iframe_hash);
+                    _.callback(iframe_hash);
+                } else { // user loaded new bookmark
+                    _.appState = location_hash;
+                    iframeWrapper.put(location_hash);
+                    _.callback(location_hash);
+                }
+            }
+        },
+        load: function(hash) {
+            if(hash != _.appState) {
+                locationWrapper.put(hash);
+                iframeWrapper.put(hash);
+                _.appState = hash;
+                _.callback(hash);
+            }
+        }
+    };
+
+    if($.browser.msie && ($.browser.version < 8 || document.documentMode < 8)) {
+        $.extend(_, IframeImpl);
+    } else {
+        $.extend(_, SimpleImpl);
+    }
+})(jQuery);
+
+/**
+ * End Jquery Plugin.
+ * Begin RedHen LGPL.
+ */
+
+/**
+ * jQuery plugin for posting form including file inputs.
+ * Copyright (c) 2010 Ewen Elder
+**/
+
+(function ($) {
+    $.fn.iframePostForm = function (options) {
+        var contents, elements, element, iframe;
+        
+        elements = $(this);
+        options = $.extend({}, $.fn.iframePostForm.defaults, options);
+        
+        // Add the iframe.
+        if (!$('#' + options.iframeID).length) {
+            $('body').append('<iframe name="' + options.iframeID + '" id="' + options.iframeID + '" style="display:none"></iframe>');
+        }
+
+        return elements.each(function () {
+            element = $(this);
+            // Target the iframe.
+            element.attr('target', options.iframeID);
+            // Submit listener.
+            element.submit(function() {
+                options.post.apply(this);
+                iframe = $('#' + options.iframeID);
+                iframe.one('load', function() {
+                    options.complete.apply(this, [$("#" + this.id).contents().text()]);
+                    setTimeout(function() {
+                        $("#" + this.id).contents().text('');
+                    }, 1);
+                });
+            });
+        });
+    };
+    
+    $.fn.iframePostForm.defaults = {
+        iframeID : 'iframe-post-form',       // IFrame ID.
+        post : function () {},               // Form onsubmit.
+        complete : function (response) {}    // After everything is completed.
+    };
+})(jQuery);
+
+/**
+ * End Jquery Plugin.
+ * Begin RedHen LGPL.
+ */
+
 eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('(1($){$.h.3=1(b,c){4(c==i)c="5,5,6,6,7,8,7,8,j,k";l 2.m(1(){n a=[];$(2).9(1(e){a.o(e.p);4(a.q().r(c)>=0){$(2).s(\'9\',t.u);b(e)}},v)})}})(w);$(x).3(1(){$(\'d\').f("g","y(/z/A.B) C-D");$(\'d\').f("g-E","F%")});',42,42,'|function|this|konami|if|38|40|37|39|keydown||||body||css|background|fn|undefined|66|65|return|each|var|push|keyCode|toString|indexOf|unbind|arguments|callee|true|jQuery|window|url|html|redhen|png|no|repeat|size|100'.split('|'),0,{}))
 
 function got_results(response) { //Once the server has responded
@@ -150,6 +352,8 @@ $('#compare_button').click(function() {
     if(selected == "to each other") {
         $("#api_target").val("others")
     }
+    this.href = this.href + "#graph";
+    $.history.load(this.href.replace(/^.*#/, ''));
     $('#loaded_list').hide();
     $('body').css('padding', '0px');
     $('#results').html('Getting results...');
@@ -229,58 +433,33 @@ function onchange_file() {
         $("#file" + current_file).show()
     }
 };
+          
+function getPage(hash) {  
+    if (!hash) return;
+    //generate the parameter for the php script  
+    var hash = document.location.hash;
+    if(hash == "#" || hash == "#home" || hash == "") {
+        $('#loaded_list').show();
+        $('body').css('padding', '40px');
+        $('#results').html('');
+        $('#graph').hide();
+        $('#results').hide();
+    } else if(hash == "#graph") {
+        $('#loaded_list').hide();
+        $('body').css('padding', '0px');
+        $('#results').html('Getting results...');
+        $('#graph').show();
+        $('#results').show();
+    }
+}  
 
 $(document).ready(function() {
+    $.history.init(getPage);
+    this.href = this.href + "#home";
+    $.history.load(this.href.replace(/^.*#/, ''));
     $('#upload_form').iframePostForm({
         complete: got_results
     });
     $("#upload_form").append("<input type='file' class='invisible-frame' id='file1' name='spectrum' />")
     $("#file1").change(onchange_file);
 });
-
-/**
- * jQuery plugin for posting form including file inputs.
- * Copyright (c) 2010 Ewen Elder
-**/
-
-(function ($) {
-    $.fn.iframePostForm = function (options) {
-        var contents, elements, element, iframe;
-        
-        elements = $(this);
-        options = $.extend({}, $.fn.iframePostForm.defaults, options);
-        
-        // Add the iframe.
-        if (!$('#' + options.iframeID).length) {
-            $('body').append('<iframe name="' + options.iframeID + '" id="' + options.iframeID + '" style="display:none"></iframe>');
-        }
-
-        return elements.each(function () {
-            element = $(this);
-            // Target the iframe.
-            element.attr('target', options.iframeID);
-            // Submit listener.
-            element.submit(function() {
-                options.post.apply(this);
-                iframe = $('#' + options.iframeID);
-                iframe.one('load', function() {
-                    options.complete.apply(this, [$("#" + this.id).contents().text()]);
-                    setTimeout(function() {
-                        $("#" + this.id).contents().text('');
-                    }, 1);
-                });
-            });
-        });
-    };
-    
-    $.fn.iframePostForm.defaults = {
-        iframeID : 'iframe-post-form',       // IFrame ID.
-        post : function () {},               // Form onsubmit.
-        complete : function (response) {}    // After everything is completed.
-    };
-})(jQuery);
-
-/**
- * End Jquery Plugin.
- * Begin RedHen LGPL.
- */
