@@ -18,13 +18,13 @@
 }
 
 #browse_button {
-    background-color: white;
+    background-color: #cccccc;
     -moz-border-radius: 10px; 
     -webkit-border-radius: 10px;
 }
 
 #compare_button {
-    background-color: white;
+    background-color: #cccccc;
     -moz-border-radius: 10px; 
     -webkit-border-radius: 10px;
 }
