@@ -1,7 +1,7 @@
 .frontpage-controls
 {
-    width:250px;
-    height:80px;
+    width:340px;
+    height:150px;
     position:relative;
     background-color: #A94040;
     -moz-border-radius: 10px; 
@@ -16,6 +16,13 @@
 {
     width: 120px;
 }
+
+#browse_button {
+        background-color: white;
+        -moz-border-radius: 10px; 
+        -webkit-border-radius: 10px;
+}
+
 .combobox-text
 {
     width:220px;
