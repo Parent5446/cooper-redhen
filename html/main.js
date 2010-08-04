@@ -461,7 +461,7 @@ $('#exit_projects').click(function() {
     $("#projects_dialog").hide();
 });
 
-var current_file = 1;
+var current_file = 1; //Change this to a static variable
 function onchange_file() {
     if(this.value) {
         $(this).unbind("change");
@@ -470,7 +470,7 @@ function onchange_file() {
         current_file++;
         $("#upload_form").append("<input type='file' class='invisible-frame' id='file" + current_file + "' name='spectrum' />")
         $("#file" + current_file).change(onchange_file);
-        $("#file" + current_file).show()
+        $("#file" + current_file).show();
     }
 };
           
