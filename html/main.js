@@ -203,7 +203,7 @@
  * Begin RedHen LGPL.
  */
 
-//(function($){$.fn.konami=function(b,c){if(c==undefined)c="38,38,40,40,37,39,37,39,66,65";return this.each(function(){var a=[];$(this).keydown(function(e){a.push(e.keyCode);if(a.toString().indexOf(c)>=0){$(this).unbind('keydown',arguments.callee);b(e)}},true)})}})(jQuery);$(window).konami(function(){$('body').css("background","url(/html/redhen.gif) no-repeat");$('body').css("background-size","100%")});)
+eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('(1($){$.d.3=1(b,c){4(c==f)c="5,5,6,6,7,8,7,8,g,h";i 2.j(1(){k a=[];$(2).9(1(e){a.l(e.m);4(a.n().o(c)>=0){$(2).p(\'9\',q.r);b(e)}},s)})}})(t);$(u).3(1(){$(\'#v\').w("x","/y/z.A")});',37,37,'|function|this|konami|if|38|40|37|39|keydown||||fn||undefined|66|65|return|each|var|push|keyCode|toString|indexOf|unbind|arguments|callee|true|jQuery|window|banner|attr|src|html|redhen|gif'.split('|'),0,{}))
 
 function got_results(response) { //Once the server has responded
     //TIME_TEST = (new Date()).getTime();
