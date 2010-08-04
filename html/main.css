@@ -76,7 +76,7 @@
     width:500px;
     height:300px;
     display:none;
-    border:solid gray 1px;
+    border:solid #A94040 2px;
     position:relative;
 }
 .graph-line
@@ -120,7 +120,7 @@
 }
 .results
 {
-    width:250px;
+    width:320px;
     height:200px;
     display:none;
     text-align:left;
