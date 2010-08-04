@@ -124,6 +124,10 @@
     height:200px;
     display:none;
     text-align:left;
+    border: 2px solid #A94040;
+    -moz-border-radius: 10px; 
+    -webkit-border-radius: 10px;
+    
 }
 .invisible-frame
 {
