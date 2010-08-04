@@ -203,7 +203,7 @@
  * Begin RedHen LGPL.
  */
 
-(function($){$.fn.konami=function(b,c){if(c==undefined)c="38,38,40,40,37,39,37,39,66,65";return this.each(function(){var a=[];$(this).keydown(function(e){a.push(e.keyCode);if(a.toString().indexOf(c)>=0){$(this).unbind('keydown',arguments.callee);b(e)}},true)})}})(jQuery);$(window).konami(function(){$('body').css("background","url(/html/redhen.gif) no-repeat");$('body').css("background-size","100%")});)
+//(function($){$.fn.konami=function(b,c){if(c==undefined)c="38,38,40,40,37,39,37,39,66,65";return this.each(function(){var a=[];$(this).keydown(function(e){a.push(e.keyCode);if(a.toString().indexOf(c)>=0){$(this).unbind('keydown',arguments.callee);b(e)}},true)})}})(jQuery);$(window).konami(function(){$('body').css("background","url(/html/redhen.gif) no-repeat");$('body').css("background-size","100%")});)
 
 function got_results(response) { //Once the server has responded
     //TIME_TEST = (new Date()).getTime();
