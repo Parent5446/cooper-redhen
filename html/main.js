@@ -312,8 +312,13 @@ function got_results(response) { //Once the server has responded
 };
 
 function unload(file) {
-    $('#checkbox_' + file).remove();
-    $('#file' + file).remove();
+    if(file == "all") {
+        $("div[id^='checkbox_']").remove();
+        $("input[id^='file']").remove();
+    else {
+        $('#checkbox_' + file).remove();
+        $('#file' + file).remove();
+    }
 }
 
 function add_to_list(s, id) {
@@ -375,6 +380,7 @@ $('#compare_button').click(function() {
     }
     this.href = this.href + "#graph";
     $.history.load(this.href.replace(/^.*#/, ''));
+    unload("all");
     $('#loaded_list').hide();
     $('body').css('padding', '0px');
     $('#results').html('Getting results...');
