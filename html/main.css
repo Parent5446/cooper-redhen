@@ -1,7 +1,7 @@
 .frontpage-controls  /*MAIN CONTROLS*/
 {
     width:320px;
-    height: 80px;
+    height: 100%;
     position:relative;
     background-color: #A94040;
     -moz-border-radius: 10px; 
@@ -123,7 +123,7 @@
 .results
 {
     width:320px;
-    height:200px;
+    height:100%;
     display:none;
     text-align:left;
     border: 2px solid #A94040;
