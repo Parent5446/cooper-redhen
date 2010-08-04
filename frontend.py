@@ -42,7 +42,7 @@ Comparing Options:
 """
 from google.appengine.api import users, memcache, quota
 from google.appengine.ext import webapp, db
-from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.ext.webapp.util import run_wsgi_app, login_required
 from google.appengine.runtime.apiproxy_errors import CapabilityDisabledError
 
 import common
@@ -108,25 +108,29 @@ class ApiHandler(webapp.RequestHandler):
             backend.auth(user, "public", "spectrum")
             backend.update()
         elif action == "projects":
+            if user is None:
+                raise common.AuthError(user, "Not logged in.")
             query = "WHERE owners = :1"
             response = [(str(proj.key()), proj.name) for proj in backend.Project.gql(query, user)]
         elif action == 'regenerate':
-            backend.auth(user, "public", "project")
-            [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
-            [db.delete(s) for s in backend.Project.all(keys_only=True)]
-            memcache.flush_all()
-            import os
-            for s in os.listdir('infrared'):
-                if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)
-            for s in os.listdir('raman'):
-                if s[0]!='.': backend.add( open('raman/'+s).read(), 'public', False) 
-            response = ["Success"]
+            return self.regenerate()
         else:
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
         # Pass it on to self.output for processing.
-        
         self._output(response)
+    
+    @login_required
+    def regenerate(self):
+        [db.delete(s) for s in backend.Spectrum.all(keys_only=True)]
+        [db.delete(s) for s in backend.Project.all(keys_only=True)]
+        memcache.flush_all()
+        import os
+        for s in os.listdir('infrared'):
+            if s[0]!='.': backend.add( open('infrared/'+s).read(), 'public', False)
+        for s in os.listdir('raman'):
+            if s[0]!='.': backend.add( open('raman/'+s).read(), 'public', False) 
+        self._output(["Success"])
     
     def _output(self, response):
         """

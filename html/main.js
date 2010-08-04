@@ -346,6 +346,10 @@ $('#browse_button').click(function() {
     if(selected == "my projects") {
         $('#projects_dialog').show();
         $.get("/api", {action: "projects", output: "json"}, function(data) {
+            alert(data)
+            if(data[0] == "AuthError") {
+                window.location = data[3];
+            }
             var projects = [];
             $.each(data, function(i, project) {
                 projects.push('<div id="' + project[0] + '" class="project">' + project[1] + '</div>');
