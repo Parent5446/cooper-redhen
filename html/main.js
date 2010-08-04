@@ -315,6 +315,7 @@ function unload(file) {
     if(file == "all") {
         $("div[id^='checkbox_']").remove();
         $("input[id^='file']").remove();
+        }
     else {
         $('#checkbox_' + file).remove();
         $('#file' + file).remove();
