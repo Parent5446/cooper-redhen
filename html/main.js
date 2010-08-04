@@ -437,6 +437,12 @@ $('#combobox_text').keyup(function(key) {
     );
 });
 
+$("#new_project").click(function() {
+    $.get("/api", {action: "browse", output: "json", targt: $("#projects_text").val()}, function(data) {
+        $('#projects_dropdown').hide(); //Finally, display it
+    }, 'json');
+});
+
 $('#exit_browse').click(function() {
     $("#browse_dialog").hide();
 });
