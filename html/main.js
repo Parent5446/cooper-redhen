@@ -346,7 +346,6 @@ $('#browse_button').click(function() {
     if(selected == "my projects") {
         $('#projects_dialog').show();
         $.get("/api", {action: "projects", output: "json"}, function(data) {
-            alert(data)
             if(data[0] == "AuthError") {
                 window.location = data[3];
             }
@@ -443,7 +442,7 @@ $('#combobox_text').keyup(function(key) {
 
 $("#new_project").click(function() {
     $.get("/api", {action: "browse", output: "json", targt: $("#projects_text").val()}, function(data) {
-        $('#projects_dropdown').hide(); //Finally, display it
+        $('#projects_dialog').hide(); //Finally, hide it
     }, 'json');
 });
 

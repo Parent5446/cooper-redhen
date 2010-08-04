@@ -152,6 +152,6 @@
     top: 5px
 }
 
-#exit_browse:hover {
+#exit_browse:hover, #exit_projects:hover {
     color: red;
 }
