@@ -1,6 +1,7 @@
 .frontpage-controls  /*MAIN CONTROLS*/
 {
     width:320px;
+    height: 80px;
     position:relative;
     background-color: #A94040;
     -moz-border-radius: 10px; 
@@ -20,14 +21,14 @@
     background-color: #cccccc;
     -moz-border-radius: 10px; 
     -webkit-border-radius: 10px;
-    font-weight: bold;
+    font-weight: bolder;
 }
 
 #compare_button {
     background-color: #cccccc;
     -moz-border-radius: 10px; 
     -webkit-border-radius: 10px;
-    font-weight: bold;
+    font-weight: bolder;
 }
 
 .combobox-text
