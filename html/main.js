@@ -207,6 +207,7 @@ eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a
 
 function got_results(response) { //Once the server has responded
     //TIME_TEST = (new Date()).getTime();
+    $('#results').html('Results:');
     response = $.parseJSON(response);
     if(response[0] == "InputError") { alert("Invalid Input.\n"+"Why: "+response[2]); return; }
     else if(response[0] == "ServerError") { alert("Server Error.\n"+"Why: "+response[1]); return; }
