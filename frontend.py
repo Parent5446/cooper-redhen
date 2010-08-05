@@ -92,6 +92,7 @@ class ApiHandler(webapp.RequestHandler):
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
+            raise Exception('here')
             response = backend.browse(target, offset, guess, spectrum_type) #a list of names and keys
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.

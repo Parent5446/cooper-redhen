@@ -308,7 +308,6 @@ function got_results(response) { //Once the server has responded
         $('#tracepoint').hide();
         document.body.style.cursor = "default";
     });
-    unload("all"); //Remove files left over from this action
     //alert('Display takes '+((new Date()).getTime()-TIME_TEST)/1000.0+' seconds');
 };
 
@@ -316,6 +315,8 @@ function unload(file) {
     if(file=="all") {
         $("div[id^='checkbox_']").remove();
         $("input[id^='file']").remove();
+        $("#upload_form").append("<input type='file' class='invisible-frame' id='file1' name='spectrum' />");
+        $("#file1").change(onchange_file);
     }
     else {
         $('#checkbox_' + file).remove();
@@ -500,6 +501,5 @@ $(document).ready(function() {
     $('#upload_form').iframePostForm({
         complete: got_results
     });
-    $("#upload_form").append("<input type='file' class='invisible-frame' id='file1' name='spectrum' />")
-    $("#file1").change(onchange_file);
+    unload("all"); //Unload files left over from last action
 });
