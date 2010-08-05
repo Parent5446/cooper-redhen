@@ -540,7 +540,8 @@ class Spectrum(db.Model):
         '''
         project = Project.get_or_insert(target)
         # Get heavyside key and peaks.
-        peaks = self.calculate_peaks()
+        if hasattr(self, 'xy'): peaks = self.calculate_peaks() #For user-entered spectra
+        else: peaks = [self.peak] #For database spectra
         heavyside = self.calculate_heavyside()
         # Check memcached for the data.
         key = self.spectrum_type + '_heavyside_' + str(heavyside) #Get the heavyside key
