@@ -124,9 +124,8 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
         spectra = memcache.get(spectrum_type + '_browse_' + guess[0:4])
         if spectra is None:
             query = "WHERE prefixes = :1 AND spectrum_type = :2"
-            query = Spectrum.gql(query, guess, spectrum_type)
-            spectra = [(str(spectrum.key()), spectrum.chemical_name)
-                       for spectrum in query]
+            query = Spectrum.gql(query, [guess], spectrum_type)
+            spectra = [(str(spectrum.key()), spectrum.chemical_name) for spectrum in query]
             memcache.set(spectrum_type + '_browse_' + guess[0:4], spectra)
         return spectra
     else: #Browse the whole project
@@ -511,8 +510,9 @@ class Spectrum(db.Model):
             # FIXME: Assumes chemical name is in TITLE label.
             match = re.search( '([^a-zA-Z]*)([a-zA-Z])(.*?)[ %,\+\-\d]*(.jdx)?$', self.get_field('##TITLE=') )
             self.chemical_name = match.group(1) + match.group(2).upper() + match.group(3)
-            self.prefixes = [self.chemical_name.lower()[0:4],
-                             "".join([match.group(2), match.group(3)]).lower()[0:4]]
+            #The following line is crippled so that gql can look it up:
+            #self.prefixes = ["".join([match.group(2), match.group(3)]).lower()[0:4]] 
+            self.prefixes = [self.chemical_name.lower()[0:4], "".join([match.group(2), match.group(3)]).lower()[0:4]]
         # Reference: http://www.jcamp-dx.org/
     
     def get_field(self, name):

@@ -415,7 +415,6 @@ $('#combobox_text').keyup(function(key) {
         '/api',
         {
             action: 'browse',
-            type: 'infrared',
             guess: $('#combobox_text').val(),
             type: spectrum_type,
             target: target
@@ -426,6 +425,7 @@ $('#combobox_text').keyup(function(key) {
                 guesses.push('<div id="' + guess[0] + '" class="guess">' + guess[1] + '</div>');
             });
             $('#combobox_dropdown').html(guesses.join(' '));
+            $('#combobox_dropdown').show();
             $(".guess").each(function(i, guess) {
                 $(guess).click(function() {
                     $('#browse_dialog').hide();
@@ -442,7 +442,7 @@ $('#combobox_text').keyup(function(key) {
                     file_upload.attr('id', 'file' + current_file);
                 });
             });
-            $('#projects_dropdown').hide();//Finally, hide it
+            $('#projects_dropdown').hide();//Finally, hide projects
         },
         'json'
     );
