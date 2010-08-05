@@ -1,4 +1,4 @@
-﻿/*global jQuery */
+﻿﻿/*global jQuery */
 /*jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, strict: true */
 
 /*
@@ -284,7 +284,7 @@ function got_results(response) { //Once the server has responded
     $('#graph').mousemove(function(e) { //Add functions to the graph
         document.body.style.cursor="crosshair";
         var x = Math.floor(e.pageX - $('#graph').position().left);
-		var presentablex = parseInt((x/500) * (maxwave - minwave) + minwave);
+                var presentablex = parseInt((x/500) * (maxwave - minwave) + minwave);
         $('#floatybar').css('left', x);
         $('#floatybar').css('bottom', spectra[selected].data[x]);
         $('#floatybar').html(presentablex + ', ' + spectra[selected].data[x]);
@@ -308,14 +308,15 @@ function got_results(response) { //Once the server has responded
         $('#tracepoint').hide();
         document.body.style.cursor = "default";
     });
+    unload("all"); //Remove files left over from this action
     //alert('Display takes '+((new Date()).getTime()-TIME_TEST)/1000.0+' seconds');
 };
 
 function unload(file) {
-    if(file == "all") {
+    if(file=="all") {
         $("div[id^='checkbox_']").remove();
         $("input[id^='file']").remove();
-        }
+    }
     else {
         $('#checkbox_' + file).remove();
         $('#file' + file).remove();
@@ -381,7 +382,6 @@ $('#compare_button').click(function() {
     }
     this.href = this.href + "#graph";
     $.history.load(this.href.replace(/^.*#/, ''));
-    unload("all");
     $('#loaded_list').hide();
     $('body').css('padding', '0px');
     $('#results').html('Getting results...');
@@ -441,7 +441,7 @@ $('#combobox_text').keyup(function(key) {
                     file_upload.attr('id', 'file' + current_file);
                 });
             });
-            $('#combobox_dropdown').show(); //Finally, display it
+            $('#projects_dropdown').hide();//Finally, hide it
         },
         'json'
     );
@@ -449,7 +449,7 @@ $('#combobox_text').keyup(function(key) {
 
 $("#new_project").click(function() {
     $.get("/api", {action: "browse", output: "json", targt: $("#projects_text").val()}, function(data) {
-        $('#projects_dialog').hide(); //Finally, hide it
+        $('#projects_dropdown').hide(); //Finally, display it
     }, 'json');
 });
 
@@ -461,7 +461,7 @@ $('#exit_projects').click(function() {
     $("#projects_dialog").hide();
 });
 
-var current_file = 1; //Change this to a static variable
+var current_file = 1;
 function onchange_file() {
     if(this.value) {
         $(this).unbind("change");
@@ -470,7 +470,7 @@ function onchange_file() {
         current_file++;
         $("#upload_form").append("<input type='file' class='invisible-frame' id='file" + current_file + "' name='spectrum' />")
         $("#file" + current_file).change(onchange_file);
-        $("#file" + current_file).show();
+        $("#file" + current_file).show()
     }
 };
           
