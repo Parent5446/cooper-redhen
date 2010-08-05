@@ -120,6 +120,7 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     or if an invalid database choice is given.
     '''
     if guess: #If the user has guessed the first 4 chars
+        guess = guess.lower()
         spectra = memcache.get(spectrum_type + '_browse_' + guess[0:4])
         if spectra is None:
             query = "WHERE prefixes = :1 AND spectrum_type = :2"
