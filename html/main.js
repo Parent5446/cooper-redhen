@@ -431,6 +431,7 @@ $('#combobox_text').keyup(function(key) {
                     $('#browse_dialog').hide();
                     $('#combobox_dropdown').hide();
                     $('#combobox_dropdown').html('');
+                    $('#combobox_text').val('');
                     $("#upload_form").append(
                         "<input type='hidden' id='file" + current_file +
                         "' name='spectrum' value='db:" + $(guess).attr('id') + "' />"
@@ -456,6 +457,9 @@ $("#new_project").click(function() {
 
 $('#exit_browse').click(function() {
     $("#browse_dialog").hide();
+    $('#combobox_dropdown').hide();
+    $('#combobox_dropdown').html('');
+    $('#combobox_text').val('');
 });
 
 $('#exit_projects').click(function() {
