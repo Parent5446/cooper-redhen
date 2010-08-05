@@ -48,15 +48,14 @@ def search(spectra_data, algorithm="bove"):
         # Load the user's spectrum into a Spectrum object.
         if spectrum_data[0:3] == "db:":
             spectrum = Spectrum.get(db.Key(spectrum_data[3:]))
-            spectrum.error = 0 #This is the original - no error
-            results.append(spectrum) #Add to results
-            continue #Don't try to parse as a file
         else:
             spectrum = Spectrum()
             try:
                 spectrum.parse_string(spectrum_data)
             except NameError:
                 raise common.InputError(spectrum_data, "Invalid spectrum data.")
+        spectrum.error = 'original' #This is the original - no error
+        results.append(spectrum) #Add to results
         # Do one-to-one on candidates and sort by error
         candidates = spectrum.find_similar()
         for candidate in candidates:
