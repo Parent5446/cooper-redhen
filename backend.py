@@ -555,8 +555,9 @@ class Spectrum(db.Model):
                            if spectrum.key() in project.spectra])
             memcache.set(key, spectra)
         # Sort by smallest distance to peaks and return top 20.
-        keys = sorted(spectra, key=lambda s: min([s[0] - peak for peak in peaks]))
-        return Spectrum.get([k[1] for k in keys[:20]])
+        keys = sorted(spectra, key=lambda s: min([s[0] - peak for peak in peaks]), reverse=True)
+        if hasattr(self, 'xy'): return Spectrum.get([k[1] for k in keys[:20]]) #For user-entered spectra
+        else: return Spectrum.get([k[1] for k in keys[1:10]]) #For database spectra
     
     def calculate_peaks(self):
         '''
