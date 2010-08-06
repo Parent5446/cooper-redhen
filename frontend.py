@@ -18,7 +18,7 @@ General Options:
  - spectrum (required for some actions): The spectrum (either file or database
    key) to do the action on. Depending on the action, multiple spectra can be
    uploaded here.
- - target (optional, defaults to "public"):
+ - targt (optional, defaults to "public"):
     - When action is "compare": Can be either "public" to search the spectrum
       against the public database or it can be another file upload if comparing
       two spectra against each other.
@@ -52,7 +52,7 @@ class ApiHandler(webapp.RequestHandler):
     """Handle any API requests and return a JSON response."""
     
     def get(self):
-        if self.request.get("action") in ("update", "projects", "data", "browse", "regenerate"):
+        if self.request.get("action") in ("update", "projects", "data", "browse", "regenerate", "purge"):
             self.post()
         else:
             self.help()
@@ -71,7 +71,7 @@ class ApiHandler(webapp.RequestHandler):
         
         action = self.request.get("action")
         target = self.request.get("targt", "public")
-        spectra = filter(lambda x: x, self.request.get_all("spectrum"))
+        spectra = filter(None, self.request.get_all("spectrum"))
         offset = self.request.get("offset", 0)
         algorithm = self.request.get("algorithm", "bove")
         guess = self.request.get("guess")
@@ -83,16 +83,16 @@ class ApiHandler(webapp.RequestHandler):
         if action == "compare" and target == "public":
             # Search the database for something.
             result = backend.search(spectra, algorithm)
-            response = ([('a blank', spec.chemical_name, spec.error, [int(d*300.0/65535+0.5) for d in spec.data], spec.spectrum_type) for spec in result])
+            self._output([('a blank', spec.chemical_name, spec.error, [int(d*300.0/65535+0.5) for d in spec.data], spec.spectrum_type) for spec in result])
         elif action == "compare":
             # Compare multiple spectra uploaded in this session.
             result = backend.compare(spectra, algorithm)
-            response = ([('Not from database', spec.chemical_name, spec.error, [int(d*300.0/65535+0.5) for d in spec.data], spec.spectrum_type) for spec in result])
+            self._output([('Not from database', spec.chemical_name, spec.error, [int(d*300.0/65535+0.5) for d in spec.data], spec.spectrum_type) for spec in result])
         elif action == "browse":
             # Get a list of spectra from the database for browsing
             backend.auth(user, target, "view")
             # Return the database key, name, and chemical type.
-            response = backend.browse(target, offset, guess, spectrum_type) #a list of names and keys
+            self._output(backend.browse(target, offset, guess, spectrum_type)) #a list of names and keys
         elif action == "add":
             # Add a new spectrum to the database. Supports multiple spectra.
             backend.auth(user, target, "spectrum")
@@ -104,6 +104,10 @@ class ApiHandler(webapp.RequestHandler):
             # Delete a spectrum from the database.
             backend.auth(user, target, "spectrum")
             backend.delete(spectra, target)
+        elif action == "purge":
+            # Delete a project from the database.
+            backend.auth(user, target, "project")
+            backend.Project.get(target).delete()
         elif action == "update":
             backend.auth(user, "public", "spectrum")
             backend.update()
@@ -111,14 +115,12 @@ class ApiHandler(webapp.RequestHandler):
             if user is None:
                 raise common.AuthError(user, "Not logged in.")
             query = "WHERE owners = :1"
-            response = [(str(proj.key()), proj.name) for proj in backend.Project.gql(query, user)]
+            self._output([(str(proj.key()), proj.name) for proj in backend.Project.gql(query, user)])
         elif action == 'regenerate':
-            return self.regenerate()
+            self.regenerate()
         else:
             # Invalid action. Raise an error.
             raise common.InputError(action, "Invalid API action.")
-        # Pass it on to self.output for processing.
-        self._output(response)
     
     @login_required
     def regenerate(self):
@@ -183,7 +185,7 @@ class ApiHandler(webapp.RequestHandler):
             self._output(["InputError", exception.expr, exception.msg])
         elif isinstance(exception, common.AuthError):
             # Authorization error: the user tried to do something disallowed.
-            self.error(401)
+#            self.error(401)
             url = users.create_login_url("/")
             self._output(["AuthError", exception.expr, exception.msg, url])
         elif isinstance(exception, CapabilityDisabledError):

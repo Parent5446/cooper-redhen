@@ -316,7 +316,7 @@ function unload(file) {
     if(file=="all") {
         $("div[id^='checkbox_']").remove();
         $("input[id^='file']").remove();
-        $("#upload_form").append("<input type='file' class='invisible-frame' id='file1' name='spectrum' />");
+        $("#upload_form").append("<input type='file' class='upload-frame' id='file1' name='spectrum' />");
         $("#file1").change(onchange_file);
     }
     else {
@@ -363,15 +363,15 @@ $('#browse_button').click(function() {
                 projects.push('<div id="' + project[0] + '" class="project">' + project[1] + '</div>');
             });
             $('#projects_dropdown').html(projects.join(' '));
-            $(".project").each(function(i, project) {
-                $(project).click(function() {
-                    target = $(this).attr("id");
-                    $('#browse_dialog').show();
-                });
+            $(".project").click(function() {
+                target = $(this).attr("id");
+                $('#browse_dialog').show();
+                $('#project_options').show();
             });
             $('#projects_dropdown').show(); //Finally, display it
         }, 'json');
     } else {
+        $('#project_options').hide();
         $('#browse_dialog').show();
         $('#combobox_text').focus();
     }
@@ -402,6 +402,21 @@ $('#browse_options').change(function() {
     }
 });
 
+$("#delete_button").click(function() {
+    $.get(
+        '/api',
+        {
+            action: 'purge',
+            guess: $('#combobox_text').val(),
+            targt: target
+        },
+        function() {
+            $("#browse_dialog").hide()
+        }
+    );
+    $("#" + target).remove();
+});
+
 var target = "public";
 $('#combobox_text').keyup(function(key) {
     var unicode = key.keyCode ? key.keyCode : key.charCode;
@@ -418,7 +433,7 @@ $('#combobox_text').keyup(function(key) {
             action: 'browse',
             guess: $('#combobox_text').val(),
             type: spectrum_type,
-            target: target
+            targt: target
         },
         function(data) {
             var guesses = [];
@@ -452,13 +467,30 @@ $('#combobox_text').keyup(function(key) {
 
 $("#new_project").click(function() {
     $.get("/api", {action: "browse", output: "json", targt: $("#projects_text").val()}, function(data) {
-        $('#projects_dropdown').hide(); //Finally, display it
+        $('#projects_dropdown').hide();
+        $.get("/api", {action: "projects", output: "json"}, function(data) {
+            if(data[0] == "AuthError") {
+                window.location = data[3];
+            }
+            var projects = [];
+            $.each(data, function(i, project) {
+                projects.push('<div id="' + project[0] + '" class="project">' + project[1] + '</div>');
+            });
+            $('#projects_dropdown').html(projects.join(' '));
+            $(".project").click(function() {
+                target = $(this).attr("id");
+                $('#browse_dialog').show();
+                $('#project_options').show();
+            });
+            $('#projects_dropdown').show(); //Finally, display it
+        }, 'json');
     }, 'json');
 });
 
 $('#exit_browse').click(function() {
     $("#browse_dialog").hide();
     $('#combobox_dropdown').hide();
+    $('#project_options').hide();
     $('#combobox_dropdown').html('');
     $('#combobox_text').val('');
 });
@@ -474,11 +506,18 @@ function onchange_file() {
         add_to_list(this.value.match('[^\\\\]+$'), current_file);
         $(this).hide();
         current_file++;
-        $("#upload_form").append("<input type='file' class='invisible-frame' id='file" + current_file + "' name='spectrum' />")
+        $("#upload_form").append("<input type='file' class='upload-frame' id='file" + current_file + "' name='spectrum' />")
         $("#file" + current_file).change(onchange_file);
         $("#file" + current_file).show()
     }
 };
+      
+$("#added_file").change(function() {
+    if(this.value) {
+        $("#add_target").val(target);
+        $("#add_form").submit();
+    }
+});
           
 function getPage(hash) {  
     if (!hash) return;
@@ -506,5 +545,6 @@ $(document).ready(function() {
     $('#upload_form').iframePostForm({
         complete: got_results
     });
+    $('#add_form').iframePostForm();
     unload("all"); //Unload files left over from last action
 });

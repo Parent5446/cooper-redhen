@@ -13,6 +13,7 @@ import operator # operator.attrgetter, operator.itemgetter
 import struct
 import array
 import StringIO
+import itertools
 
 from google.appengine.ext import db # import database
 from google.appengine.api import memcache, users # import memory cache and user
@@ -119,17 +120,23 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     at once, the user is not logged in and tries to access a private database,
     or if an invalid database choice is given.
     '''
-    if guess: #If the user has guessed the first 4 chars
+    try:
+        target = Project.get(target)
+    except db.BadKeyError:
+        target = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
+    if guess:
+        # If the user has guessed the first 4 chars.
         guess = guess.lower()
         spectra = memcache.get(spectrum_type + '_browse_' + guess[0:4])
-        if spectra is None:
+        if spectra is None or target.key().name() != "public":
             query = "WHERE prefixes = :1 AND spectrum_type = :2"
             query = Spectrum.gql(query, [guess], spectrum_type)
             spectra = [(str(spectrum.key()), spectrum.chemical_name) for spectrum in query]
-            memcache.set(spectrum_type + '_browse_' + guess[0:4], spectra)
-        return spectra
-    else: #Browse the whole project
-        target = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
+            if target.key().name() == "public":
+                memcache.set(spectrum_type + '_browse_' + guess[0:4], spectra)
+        return [spectrum for spectrum in spectra if db.Key(spectrum[0]) in target.spectra]
+    else:
+        #Browse the whole project
         return [(str(spectrum.key()), spectrum.chemical_name) for spectrum in Spectrum.get(target.spectra)]
         
 def add(spectra_data, target="public", preprocessed=False):
@@ -147,7 +154,10 @@ def add(spectra_data, target="public", preprocessed=False):
     if not isinstance(spectra_data, list):
         spectra_data = [spectra_data]    
     
-    project = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
+    try:
+        target = Project.get(target)
+    except db.BadKeyError:
+        target = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
     for spectrum_data in spectra_data:
         # If project does not exist, make a new one.
         # Load the user's spectrum into a Spectrum object.
@@ -163,8 +173,8 @@ def add(spectra_data, target="public", preprocessed=False):
             data = eval(urllib.unquote(spectrum_data))
             spectrum = Spectrum(**data)
         spectrum.put()
-        project.spectra.append(spectrum.key())
-    project.put()
+        target.spectra.append(spectrum.key())
+    target.put()
 
 def delete(spectra_data, target="public"):
     '''
@@ -180,7 +190,10 @@ def delete(spectra_data, target="public"):
     if not isinstance(spectra_data, list):
         spectra_data = [spectra_data]    
     
-    project = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
+    try:
+        target = Project.get(target)
+    except db.BadKeyError:
+        target = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
     for spectrum_data in spectra_data:
         # Load the spectrum into a Spectrum object.
         spectrum = Spectrum.get(spectrum_data)
@@ -189,7 +202,7 @@ def delete(spectra_data, target="public"):
             # If private, check if it is indeed the user's database.
             if not spectrum.project == target:
                 raise common.AuthError(target, "Spectrum does not belong to targeted project.")
-        project.spectra.remove(spectrum.key())
+        target.spectra.remove(spectrum.key())
         spectrum.delete()
 
 def update():
@@ -209,7 +222,7 @@ def update():
     # Put the project back in database
     project.put()
 
-def auth(user, project, action):
+def auth(user, target, action):
     '''
     Check if user is allowed to do action on project.
     
@@ -224,10 +237,8 @@ def auth(user, project, action):
     @return: Whether the user is allowed
     @rtype: C{bool}
     '''
-    if isinstance(project, unicode):
-        return True
     # The main project has separate permissions
-    if project == "public":
+    if target == "public":
         # Only app admins can change the public project.
         if action in ("spectrum", "project"):
             if users.is_current_user_admin():
@@ -237,6 +248,11 @@ def auth(user, project, action):
         else:
             # Everybody can view the main project
             return True
+    else:
+        try:
+            project = Project.get(target)
+        except db.BadKeyError:
+            project = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
     # Owners can do anything.
     if user in project.owners:
         return True
