@@ -18,7 +18,7 @@
 (function($) {
     var locationWrapper = {
         put: function(hash, win) {
-            (win || window).location.hash = this.encoder(hash);
+            (win || window).location.hash = hash;
         },
         get: function(win) {
             var hash = ((win || window).location.hash).replace(/^#/, '');
@@ -353,6 +353,8 @@ function Spectrum(spectrum_name, data, color) //Spectrum class
 $('#browse_button').click(function() {
     var selected = $('#browse_options option:selected').val();
     if(selected == "my projects") {
+        location.href = "#home/projects";
+        $.history.load(location.href.replace(/^.*#/, ''));
         $('#projects_dialog').show();
         $.get("/api", {action: "projects", output: "json"}, function(data) {
             if(data[0] == "AuthError") {
@@ -364,6 +366,8 @@ $('#browse_button').click(function() {
             });
             $('#projects_dropdown').html(projects.join(' '));
             $(".project").click(function() {
+                location.href = "#home/projects/" + $(this).attr("id") + "/browse";
+                $.history.load(location.href.replace(/^.*#/, ''));
                 target = $(this).attr("id");
                 $('#browse_dialog').show();
                 $('#project_options').show();
@@ -371,6 +375,8 @@ $('#browse_button').click(function() {
             $('#projects_dropdown').show(); //Finally, display it
         }, 'json');
     } else {
+        location.href = "#home/browse";
+        $.history.load(location.href.replace(/^.*#/, ''));
         $('#project_options').hide();
         $('#browse_dialog').show();
         $('#combobox_text').focus();
@@ -382,14 +388,15 @@ $('#compare_button').click(function() {
     if(selected == "to each other") {
         $("#api_target").val("others")
     }
-    this.href = this.href + "#graph";
-    $.history.load(this.href.replace(/^.*#/, ''));
+    location.href = "#graph";
+    $.history.load(location.href.replace(/^.*#/, ''));
     $('#loaded_list').hide();
     $('body').css('padding', '0px');
     $('#results').html('Getting results...');
     $('#graph').show();
     $('#results').show();
-    $("#upload_form").submit()
+    $("#upload_form").submit();
+    unload("all");
 });
 
 $('#browse_options').change(function() {
@@ -444,6 +451,8 @@ $('#combobox_text').keyup(function(key) {
             $('#combobox_dropdown').show();
             $(".guess").each(function(i, guess) {
                 $(guess).click(function() {
+                    location.href = "#home";
+                    $.history.load(location.href.replace(/^.*#/, ''));
                     $('#browse_dialog').hide();
                     $('#combobox_dropdown').hide();
                     $('#combobox_dropdown').html('');
@@ -488,6 +497,8 @@ $("#new_project").click(function() {
 });
 
 $('#exit_browse').click(function() {
+    location.href = "#home";
+    $.history.load(location.href.replace(/^.*#/, ''));
     $("#browse_dialog").hide();
     $('#combobox_dropdown').hide();
     $('#project_options').hide();
@@ -496,6 +507,8 @@ $('#exit_browse').click(function() {
 });
 
 $('#exit_projects').click(function() {
+    location.href = "#home";
+    $.history.load(location.href.replace(/^.*#/, ''));
     $("#projects_dialog").hide();
 });
 
@@ -522,26 +535,50 @@ $("#added_file").change(function() {
 function getPage(hash) {  
     if (!hash) return;
     //generate the parameter for the php script  
-    var hash = document.location.hash;
-    if(hash == "#" || hash == "#home" || hash == "") {
+    var hash = document.location.hash.split('/');
+    // Check top level (home or graph)
+    if(hash[0] == "#" || hash[0] == "#home" || hash[0] == "") {
         $('#loaded_list').show();
         $('body').css('padding', '40px');
-        $('#results').html('');
+        $('#results').hide('');
         $('#graph').hide();
         $('#results').hide();
-    } else if(hash == "#graph") {
+    } else if(hash[0] == "#graph") {
         $('#loaded_list').hide();
         $('body').css('padding', '0px');
-        $('#results').html('Getting results...');
+        $('#results').show();
         $('#graph').show();
         $('#results').show();
+    }
+    
+    // Check for dialog boxes.
+    if(hash[1] == "projects") {
+        $('#project_options').show();
+        $('#projects_dialog').show();
+        $('#browse_dialog').hide();
+    } else if(hash[1] == "browse") {
+        $('#project_options').hide();
+        $('#projects_dialog').hide();
+        $('#browse_dialog').show();
+        $('#combobox_text').focus();
+    } else {
+        $('#project_options').hide();
+        $('#projects_dialog').hide();
+        $('#browse_dialog').hide();
+    }
+    
+    // Check for higher levels
+    if(hash[3] == "browse") {
+        target = hash[2];
+        $('#browse_dialog').show();
+        $('#combobox_text').focus();
     }
 }  
 
 $(document).ready(function() {
     $.history.init(getPage);
-    this.href = this.href + "#home";
-    $.history.load(this.href.replace(/^.*#/, ''));
+    location.href = "#home";
+    $.history.load(location.href.replace(/^.*#/, ''));
     $('#upload_form').iframePostForm({
         complete: got_results
     });
