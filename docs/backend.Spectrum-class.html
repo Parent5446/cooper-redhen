@@ -59,20 +59,25 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class Spectrum</h1><p class="nomargin-top"><span class="codelink"><a href="backend-pysrc.html#Spectrum">source&nbsp;code</a></span></p>
 <center>
-<center>  <map id="uml_class_diagram_for_backend__3" name="uml_class_diagram_for_backend__3">
-<area shape="rect" href="backend.Spectrum-class.html#chemical_name" title="The chemical name associated with the spectrum" alt="" coords="17,28,215,47"/>
-<area shape="rect" href="backend.Spectrum-class.html#chemical_type" title="The chemical type of the substance the spectrum represents" alt="" coords="17,47,215,65"/>
-<area shape="rect" href="backend.Spectrum-class.html#data" title="A list of integrated y values for comparisons (&#39;H&#39; = unsigned short)" alt="" coords="17,65,215,84"/>
-<area shape="rect" href="backend.Spectrum-class.html#data_y_max" title="backend.Spectrum.data_y_max" alt="" coords="17,84,215,103"/>
-<area shape="rect" href="backend.Spectrum-class.html#notes" title="Notes on the spectrum if in a private database" alt="" coords="17,103,215,121"/>
-<area shape="rect" href="backend.Spectrum-class.html#spectrum_type" title="#define SPCGEN &#160;&#160;&#160;0 &#160;&#160;&#160;/* General SPC (could be anything) */ #define SPCGC 1 &#160;&#160;&#160;/* Gas Chromatogram */ #define SPCCGM &#160;&#160;&#160;2 &#160;&#160;&#160;/* General Chromatogram &#160;(same as SPCGEN with TCGRAM) */ #define SPCHPLC 3 &#160;&#160;&#160;/* HPLC Chromatogram &#160;*/ #define SPCFTIR 4 &#160;&#160;&#160;/* FT&#45;IR, FT&#45;NIR, FT&#45;Raman Spectrum or Igram (Can &#160;also be used for scanning IR.) */ #define SPCNIR &#160;&#160;&#160;5 &#160;&#160;&#160;/* NIR Spectrum &#160;(Usually multi&#45;spectral data sets for calibration.) */ #define SPCUV &#160;&#160;&#160;7 /* UV&#45;VIS Spectrum (Can be used for single scanning UV&#45;VIS&#45;NIR.) */ #define SPCXRY &#160;&#160;&#160;8 &#160;&#160;&#160;/* X&#45;ray Diffraction Spectrum */ #define SPCMS &#160;&#160;&#160;9 &#160;&#160;&#160;/* &#160;Mass Spectrum &#160;(Can be single, GC&#45;MS, Continuum, Centroid or TOF.) */ &#160;/* Raman Spectrum (Usually Diode Array, CCD, etc." alt="" coords="17,121,215,140"/>
-<area shape="rect" href="backend.Spectrum-class.html#parse_string" title="Parse a string of JCAMP file data and extract all needed data." alt="" coords="17,143,215,161"/>
-<area shape="rect" href="backend.Spectrum-class.html#get_field" title="Get a specific data field from the file." alt="" coords="17,161,215,180"/>
-<area shape="rect" href="backend.Spectrum-class.html#calculate_peaks" title="Calculate the peaks for a spectrum." alt="" coords="17,180,215,199"/>
-<area shape="rect" href="backend.Spectrum-class.html#calculate_heavyside" title="Calculate the heavyside index for a spectrum." alt="" coords="17,199,215,217"/>
-<area shape="rect" href="backend.Spectrum-class.html" title="Store a spectrum, its related data, and any algorithms necessary to compare the spectrum to the DataStore." alt="" coords="16,11,216,219"/>
+<center>  <map id="uml_class_diagram_for_backend__2" name="uml_class_diagram_for_backend__2">
+<area shape="rect" href="backend.Spectrum-class.html#chemical_name" title="The chemical name associated with the spectrum" alt="" coords="17,28,209,47"/>
+<area shape="rect" href="backend.Spectrum-class.html#chemical_type" title="The chemical type of the substance the spectrum represents" alt="" coords="17,47,209,65"/>
+<area shape="rect" href="backend.Spectrum-class.html#peak" title="The x location of the spectrum&#39;s highest peak" alt="" coords="17,65,209,84"/>
+<area shape="rect" href="backend.Spectrum-class.html#heavyside" title="The heavyside index for the spectrum." alt="" coords="17,84,209,103"/>
+<area shape="rect" href="backend.Spectrum-class.html#prefixes" title="Just the non&#45;alphabetical prefix to the chemical_name." alt="" coords="17,103,209,121"/>
+<area shape="rect" href="backend.Spectrum-class.html#FLAT_HEAVYSIDE_BITS" title="Number of bits in the heavyside index, should be a power of 2" alt="" coords="17,121,209,140"/>
+<area shape="rect" href="backend.Spectrum-class.html#data" title="A list of integrated y values for comparisons (&#39;H&#39; = unsigned short)" alt="" coords="17,140,209,159"/>
+<area shape="rect" href="backend.Spectrum-class.html#data_y_max" title="backend.Spectrum.data_y_max" alt="" coords="17,159,209,177"/>
+<area shape="rect" href="backend.Spectrum-class.html#notes" title="Notes on the spectrum if in a private database" alt="" coords="17,177,209,196"/>
+<area shape="rect" href="backend.Spectrum-class.html#spectrum_type" title="#define SPCGEN &#160;&#160;&#160;0 &#160;&#160;&#160;/* General SPC (could be anything) */ #define SPCGC 1 &#160;&#160;&#160;/* Gas Chromatogram */ #define SPCCGM &#160;&#160;&#160;2 &#160;&#160;&#160;/* General Chromatogram &#160;(same as SPCGEN with TCGRAM) */ #define SPCHPLC 3 &#160;&#160;&#160;/* HPLC Chromatogram &#160;*/ #define SPCFTIR 4 &#160;&#160;&#160;/* FT&#45;IR, FT&#45;NIR, FT&#45;Raman Spectrum or Igram (Can &#160;also be used for scanning IR.) */ #define SPCNIR &#160;&#160;&#160;5 &#160;&#160;&#160;/* NIR Spectrum &#160;(Usually multi&#45;spectral data sets for calibration.) */ #define SPCUV &#160;&#160;&#160;7 /* UV&#45;VIS Spectrum (Can be used for single scanning UV&#45;VIS&#45;NIR.) */ #define SPCXRY &#160;&#160;&#160;8 &#160;&#160;&#160;/* X&#45;ray Diffraction Spectrum */ #define SPCMS &#160;&#160;&#160;9 &#160;&#160;&#160;/* &#160;Mass Spectrum &#160;(Can be single, GC&#45;MS, Continuum, Centroid or TOF.) */ &#160;/* Raman Spectrum (Usually Diode Array, CCD, etc." alt="" coords="17,196,209,215"/>
+<area shape="rect" href="backend.Spectrum-class.html#parse_string" title="Parse a string of JCAMP file data and extract all needed data." alt="" coords="17,217,209,236"/>
+<area shape="rect" href="backend.Spectrum-class.html#get_field" title="Get a specific data field from the file." alt="" coords="17,236,209,255"/>
+<area shape="rect" href="backend.Spectrum-class.html#find_similar" title="Find spectra similar to the given one." alt="" coords="17,255,209,273"/>
+<area shape="rect" href="backend.Spectrum-class.html#calculate_peaks" title="Find the x values of the highest peaks (those within 95% of the absolute &#160;highest)" alt="" coords="17,273,209,292"/>
+<area shape="rect" href="backend.Spectrum-class.html#calculate_heavyside" title="Calculate the heavyside index for a spectrum." alt="" coords="17,292,209,311"/>
+<area shape="rect" href="backend.Spectrum-class.html" title="Store a spectrum, its related data, and any algorithms necessary to compare the spectrum to the DataStore." alt="" coords="16,11,211,312"/>
 </map>
-  <img src="uml_class_diagram_for_backend__3.gif" alt='' usemap="#uml_class_diagram_for_backend__3" ismap="ismap" class="graph-without-title" />
+  <img src="uml_class_diagram_for_backend__2.gif" alt='' usemap="#uml_class_diagram_for_backend__2" ismap="ismap" class="graph-without-title" />
 </center>
 </center>
 <hr />
@@ -134,13 +139,32 @@
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type"><code>list</code> or <code>float</code></span>
+      <span class="summary-type"><code>list</code> of <a href="backend.Spectrum-class.html" 
+      class="link">backend.Spectrum</a></span>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="backend.Spectrum-class.html#calculate_peaks" class="summary-sig-name">calculate_peaks</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">one</span>=<span class="summary-sig-default">False</span>)</span><br />
-      Calculate the peaks for a spectrum.</td>
+          <td><span class="summary-sig"><a href="backend.Spectrum-class.html#find_similar" class="summary-sig-name">find_similar</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">target</span>=<span class="summary-sig-default">&quot;public&quot;</span>)</span><br />
+      Find spectra similar to the given one.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="backend-pysrc.html#Spectrum.find_similar">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>list</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="backend.Spectrum-class.html#calculate_peaks" class="summary-sig-name">calculate_peaks</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Find the x values of the highest peaks (those within 95% of the 
+      absolute highest)</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="backend-pysrc.html#Spectrum.calculate_peaks">source&nbsp;code</a></span>
             
@@ -199,6 +223,38 @@
     </td><td class="summary">
         <a name="chemical_type"></a><span class="summary-name">chemical_type</span> = <code title="db.StringProperty()">db.StringProperty()</code><br />
       The chemical type of the substance the spectrum represents
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>float</code></span>
+    </td><td class="summary">
+        <a name="peak"></a><span class="summary-name">peak</span> = <code title="db.FloatProperty()">db.FloatProperty()</code><br />
+      The x location of the spectrum's highest peak
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>float</code></span>
+    </td><td class="summary">
+        <a name="heavyside"></a><span class="summary-name">heavyside</span> = <code title="db.IntegerProperty()">db.IntegerProperty()</code><br />
+      The heavyside index for the spectrum.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>str</code></span>
+    </td><td class="summary">
+        <a name="prefixes"></a><span class="summary-name">prefixes</span> = <code title="db.StringListProperty()">db.StringListProperty()</code><br />
+      Just the non-alphabetical prefix to the chemical_name.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>int</code></span>
+    </td><td class="summary">
+        <a name="FLAT_HEAVYSIDE_BITS"></a><span class="summary-name">FLAT_HEAVYSIDE_BITS</span> = <code title="8">8</code><br />
+      Number of bits in the heavyside index, should be a power of 2
     </td>
   </tr>
 <tr>
@@ -329,10 +385,36 @@
   <dl class="fields">
     <dt>Parameters:</dt>
     <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>name</code></strong> (<code>str</code>) - Name of the field to retrieve</li>
+        <li><strong class="pname"><code>name</code></strong> (<code>str</code>) - Name of the field to retrieve (regex syntax allowed)</li>
     </ul></dd>
     <dt>Returns: <code>str</code></dt>
         <dd>Value of the field</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="find_similar"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">find_similar</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">target</span>=<span class="sig-default">&quot;public&quot;</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="backend-pysrc.html#Spectrum.find_similar">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Find spectra similar to the given one.</p>
+  <p>Find spectra that may represent the given Spectrum object by sorting 
+  the database using different heuristics, having them vote, and returning 
+  only the spectra deemed similar to the given spectrum.</p>
+  <dl class="fields">
+    <dt>Returns: <code>list</code> of <a href="backend.Spectrum-class.html" 
+      class="link">backend.Spectrum</a></dt>
+        <dd>List of similar spectra</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -343,22 +425,18 @@
 <tr><td>
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">calculate_peaks</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">one</span>=<span class="sig-default">False</span>)</span>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">calculate_peaks</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="backend-pysrc.html#Spectrum.calculate_peaks">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
-  <p>Calculate the peaks for a spectrum.</p>
+  <p>Find the x values of the highest peaks (those within 95% of the 
+  absolute highest)</p>
   <dl class="fields">
-    <dt>Parameters:</dt>
-    <dd><ul class="nomargin-top">
-        <li><strong class="pname"><code>one</code></strong> (<code>bool</code>) - Whether to get all the peaks or just the first one</li>
-    </ul></dd>
-    <dt>Returns: <code>list</code> or <code>float</code></dt>
-        <dd>Either a list of peaks or one peak, depending on the parameter</dd>
+    <dt>Returns: <code>list</code></dt>
+        <dd>A list of peaks</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -456,7 +534,7 @@
   <tr>
     <td align="left" class="footer">
     <a href="epydoc-log.html">Generated by Epydoc
-    3.0.1 on Thu Jul 29 17:45:43 2010</a>
+    3.0.1 on Sat Aug  7 14:15:48 2010</a>
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -25,8 +25,8 @@ def search(spectra_data, algorithm="bove"):
     Search for spectra in the database which are similar to the given spectra_data.
     Use fast heuristics first, then linear comparison algorithms.
     
-    @param spectrum_data: String containing spectrum information
-    @type  spectrum_data: C{str}
+    @param spectra_data: String containing spectra information
+    @type  spectra_data: C{str}
     @param algorithm: Algorithm to do one-to-one comparisons with
     @type  algorithm: "bove" or "leastsquares"
     @return: List of candidates similar to the input spectrum
@@ -71,8 +71,8 @@ def compare(data_list, algorithm="bove"):
     '''
     Compare multiple spectra using the given algorithm.
     
-    @param dataList: A list of spectra strings to compare
-    @type  dataList: [C{str}]
+    @param data_list: A list of spectra strings to compare
+    @type  data_list: [C{str}]
     @return: Calculated error between the two spectra
     @rtype: C{int}
     @raise common.InputError: If a non-string is given as spectrum_data or if
@@ -110,8 +110,6 @@ def browse(target="public", offset=0, guess=False, spectrum_type="infrared"):
     
     @param target: Where to list spectrum from ("public" or "private")
     @type  target: C{str} or L{google.appengine.api.users.User}
-    @param limit: Number of spectra to list
-    @type  limit: C{int}
     @param offset: Where to start listing from (for pagination)
     @type  offset: C{int}
     @return: List of spectra
@@ -144,8 +142,8 @@ def add(spectra_data, target="public", preprocessed=False):
     Parse the given files and add new spectra to the database.
     Also store the hueristic data needed for fast searching.
     
-    @param spectrum_data: String containing spectrum information
-    @type  spectrum_data: C{str}
+    @param spectra_data: String containing spectra information
+    @type  spectra_data: C{str}
     @param target: Where to store the spectrum
     @type  target: "public" or the db key for a project
     @param preprocessed: Whether spectrum_data is already integrated or not
@@ -180,8 +178,8 @@ def delete(spectra_data, target="public", purge=False):
     '''
     Delete a spectrum from the database
     
-    @param spectrum_data: String containing database keys
-    @type  spectrum_data: C{str}
+    @param spectra_data: String containing database keys
+    @type  spectra_data: C{str} or C{list} of C{str}
     @param target: Where to store the spectrum
     @type  target: C{"public"} or L{backend.Project} key
     @raise common.AuthError: If a user tries to delete a spectrum outside
@@ -236,8 +234,8 @@ def auth(user, target, action):
     
     @param user: User trying to access the project
     @type  user: L{google.appengine.api.users.User}
-    @param project: Project action is being done on
-    @type  project: "public" or L{backend.Project}
+    @param target: Project action is being done on
+    @type  target: "public" or L{backend.Project}
     @param action: Action to be done. "View" means view the project. "Spectrum"
     means add, edit, or delete spectra in the project. "Project" means change
     the project itself and its permissions.
