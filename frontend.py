@@ -107,7 +107,7 @@ class ApiHandler(webapp.RequestHandler):
         elif action == "purge":
             # Delete a project from the database.
             backend.auth(user, target, "project")
-            backend.Project.get(target).delete()
+            backend.delete("*", target, True)
         elif action == "update":
             backend.auth(user, "public", "spectrum")
             backend.update()

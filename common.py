@@ -105,7 +105,7 @@ class AuthError(Error):
         @type  msg: C{str}
         """
         if user is not None:
-            self.expr = user.nickname
+            self.expr = user.nickname()
         else:
             self.expr = "Anonymous"
         self.msg = msg

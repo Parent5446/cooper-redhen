@@ -176,7 +176,7 @@ def add(spectra_data, target="public", preprocessed=False):
         target.spectra.append(spectrum.key())
     target.put()
 
-def delete(spectra_data, target="public"):
+def delete(spectra_data, target="public", purge=False):
     '''
     Delete a spectrum from the database
     
@@ -186,24 +186,32 @@ def delete(spectra_data, target="public"):
     @type  target: C{"public"} or L{backend.Project} key
     @raise common.AuthError: If a user tries to delete a spectrum outside
     of his or her projects.
-    '''
-    if not isinstance(spectra_data, list):
-        spectra_data = [spectra_data]    
-    
+    ''' 
+    # Try getting the project, or make a new one.   
     try:
         target = Project.get(target)
     except db.BadKeyError:
         target = Project.get_or_insert(target, owners=[users.get_current_user()], name=target)
+    
+    # Passing * to spectra_data removes all spectra from project. Also, if
+    # purge is true, user is deleting the entire project.
+    if spectra_data == "*" or purge is True:
+        spectra_data = target.spectra
+    elif not isinstance(spectra_data, list):
+        spectra_data = [spectra_data]
+    # Delete the spectra.
     for spectrum_data in spectra_data:
         # Load the spectrum into a Spectrum object.
         spectrum = Spectrum.get(spectrum_data)
-        if target == "public": raise Exception('Delete is not yet supported')
-        else:
-            # If private, check if it is indeed the user's database.
-            if not spectrum.project == target:
-                raise common.AuthError(target, "Spectrum does not belong to targeted project.")
+        # If private, check if it is indeed the user's database.
+        if not spectrum.key() in target.spectra:
+            raise common.AuthError(users.get_current_user(),
+                               "Spectrum does not belong to targeted project.")
         target.spectra.remove(spectrum.key())
         spectrum.delete()
+    # If requested, delete the project.
+    if purge:
+        target.delete()
 
 def update():
     '''
@@ -557,8 +565,10 @@ class Spectrum(db.Model):
         '''
         project = Project.get_or_insert(target)
         # Get heavyside key and peaks.
-        if hasattr(self, 'xy'): peaks = self.calculate_peaks() #For user-entered spectra
-        else: peaks = [self.peak] #For database spectra
+        if hasattr(self, 'xy'):
+            peaks = self.calculate_peaks() #For user-entered spectra
+        else:
+            peaks = [self.peak] #For database spectra
         heavyside = self.calculate_heavyside()
         # Check memcached for the data.
         key = self.spectrum_type + '_heavyside_' + str(heavyside) #Get the heavyside key
@@ -570,11 +580,14 @@ class Spectrum(db.Model):
             spectra = set([(spectrum.peak, str(spectrum.key()))
                            for spectrum in data
                            if spectrum.key() in project.spectra])
-            memcache.set(key, spectra)
+            if target == "public":
+                memcache.set(key, spectra)
         # Sort by smallest distance to peaks and return top 20.
         keys = sorted(spectra, key=lambda s: min([s[0] - peak for peak in peaks]), reverse=True)
-        if hasattr(self, 'xy'): return Spectrum.get([k[1] for k in keys[:20]]) #For user-entered spectra
-        else: return Spectrum.get([k[1] for k in keys[1:10]]) #For database spectra
+        if hasattr(self, 'xy'):
+            return Spectrum.get([k[1] for k in keys[:20]]) # For user-entered spectra
+        else:
+            return Spectrum.get([k[1] for k in keys[1:10]]) # For database spectra
     
     def calculate_peaks(self):
         '''
