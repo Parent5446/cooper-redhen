@@ -64,16 +64,6 @@ def main_client(appcfg, dirname, recursive=False, send=True):
     else:
         return upload_data
 
-def transfer(file_obj):
-    """
-    Submit a POST request to the server with the spectrum information.
-    
-    @param file_obj: Filename to upload
-    @type  file_obj: C{str}
-    @raise Exception: If the server gave a response code other than 200
-    """
-    
-
 def get_field(contents, name):
     '''
     Get a specific data label from the file.
